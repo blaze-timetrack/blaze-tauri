@@ -1,0 +1,124 @@
+import { Button } from "@/components/ui/button";
+import {
+  Calendar,
+  ChartPie,
+  CircleHelp,
+  Command,
+  FolderTree,
+  Home,
+  Settings,
+  Zap,
+} from "lucide-react";
+import { NavLink } from "react-router";
+import "./shared.module.css";
+
+function Tabs() {
+  return (
+    <div className="row-span-20 flex w-16 flex-col items-center justify-between border-r py-6">
+      {/* top-tabs */}
+      <div className="flex flex-col gap-3">
+        <NavLink to="/">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <Home />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/categories">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <ChartPie />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/projects">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <FolderTree />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/calender">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <Calendar />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/insight">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <Zap />
+            </Button>
+          )}
+        </NavLink>
+      </div>
+      {/* bottom-tabs */}
+      <div className="flex flex-col gap-3">
+        <NavLink to="/command">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <Command />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/help">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <CircleHelp />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/settings">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <Settings />
+            </Button>
+          )}
+        </NavLink>
+      </div>
+    </div>
+  );
+}
+
+export default Tabs;

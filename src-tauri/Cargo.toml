@@ -2,7 +2,7 @@
 name = "blaze"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
+authors = ["gaurav"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -18,16 +18,23 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.1.1", features = [] }
 
 [dependencies]
-
 # general dependencies
 sysinfo = "0.35.1"
 chrono = { version = "0.4.40", features = ["serde"] }
 chrono-tz = "0.10.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+surrealdb = "2.3.2"
+serde_with_macros = "3"
+tokio = { version = "1", features = ["full"] } # feature for surrealdb this macros,rt-multi-thread
+parking_lot = "0.12"
+modql = "0.2.0"
+# NOTE: , features = ["format"] would be nice, but it is very heavy, and sometime have compiles issues with swc_ components
+ts-rs = { version = "6" }
+anyhow = "1"
 
 # tauri dependencies 
-tauri = { version = "2.4.1", features = [] }
+tauri = { version = "2.4.1", features = ["tray-icon"] }
 tauri-plugin-opener = "2"
 tauri-plugin-devtools = "2.0.0"
 tauri-plugin-log = "2.4.0"
@@ -51,5 +58,19 @@ features = [
     "Win32_Networking_WinSock",
 ]
 
+# not for mobile
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = "2"
 tauri-plugin-window-state = "2"
+
+# only macOS
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.26"
+
+[features]
+# by default Tauri runs in production mode
+# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
+default = [ "custom-protocol" ]
+# this feature is used used for production builds where `devPath` points to the filesystem
+# DO NOT remove this
+custom-protocol = [ "tauri/custom-protocol" ]

@@ -1,0 +1,9 @@
+@reference "../../app.css"
+
+h1 {
+  @apply text-2xl
+}
+
+h1i {
+  @apply hover:bg-purple-500
+}

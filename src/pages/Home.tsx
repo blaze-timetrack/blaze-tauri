@@ -1,7 +1,10 @@
-function Home() {
+import { NavLink } from "react-router";
+
+function HomePage() {
   return (
-    <div>Home</div>
-  )
+    <div>
+    </div>
+  );
 }
 
-export default Home
+export default HomePage;
