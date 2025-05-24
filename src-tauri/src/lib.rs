@@ -1,7 +1,12 @@
 // -- Sub-Modules
 mod utils;
+mod models;
 
-use std::result;
+use std::{env, result};
+use std::sync::LazyLock;
+use surrealdb::engine::remote::ws::{Client, Wss};
+use surrealdb::opt::auth::Root;
+use surrealdb::Surreal;
 use tauri::{
     menu::{Menu, MenuItem},
     utils::TitleBarStyle,
@@ -12,9 +17,25 @@ use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use utils::commands::{get_systems_timezone, greet};
 
+static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tokio::main]
-pub async fn run() {
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let RUST_BACKTRACE: &'static str = "RUST_BACKTRACE";
+    unsafe {
+        env::set_var(RUST_BACKTRACE, "1");
+    }
+    DB.connect::<Wss>("blaze--time-tra-06bdubvl4pv4t6a2oniuik9d04.aws-euw1.surreal.cloud")
+        .await?;
+    DB.signin(Root {
+        username: "test",
+        password: "test",
+    })
+        .await?;
+    DB.use_ns("test").use_db("test").await?;
+    println!("Connected to DB...");
+
     let mut builder = tauri::Builder::default();
 
     #[cfg(desktop)]
@@ -43,7 +64,7 @@ pub async fn run() {
         .setup(|app| {
             let main_window = app.get_webview_window("main").unwrap();
 
-            main_window.set_decorations(false)?;
+            main_window.set_decorations(true)?;
 
             let win_builder = main_window.set_title_bar_style(TitleBarStyle::Transparent)?;
             // set background color only when building for macOS
@@ -88,7 +109,17 @@ pub async fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             greet,
-            get_systems_timezone])
+            get_systems_timezone,
+        
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    Ok(())
+}
+
+
+pub async fn get_programs() {
+    let res = DB.query("SELECT * FROM Programs;").await?;
+    println!("{:#?}", res);
 }
