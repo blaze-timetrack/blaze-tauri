@@ -9,7 +9,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// @ts-ignore
 function ThemeToggle({ selectedTheme }: any) {
+// @ts-ignore
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
       return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -21,7 +23,7 @@ function ThemeToggle({ selectedTheme }: any) {
 }
 
 function ThemeDropdown() {
-  const [theme, setTheme] = useState("cupcake");
+  const [theme, setTheme] = useState("dark");
 
   useEffect(() => {
     const root = window.document.documentElement;

@@ -1,5 +1,5 @@
-function SettingsPage() {
+function Settings() {
   return <div>SettingsPage</div>;
 }
 
-export default SettingsPage;
+export default Settings;

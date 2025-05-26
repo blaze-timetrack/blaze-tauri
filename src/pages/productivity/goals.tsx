@@ -1,5 +1,5 @@
-function GoalsPage() {
+function Goals() {
   return <div>GoalsPage</div>;
 }
 
-export default GoalsPage;
+export default Goals;

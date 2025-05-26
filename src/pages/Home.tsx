@@ -1,10 +1,15 @@
-import { NavLink } from "react-router";
+import ActivitiesSummaryDemo from "@/components/shared/activities-summary-demo.tsx";
+import ScheduleDashboard from "@/components/ScheduleDashboard";
 
-function HomePage() {
+function Home() {
   return (
-    <div>
+    <div className={"col-span-11 w-full"}>
+      <div className="mr-8 flex justify-end">
+        <ScheduleDashboard />
+        <ActivitiesSummaryDemo />
+      </div>
     </div>
   );
 }
 
-export default HomePage;
+export default Home;

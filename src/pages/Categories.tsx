@@ -1,9 +1,9 @@
-function CategoriesPage() {
+function Categories() {
   return (
-    <div className="text-2xl bg-amber-600">
-      <p className="">Categories Page</p>
+    <div className="">
+      <p className=""></p>
     </div>
   );
 }
 
-export default CategoriesPage;
+export default Categories;

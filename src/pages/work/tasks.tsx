@@ -1,5 +1,5 @@
-function TasksPage() {
+function Tasks() {
   return <div>TasksPage</div>;
 }
 
-export default TasksPage;
+export default Tasks;

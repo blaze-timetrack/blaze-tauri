@@ -120,6 +120,6 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
 
 pub async fn get_programs() {
-    let res = DB.query("SELECT * FROM Programs;").await?;
+    let res = DB.query("SELECT * FROM Programs;").await;
     println!("{:#?}", res);
 }

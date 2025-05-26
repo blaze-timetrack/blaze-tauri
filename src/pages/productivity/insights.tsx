@@ -1,8 +1,8 @@
 
-function InsightsPage() {
+function Insights() {
   return (
     <div>InsightsPage</div>
   )
 }
 
-export default InsightsPage
+export default Insights

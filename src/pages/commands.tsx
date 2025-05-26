@@ -1,5 +1,5 @@
-function CommandsPage() {
+function Commands() {
   return <div>CommandsPage</div>;
 }
 
-export default CommandsPage;
+export default Commands;

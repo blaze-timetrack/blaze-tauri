@@ -1,7 +1,7 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import { type RouteConfig, route, index } from "@react-router/dev/routes";
 
 export default [
-  route("*?", "catchall.tsx"),
+  index("pages/home.tsx"),
   route("categories", "./pages/categories.tsx"),
   // work
   route("work/projects", "./pages/work/projects.tsx"),
@@ -12,5 +12,5 @@ export default [
   route("productivity/goals", "./pages/productivity/goals.tsx"),
   route("productivity/insights", "./pages/productivity/insights.tsx"),
   // teams
-  route("teams", "./pages/teams/index.tsx"),
+  route("teams", "./pages/teams/teams.tsx"),
 ] satisfies RouteConfig;

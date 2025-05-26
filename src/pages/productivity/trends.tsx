@@ -1,8 +1,8 @@
 
-function TrendsPage() {
+function Trends() {
   return (
     <div>TrendsPage</div>
   )
 }
 
-export default TrendsPage
+export default Trends

@@ -1,16 +1,15 @@
 import { Moon, Sun } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { isRouteErrorResponse, Links, Meta, Outlet } from "react-router";
+import { isRouteErrorResponse } from "react-router";
 
 import StateOfFlow from "@/components/shared/stage-of-flow";
 import Tabs from "@/components/shared/tabs";
 import TopBar from "@/components/shared/top-bar";
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-// import type { Route } from "./+types/root";
-import type { Route } from "../.react-router/types/src/+types/root";
-import "./app.css";
+import { Outlet } from "react-router";
+import TopBar2 from "@/components/shared/top-bar2.tsx";
 
+// @ts-ignore
 function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
@@ -22,9 +21,10 @@ function ThemeToggle() {
   });
 
   useEffect(() => {
+    // @ts-ignore/
     const root = window.document.documentElement;
-    root.classList = "";
-    root.classList.add(theme);
+    // root.classList = "";
+    // root.classList.add(theme);
   }, [theme]);
 
   return (
@@ -42,39 +42,20 @@ function ThemeToggle() {
   );
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function RootLayout() {
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Blaze - Time Tracker</title>
-        <Meta />
-        <Links />
-      </head>
-      <body className="">
         <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24">
           <TopBar />
           <Tabs />
-          {children}
+          <TopBar2 />
+          <Outlet />
           <StateOfFlow />
            {/*<ThemeToggle />*/}
         </div>
-      </body>
-    </html>
   );
 }
 
-export default function Root() {
-  return (
-    <>
-      <Outlet />;
-      <TanStackRouterDevtools initialIsOpen={true} />
-    </>
-  );
-}
-
+// @ts-ignore
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
@@ -86,6 +67,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       error.status === 404
         ? "The requested page could not be found."
         : error.statusText || details;
+  //   @ts-ignore
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;

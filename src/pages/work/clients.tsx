@@ -1,8 +1,8 @@
 
-function ClientsPage() {
+function Clients() {
   return (
     <div>ClientsPage</div>
   )
 }
 
-export default ClientsPage
+export default Clients

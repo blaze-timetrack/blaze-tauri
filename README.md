@@ -119,7 +119,16 @@ useEffect(() => {
   }, []);
 ```
 
-# How to use ipc in right way
+# How to use ipc in the right way
   - calling ipc_commands (ipc.ts=create_all_commands => view(app-v.ts uses ipc_project_command)
   - init model_manage in build of tauri and init store (db, ses)
   - ipc(ctx) -> model(bmc_ctx) -> bmc(get_model_manage && store ) -> surreal_store (query exe)
+
+# Design of the app
+  - Design of DB
+  - IPC design
+  - business logic design
+  - Invoke design
+  - frontend result design
+
+# types of tracking programName, title & url

@@ -1,8 +1,8 @@
 
-function ProjectTasksClientsPage() {
+function ProjectTasksClients() {
   return (
     <div>ProjectTasksClientsPage</div>
   )
 }
 
-export default ProjectTasksClientsPage
+export default ProjectTasksClients

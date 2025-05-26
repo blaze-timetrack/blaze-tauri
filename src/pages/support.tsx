@@ -1,5 +1,5 @@
-function SupportPage() {
+function Support() {
   return <div>SupportPage</div>;
 }
 
-export default SupportPage;
+export default Support;

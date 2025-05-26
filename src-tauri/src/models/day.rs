@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::DB;
+use crate::models::activity::Activity;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Day {
