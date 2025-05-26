@@ -1,4 +1,4 @@
-import ThemeDropdown  from "@/components/custom ui/theme-dropdown";
+import ThemeDropdown from "@/components/custom ui/theme-dropdown";
 import { Button } from "@/components/ui/button";
 import { Activity, Search } from "lucide-react";
 
@@ -27,6 +27,12 @@ function TopBar() {
             <Search />
           </Button>
         </div>
+      </div>
+
+      <div>
+        <p className={"pr-20 text-2xl font-bold uppercase lg:pr-36 xl:pr-40"}>
+          Blaze
+        </p>
       </div>
 
       {/* profile */}

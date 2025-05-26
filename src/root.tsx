@@ -44,14 +44,27 @@ function ThemeToggle() {
 
 export function RootLayout() {
   return (
-        <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24">
-          <TopBar />
-          <Tabs />
+    <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24">
+      <TopBar />
+      <div className={"col-span-full row-span-20 grid grid-cols-[auto_1fr]"}>
+        <Tabs />
+        <div className={"row-span-10 grid grid-rows-[auto_1fr] gap-4"}>
           <TopBar2 />
           <Outlet />
-          <StateOfFlow />
-           {/*<ThemeToggle />*/}
         </div>
+      </div>
+      {/*<div className={"row-span-20"}></div>*/}
+      <StateOfFlow />
+      {/*<ThemeToggle />*/}
+    </div>
+  );
+}
+
+export function OutletLayout() {
+  return (
+    <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24">
+      <Outlet />
+    </div>
   );
 }
 
@@ -67,14 +80,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       error.status === 404
         ? "The requested page could not be found."
         : error.statusText || details;
-  //   @ts-ignore
+    //   @ts-ignore
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;
   }
 
   return (
-    <main className="text-accent mx-auto flex flex-1 flex-col items-center justify-center text-2xl bg-accent-foreground">
+    <main className="text-accent bg-accent-foreground mx-auto flex flex-1 flex-col items-center justify-center text-2xl">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (

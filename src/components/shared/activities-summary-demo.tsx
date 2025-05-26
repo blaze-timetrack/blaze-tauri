@@ -86,7 +86,7 @@ const CircularProgress = ({ activities }: { activities: ActivityData[] }) => {
 
 export default function DailySummary() {
   return (
-    <Card className="w-96 border-gray-800 bg-gray-900 text-white">
+    <Card className="h-fit w-[424px] border-gray-800 bg-gray-900 text-white">
       <CardHeader className="">
         <CardTitle className="text-lg font-medium text-gray-100">
           Daily Summary

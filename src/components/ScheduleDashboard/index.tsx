@@ -5,7 +5,14 @@ import FlowSessionsColumn from "./FlowSessionsColumn";
 import CalendarColumn from "./CalendarColumn";
 import ProjectsColumn from "./ProjectsColumn";
 import ColumnHeader from "./ColumnHeader";
-import { DndContext, DragEndEvent, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { restrictToVerticalAxis, snapCenterToCursor } from "@dnd-kit/modifiers";
 import { useState } from "react";
 
@@ -97,12 +104,12 @@ const ScheduleDashboard = () => {
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (!over) return;
 
     const eventId = active.id;
@@ -117,27 +124,27 @@ const ScheduleDashboard = () => {
 
     // Add event to target column
     switch (targetColumn) {
-      case 'activities':
-        setActivities(prev => [...prev, draggedEvent]);
+      case "activities":
+        setActivities((prev) => [...prev, draggedEvent]);
         break;
-      case 'flowSessions':
-        setFlowSessions(prev => [...prev, draggedEvent]);
+      case "flowSessions":
+        setFlowSessions((prev) => [...prev, draggedEvent]);
         break;
-      case 'calendar':
-        setCalendarEvents(prev => [...prev, draggedEvent]);
+      case "calendar":
+        setCalendarEvents((prev) => [...prev, draggedEvent]);
         break;
-      case 'projects':
-        setProjects(prev => [...prev, draggedEvent]);
+      case "projects":
+        setProjects((prev) => [...prev, draggedEvent]);
         break;
     }
   };
 
   const getColumnByEventId = (eventId: string): string => {
-    if (activities.find(e => e.id === eventId)) return 'activities';
-    if (flowSessions.find(e => e.id === eventId)) return 'flowSessions';
-    if (calendarEvents.find(e => e.id === eventId)) return 'calendar';
-    if (projects.find(e => e.id === eventId)) return 'projects';
-    return '';
+    if (activities.find((e) => e.id === eventId)) return "activities";
+    if (flowSessions.find((e) => e.id === eventId)) return "flowSessions";
+    if (calendarEvents.find((e) => e.id === eventId)) return "calendar";
+    if (projects.find((e) => e.id === eventId)) return "projects";
+    return "";
   };
 
   const findAndRemoveEvent = (eventId: string): Event | undefined => {
@@ -145,28 +152,28 @@ const ScheduleDashboard = () => {
     let event: Event | undefined;
 
     switch (column) {
-      case 'activities':
-        setActivities(prev => {
-          event = prev.find(e => e.id === eventId);
-          return prev.filter(e => e.id !== eventId);
+      case "activities":
+        setActivities((prev) => {
+          event = prev.find((e) => e.id === eventId);
+          return prev.filter((e) => e.id !== eventId);
         });
         break;
-      case 'flowSessions':
-        setFlowSessions(prev => {
-          event = prev.find(e => e.id === eventId);
-          return prev.filter(e => e.id !== eventId);
+      case "flowSessions":
+        setFlowSessions((prev) => {
+          event = prev.find((e) => e.id === eventId);
+          return prev.filter((e) => e.id !== eventId);
         });
         break;
-      case 'calendar':
-        setCalendarEvents(prev => {
-          event = prev.find(e => e.id === eventId);
-          return prev.filter(e => e.id !== eventId);
+      case "calendar":
+        setCalendarEvents((prev) => {
+          event = prev.find((e) => e.id === eventId);
+          return prev.filter((e) => e.id !== eventId);
         });
         break;
-      case 'projects':
-        setProjects(prev => {
-          event = prev.find(e => e.id === eventId);
-          return prev.filter(e => e.id !== eventId);
+      case "projects":
+        setProjects((prev) => {
+          event = prev.find((e) => e.id === eventId);
+          return prev.filter((e) => e.id !== eventId);
         });
         break;
     }
@@ -175,27 +182,31 @@ const ScheduleDashboard = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto bg-black text-white rounded-lg overflow-hidden">
-      <div className="grid grid-cols-5">
-        <div className="col-span-1 border-r border-gray-800"></div>
-        <ColumnHeader title="Activities" />
-        <ColumnHeader title="Flow Sessions" />
-        <ColumnHeader title="Calendar" />
-        <ColumnHeader title="Projects" />
+    <div className="border-border w-full max-w-7xl overflow-hidden rounded-lg border bg-gray-900 text-white shadow-2xl">
+      <div className="grid grid-cols-[auto_1fr]">
+        <div className="w-16 border-r border-gray-800"></div>
+        <div className={"ml-1.5 grid grid-cols-4"}>
+          <ColumnHeader title="Activities" />
+          <ColumnHeader title="Flow Sessions" />
+          <ColumnHeader title="Calendar" />
+          <ColumnHeader title="Projects" />
+        </div>
       </div>
 
-      <ScrollArea className="h-[600px]" scrollHideDelay={0}>
+      <ScrollArea className="h-[700px]" scrollHideDelay={0}>
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis, snapCenterToCursor]}
         >
-          <div className="grid grid-cols-5">
+          <div className="grid grid-cols-[auto_1fr]">
             <TimeColumn />
-            <ActivitiesColumn events={activities} />
-            <FlowSessionsColumn events={flowSessions} />
-            <CalendarColumn events={calendarEvents} />
-            <ProjectsColumn events={projects} />
+            <div className="grid grid-cols-4">
+              <ActivitiesColumn events={activities} />
+              <ProjectsColumn events={projects} />
+              <FlowSessionsColumn events={flowSessions} />
+              <CalendarColumn events={calendarEvents} />
+            </div>
           </div>
         </DndContext>
       </ScrollArea>

@@ -3,8 +3,8 @@ import ScheduleDashboard from "@/components/ScheduleDashboard";
 
 function Home() {
   return (
-    <div className={"col-span-11 w-full"}>
-      <div className="mr-8 flex justify-end">
+    <div className={"w-full"}>
+      <div className="mx-12 flex justify-start gap-10">
         <ScheduleDashboard />
         <ActivitiesSummaryDemo />
       </div>

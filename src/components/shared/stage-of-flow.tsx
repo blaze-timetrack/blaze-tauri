@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Power, Volume2Icon } from "lucide-react";
+import MusicPlayer from "@/components/shared/music-player.tsx";
 
 function StateOfFlow() {
   return (
@@ -17,9 +18,10 @@ function StateOfFlow() {
 
       {/* music */}
       <div className="flex h-full items-center gap-2">
-        <Button></Button>
-        <p className="">Silent</p>
-        <Volume2Icon className="size-6" />
+        <MusicPlayer />
+        {/*<Button></Button>*/}
+        {/*<p className="">Silent</p>*/}
+        {/*<Volume2Icon className="size-6" />*/}
       </div>
     </div>
   );
