@@ -32,6 +32,7 @@ const categories: CategoryData[] = [
   { name: "Finance", percentage: 8, duration: "30min", color: "#8B5CF6" },
 ];
 
+// @ts-ignore
 const CircularProgress = ({ activities }: { activities: ActivityData[] }) => {
   const radius = 45;
   const strokeWidth = 8;
@@ -86,17 +87,17 @@ const CircularProgress = ({ activities }: { activities: ActivityData[] }) => {
 
 export default function DailySummary() {
   return (
-    <Card className="h-fit w-[424px] border-gray-800 bg-gray-900 text-white">
-      <CardHeader className="">
+    <Card className="mb-2 h-fit w-[458px] min-w-[324px] gap-2 border-gray-800 bg-gray-900 text-white">
+      <CardHeader className="py-0">
         <CardTitle className="text-lg font-medium text-gray-100">
           Daily Summary
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-3 lg:space-y-4">
         {/* Work Hours Section */}
         <div className="space-y-2">
-          <div className="flex items-baseline justify-between">
+          <div className="flex justify-between lg:items-baseline">
             <div>
               <p className="mb-1 text-sm text-gray-400">Work hours</p>
               <p className="text-2xl font-semibold">6hrs 45min</p>
@@ -112,7 +113,7 @@ export default function DailySummary() {
         </div>
 
         {/* Breakdown Section */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           <p className="text-sm text-gray-400">Breakdown</p>
 
           <div className="flex items-center gap-6">
@@ -139,7 +140,7 @@ export default function DailySummary() {
         </div>
 
         {/* Top Categories Section */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           <p className="text-sm text-gray-400">Top Categories</p>
 
           <div className="space-y-3">

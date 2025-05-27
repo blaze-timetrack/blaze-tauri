@@ -8,6 +8,7 @@ import Tabs from "@/components/shared/tabs";
 import TopBar from "@/components/shared/top-bar";
 import { Outlet } from "react-router";
 import TopBar2 from "@/components/shared/top-bar2.tsx";
+import TitleBar from "@/components/backend components/title-bar.tsx";
 
 // @ts-ignore
 function ThemeToggle() {
@@ -44,11 +45,12 @@ function ThemeToggle() {
 
 export function RootLayout() {
   return (
-    <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24">
+    <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24 select-none">
+      <TitleBar />
       <TopBar />
-      <div className={"col-span-full row-span-20 grid grid-cols-[auto_1fr]"}>
+      <div className={"col-span-full row-span-19 grid grid-cols-[auto_1fr]"}>
         <Tabs />
-        <div className={"row-span-10 grid grid-rows-[auto_1fr] gap-4"}>
+        <div className={"row-span-16 grid grid-rows-[auto_1fr] gap-4"}>
           <TopBar2 />
           <Outlet />
         </div>

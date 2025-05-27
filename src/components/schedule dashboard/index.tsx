@@ -182,18 +182,17 @@ const ScheduleDashboard = () => {
   };
 
   return (
-    <div className="border-border w-full max-w-7xl overflow-hidden rounded-lg border bg-gray-900 text-white shadow-2xl">
+    <div className="border-border h-full w-full overflow-hidden rounded-lg border bg-gray-900 text-white shadow-2xl">
       <div className="grid grid-cols-[auto_1fr]">
         <div className="w-16 border-r border-gray-800"></div>
         <div className={"ml-1.5 grid grid-cols-4"}>
           <ColumnHeader title="Activities" />
           <ColumnHeader title="Flow Sessions" />
-          <ColumnHeader title="Calendar" />
           <ColumnHeader title="Projects" />
+          <ColumnHeader title="Calendar" />
         </div>
       </div>
-
-      <ScrollArea className="h-[700px]" scrollHideDelay={0}>
+      <ScrollArea className="ssc overflow-hidden" scrollHideDelay={0}>
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}
@@ -203,8 +202,8 @@ const ScheduleDashboard = () => {
             <TimeColumn />
             <div className="grid grid-cols-4">
               <ActivitiesColumn events={activities} />
-              <ProjectsColumn events={projects} />
               <FlowSessionsColumn events={flowSessions} />
+              <ProjectsColumn events={projects} />
               <CalendarColumn events={calendarEvents} />
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 pub struct Routine {
     break_states: Vec<String>,
     end_time: String,

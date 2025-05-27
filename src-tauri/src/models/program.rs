@@ -2,7 +2,7 @@ use crate::models::category::Category;
 
 enum TrackState {
     On,
-    Off
+    Off,
 }
 pub struct Program {
     name: String,

@@ -1,10 +1,10 @@
 import ActivitiesSummaryDemo from "@/components/shared/activities-summary-demo.tsx";
-import ScheduleDashboard from "@/components/ScheduleDashboard";
+import ScheduleDashboard from "src/components/schedule dashboard";
 
 function Home() {
   return (
-    <div className={"w-full"}>
-      <div className="mx-12 flex justify-start gap-10">
+    <div className={"row-span-16 w-full"}>
+      <div className="row-span-16 mx-8 flex justify-start gap-6 lg:mx-12">
         <ScheduleDashboard />
         <ActivitiesSummaryDemo />
       </div>

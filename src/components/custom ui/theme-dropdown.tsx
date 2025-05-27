@@ -11,7 +11,7 @@ import {
 
 // @ts-ignore
 function ThemeToggle({ selectedTheme }: any) {
-// @ts-ignore
+  // @ts-ignore
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
       return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -51,6 +51,7 @@ function ThemeDropdown() {
           <DropdownMenuRadioItem value="business">
             Business
           </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="mono">Mono</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

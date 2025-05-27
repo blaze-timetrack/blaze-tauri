@@ -1,4 +1,4 @@
-use chrono::{ Local, Utc};
+use chrono::{Local, Utc};
 use serde::Serialize;
 
 #[derive(Serialize)]

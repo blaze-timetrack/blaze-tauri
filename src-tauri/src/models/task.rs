@@ -1,4 +1,3 @@
-
 pub enum State {
     Completed,
     InProgress,

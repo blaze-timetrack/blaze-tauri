@@ -4,17 +4,17 @@ import { Activity, Search } from "lucide-react";
 
 function TopBar() {
   return (
-    <div className="border-border col-span-full row-span-2 flex items-center justify-between border-b pr-4 pl-4">
+    <div className="bg-primary/10 border-border col-span-full row-span-2 flex items-center justify-between border-b px-4">
       {/* logo */}
       <div className="flex gap-8">
-        <Button variant={"icon_btn"} size={"icon"}>
-          <img
-            src="/images/StoreLogo.png"
-            alt=""
-            width={"26px"}
-            height={"26px"}
-          />
-        </Button>
+        {/*<Button variant={"icon_btn"} size={"icon"}>*/}
+        {/*  <img*/}
+        {/*    src="/images/StoreLogo.png"*/}
+        {/*    alt=""*/}
+        {/*    width={"26px"}*/}
+        {/*    height={"26px"}*/}
+        {/*  />*/}
+        {/*</Button>*/}
 
         {/* fast-command */}
         <div className="flex gap-2">

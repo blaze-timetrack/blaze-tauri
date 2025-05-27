@@ -1,5 +1,5 @@
-use chrono::{DateTime, TimeZone};
 use crate::models::activity::TimeDetail;
+use chrono::{DateTime, TimeZone};
 
 pub struct User {
     name: String,

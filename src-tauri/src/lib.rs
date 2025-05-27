@@ -1,9 +1,9 @@
 // -- Sub-Modules
-mod utils;
 mod models;
+mod utils;
 
-use std::{env, result};
 use std::sync::LazyLock;
+use std::{env, result};
 use surrealdb::engine::remote::ws::{Client, Wss};
 use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
@@ -13,6 +13,7 @@ use tauri::{
     AppHandle,
 };
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
+use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use utils::commands::{get_systems_timezone, greet};
@@ -26,15 +27,16 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     unsafe {
         env::set_var(RUST_BACKTRACE, "1");
     }
-    DB.connect::<Wss>("blaze--time-tra-06bdubvl4pv4t6a2oniuik9d04.aws-euw1.surreal.cloud")
-        .await?;
-    DB.signin(Root {
-        username: "test",
-        password: "test",
-    })
-        .await?;
-    DB.use_ns("test").use_db("test").await?;
-    println!("Connected to DB...");
+    
+    // DB.connect::<Wss>("blaze--time-tra-06bdubvl4pv4t6a2oniuik9d04.aws-euw1.surreal.cloud")
+    //     .await?;
+    // DB.signin(Root {
+    //     username: "test",
+    //     password: "test",
+    // })
+    // .await?;
+    // DB.use_ns("test").use_db("test").await?;
+    // println!("Connected to DB...");
 
     let mut builder = tauri::Builder::default();
 
@@ -52,21 +54,22 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let devtools = tauri_plugin_devtools::init();
 
     // menu not working because of set_decorations = false in webview
-    {
-        builder = builder.menu(|handle| Menu::default(handle))
-    }
+    // {
+    //     builder = builder.menu(|handle| Menu::default(handle))
+    // }
+
 
     builder
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(devtools)
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let main_window = app.get_webview_window("main").unwrap();
-
-            main_window.set_decorations(true)?;
-
+            main_window.set_decorations(false)?;
             let win_builder = main_window.set_title_bar_style(TitleBarStyle::Transparent)?;
+            
             // set background color only when building for macOS
             #[cfg(target_os = "macos")]
             {
@@ -96,28 +99,23 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 });
             }
-
-            // TODO: restore size of window using rust
-            // save size at before restart to restore it
-            let app_handle = app.handle();
-            let _ = app_handle.save_window_state(StateFlags::all());
-
-            // create a system tray
-            utils::tray::create_tray(app.handle()).unwrap();
+ 
+            #[cfg(desktop)]
+            {
+                app.handle().save_window_state(StateFlags::all())?;
+                utils::autostart::set_auto_start(app.handle())?;
+                utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();
+                utils::tray::create_tray(app.handle()).unwrap();   
+            }
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            greet,
-            get_systems_timezone,
-        
-        ])
+        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
     Ok(())
 }
-
 
 pub async fn get_programs() {
     let res = DB.query("SELECT * FROM Programs;").await;

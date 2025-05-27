@@ -5,7 +5,9 @@ use std::env;
 
 fn main() {
     const RUST_BACKTRACE: &str = "1";
-    unsafe {env::set_var(RUST_BACKTRACE, "1"); }
-    
-    blaze_lib::run();
+    unsafe {
+        env::set_var(RUST_BACKTRACE, "1");
+    }
+
+    let _ = blaze_lib::run();
 }

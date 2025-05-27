@@ -6,5 +6,5 @@ pub struct Meeting {
     duration: i32,
     start_time: String,
     end_time: String,
-    projects: Vec<String>
+    projects: Vec<String>,
 }

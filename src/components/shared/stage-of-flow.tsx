@@ -4,7 +4,7 @@ import MusicPlayer from "@/components/shared/music-player.tsx";
 
 function StateOfFlow() {
   return (
-    <div className="col-span-full row-span-2 flex justify-between border-t px-4">
+    <div className="bg-primary/10 z-50 col-span-full row-span-2 flex justify-between border-t px-4">
       {/* state */}
       <div className="flex h-full items-center gap-4 text-lg">
         <div className="flex items-center">

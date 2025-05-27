@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -6,20 +5,17 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 function ActivitiesSummary() {
-  return (  <Card className="w-[350px]">
+  return (
+    <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Daily Summary</CardTitle>
         <CardDescription>activities, flows, breaks, meetings</CardDescription>
       </CardHeader>
-      <CardContent>
-
-      </CardContent>
-      <CardFooter className="flex justify-between">
-
-      </CardFooter>
+      <CardContent></CardContent>
+      <CardFooter className="flex justify-between"></CardFooter>
     </Card>
   );
 }

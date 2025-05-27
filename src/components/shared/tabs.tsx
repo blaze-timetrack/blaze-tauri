@@ -14,7 +14,7 @@ import "./shared.module.css";
 
 function Tabs() {
   return (
-    <div className="row-span-20 flex w-16 flex-col items-center justify-between border-r py-6">
+    <div className="bg-primary/10 row-span-19 flex w-16 flex-col items-center justify-between border-r py-6">
       {/* top-tabs */}
       <div className="flex flex-col gap-3">
         <NavLink to="/">

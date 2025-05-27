@@ -7,12 +7,12 @@ pub enum State {
     Dist,
     Work,
     // close states
-        Disable,
+    Disable,
     Off,
 }
 
 pub struct Category {
     name: String,
     programs: Vec<String>, // record link
-    state: State
+    state: State,
 }

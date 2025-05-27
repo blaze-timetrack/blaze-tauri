@@ -17,18 +17,18 @@ function App() {
       <Route element={<RootLayout />}>
         <Route index element={<HomePage />} />
         <Route path="categories" element={<CategoriesPage />} />
-        <Route path={'work/projects'} element={<Projects />} />
-        <Route path={'work/tasks'} element={<Tasks />} />
-        <Route path={'work/clients'} element={<Clients />} />
+        <Route path={"work/projects"} element={<Projects />} />
+        <Route path={"work/tasks"} element={<Tasks />} />
+        <Route path={"work/clients"} element={<Clients />} />
         {/* productivity */}
-        <Route path={'productivity/trends'} element={<Trends />} />
-        <Route path={'productivity/goals'} element={<Goals />} />
-        <Route path={'productivity/insights'} element={<Insights />} />
+        <Route path={"productivity/trends"} element={<Trends />} />
+        <Route path={"productivity/goals"} element={<Goals />} />
+        <Route path={"productivity/insights"} element={<Insights />} />
 
-        { /* teams */}
-        <Route path={'teams'} element={<Teams />} />
+        {/* teams */}
+        <Route path={"teams"} element={<Teams />} />
 
-      {/*  Errors */}
+        {/*  Errors */}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
@@ -37,19 +37,17 @@ function App() {
 
 const NotFound = () => {
   return (
-    <main className="w-full col-span-11 row-span-12 flex flex-col items-center justify-center text-2xl">
+    <main className="row-span-20 flex w-full flex-col items-center justify-center text-2xl">
       <h1>404 - Not Found</h1>
-      <p>this path is invalid to
-
-      <a href="/">
-        <Button variant={'link'} className={'text-2xl'}>
-
-        Go Home
-
-        </Button>
-      </a>
+      <p>
+        this path is invalid to
+        <a href="/">
+          <Button variant={"link"} className={"text-2xl"}>
+            Go Home
+          </Button>
+        </a>
       </p>
     </main>
-  )
-}
+  );
+};
 export default App;

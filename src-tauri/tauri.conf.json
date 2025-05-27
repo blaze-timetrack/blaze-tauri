@@ -13,11 +13,11 @@
     "windows": [
       {
         "title": "Blaze",
-        "width": 744,
-        "height": 720,
+        "width": 1024,
+        "height": 744,
         "visible": false,
-        "minWidth": 744,
-        "minHeight": 720,
+        "minWidth": 1024,
+        "minHeight": 744,
         "hiddenTitle": true,
         "titleBarStyle": "Transparent",
         "decorations": false
