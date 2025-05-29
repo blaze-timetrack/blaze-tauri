@@ -1,12 +1,12 @@
 import { Moon, Sun } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { isRouteErrorResponse } from "react-router";
+// @ts-ignore
+import { isRouteErrorResponse, Outlet, type Route } from "react-router";
 
 import StateOfFlow from "@/components/shared/stage-of-flow";
 import Tabs from "@/components/shared/tabs";
 import TopBar from "@/components/shared/top-bar";
-import { Outlet } from "react-router";
 import TopBar2 from "@/components/shared/top-bar2.tsx";
 import TitleBar from "@/components/backend components/title-bar.tsx";
 

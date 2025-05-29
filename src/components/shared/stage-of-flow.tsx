@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Power, Volume2Icon } from "lucide-react";
+import { Power } from "lucide-react";
 import MusicPlayer from "@/components/shared/music-player.tsx";
 
 function StateOfFlow() {

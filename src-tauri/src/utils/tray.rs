@@ -36,6 +36,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
                 "show" => {
                     println!("show menu item was clicked");
                     main_window.show().unwrap();
+                    main_window.set_focus().unwrap();
                 }
 
                 "quit" => {
@@ -59,7 +60,6 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
                 // in this example, let's show and focus the main window when the tray is clicked
                 let app = tray.app_handle();
                 if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.center();
                     let _ = window.unminimize();
                     let _ = window.show();
                     let _ = window.set_focus();

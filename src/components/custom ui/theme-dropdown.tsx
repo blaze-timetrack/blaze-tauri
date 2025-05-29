@@ -27,7 +27,7 @@ function ThemeDropdown() {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList = "";
+    root.classList.value = "";
     root.classList.add(theme);
   }, [theme]);
 

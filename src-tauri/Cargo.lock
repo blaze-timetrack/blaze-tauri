@@ -3,6 +3,37 @@
 version = 4
 
 [[package]]
+name = "Blaze"
+version = "0.1.0"
+dependencies = [
+ "active-win-pos-rs",
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "cocoa",
+ "modql",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "serde_with_macros",
+ "surrealdb",
+ "sysinfo 0.35.1",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-deep-link",
+ "tauri-plugin-devtools",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-log",
+ "tauri-plugin-opener",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-window-state",
+ "tokio",
+ "ts-rs",
+ "windows 0.61.1",
+]
+
+[[package]]
 name = "Inflector"
 version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -690,37 +721,6 @@ dependencies = [
  "cc",
  "cfg-if",
  "constant_time_eq",
-]
-
-[[package]]
-name = "blaze"
-version = "0.1.0"
-dependencies = [
- "active-win-pos-rs",
- "anyhow",
- "chrono",
- "chrono-tz",
- "cocoa",
- "modql",
- "parking_lot",
- "serde",
- "serde_json",
- "serde_with_macros",
- "surrealdb",
- "sysinfo 0.35.1",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-deep-link",
- "tauri-plugin-devtools",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-log",
- "tauri-plugin-opener",
- "tauri-plugin-single-instance",
- "tauri-plugin-window-state",
- "tokio",
- "ts-rs",
- "windows 0.61.1",
 ]
 
 [[package]]

@@ -1,3 +1,4 @@
+use crate::DB;
 use chrono::{Local, Utc};
 use serde::Serialize;
 
@@ -18,4 +19,14 @@ pub fn get_systems_timezone() -> String {
     let full_time = Utc::now().to_string();
 
     format!("{}", current_time)
+}
+// -> Result<Value, String>
+#[tauri::command]
+pub async fn get_programs() {
+    let res = DB.query("SELECT *, ->category AS category FROM program;").await.map_err(|e| e.to_string());
+    let res2 = DB.query("SELECT * FROM program;").await.map_err(|e| e.to_string());
+    let json = res.iter().take(0);
+    // println!("{:#?}", res);
+    println!("{:#?}", json.take(0));
+    // Ok(json)
 }

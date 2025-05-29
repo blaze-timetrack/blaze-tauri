@@ -11,12 +11,12 @@
 - set client projects and tasks
 - commands
 - Activity =>
-  - time zone
-  - time format
-  - setting start of the week
-  - set routines
-  - work target
-  - Day Cutoff Time
+    - time zone
+    - time format
+    - setting start of the week
+    - set routines
+    - work target
+    - Day Cutoff Time
 - export data
 
 ---
@@ -28,7 +28,8 @@
 - insights
 - leaderboard
 - Specific features
-  - integration notion, task(clickUp, Google Tasks, zapier), calender(notion-calender, google-calender, microsoft-calender)
+    - integration notion, task(clickUp, Google Tasks, zapier), calender(notion-calender, google-calender,
+      microsoft-calender)
 
 **_Categories on and off auto_**
 
@@ -120,15 +121,28 @@ useEffect(() => {
 ```
 
 # How to use ipc in the right way
-  - calling ipc_commands (ipc.ts=create_all_commands => view(app-v.ts uses ipc_project_command)
-  - init model_manage in build of tauri and init store (db, ses)
-  - ipc(ctx) -> model(bmc_ctx) -> bmc(get_model_manage && store ) -> surreal_store (query exe)
+
+- calling ipc_commands (ipc.ts=create_all_commands => view(app-v.ts uses ipc_project_command)
+- init model_manage in build of tauri and init store (db, ses)
+- ipc(ctx) -> model(bmc_ctx) -> bmc(get_model_manage && store ) -> surreal_store (query exe)
 
 # Design of the app
-  - Design of DB
-  - IPC design
-  - business logic design
-  - Invoke design
-  - frontend result design
+
+- Design of DB
+- IPC design
+- business logic design
+- Invoke design
+- frontend result design
 
 # types of tracking programName, title & url
+
+# later customize the app
+
+- menu && tray icon menu
+- installer gui
+- getting up commands && global shortcuts
+- change theme with animation (transparent theme)
+- widget for desktop && phones
+
+- remove the start screen white background or display when ready (visible: false, focus: true -> check this as this may
+  not work in all platforms)  = visible: true, focus: true

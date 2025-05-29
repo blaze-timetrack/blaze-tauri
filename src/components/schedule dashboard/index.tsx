@@ -112,7 +112,7 @@ const ScheduleDashboard = () => {
 
     if (!over) return;
 
-    const eventId = active.id;
+    const eventId = active.id.toString();
     const sourceColumn = getColumnByEventId(eventId);
     const targetColumn = over.id as string;
 
