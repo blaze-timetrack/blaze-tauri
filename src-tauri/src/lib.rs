@@ -1,12 +1,7 @@
 // -- Sub-Modules
-mod models;
 mod utils;
 
-use std::sync::LazyLock;
 use std::{env, result};
-use surrealdb::engine::remote::ws::{Client, Wss};
-use surrealdb::opt::auth::Root;
-use surrealdb::{Response, Surreal};
 use tauri::{
     menu::{Menu, MenuItem},
     utils::TitleBarStyle,
@@ -16,32 +11,23 @@ use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
-use utils::commands::{get_programs, get_systems_timezone, greet};
-
-static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
+use utils::commands::{get_systems_timezone, greet};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tokio::main]
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    DB.connect::<Wss>("blaze--time-tra-06bdubvl4pv4t6a2oniuik9d04.aws-euw1.surreal.cloud")
-        .await?;
-    DB.signin(Root {
-        username: "test",
-        password: "test",
-    })
-        .await?;
-    DB.use_ns("test").use_db("test").await?;
-    println!("Connected to DB...");
-
     let mut builder = tauri::Builder::default();
 
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-            let _ = app
+            let main_window = app
                 .get_webview_window("main")
-                .expect("no main window")
-                .set_focus();
+                .expect("no main window");
+
+            main_window.show().unwrap();
+            main_window.set_focus().unwrap();
+            main_window.unminimize().unwrap();
         }));
     }
 
@@ -107,7 +93,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone, get_programs])
+        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

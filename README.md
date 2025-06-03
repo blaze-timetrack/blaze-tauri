@@ -1,14 +1,29 @@
 # BLAZE
 
+## Ideas of BLAZE
+
+- flow creation
+- privacy
+- project management
+- teams
+- ease of use
+- community
+- connectivity
+
 ## Features
 
-**_1st Priority_**
+**1st Version**
 
-- default categories of programs (_program->categories_->states(flow,work,idle,distraction))
-- Track (applications and history), Display (days, weeks, months, years) with categories (prebuilt, setup)
+- Track (applications and history), Display (days, weeks, months, years) with categories (prebuilt, setup) => Tracking
+  of window, title, urls, afk (store them locally)
+- default categories of programs (_program->categories_->states(flow,work,idle,distraction)) => Settings of categories
 - auto & self flow-sessions, breaks(idle detection), meeting, workout (duration changing).
 - stoping distractions
+- go cloud
 - set client projects and tasks
+
+**_Small updates_**
+
 - commands
 - Activity =>
     - time zone
@@ -21,15 +36,19 @@
 
 ---
 
-**_2nd Priority_**
+**2nd Version**
 
 - music
-- privacy => tracking(url, title, schedule deletion, All data deletion, store-locally)
+- privacy => tracking(url, title, schedule deletion, All data deletion, store-locally) + editor + browser + media
 - insights
 - leaderboard
 - Specific features
     - integration notion, task(clickUp, Google Tasks, zapier), calender(notion-calender, google-calender,
       microsoft-calender)
+
+**3rd Version**
+
+- integrating with other tracking app or importing tracking data
 
 **_Categories on and off auto_**
 
