@@ -1,6 +1,8 @@
 pub mod commands;
 pub mod tray;
 
-pub mod global_shortcut;
 pub mod autostart;
-pub mod init_supabase;
+pub mod global_shortcut;
+pub mod store;
+pub mod stronghold;
+pub mod notification;

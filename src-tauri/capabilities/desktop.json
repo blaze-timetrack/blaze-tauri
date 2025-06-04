@@ -12,6 +12,7 @@
     "window-state:default",
     "deep-link:default",
     "global-shortcut:default",
-    "autostart:default"
+    "autostart:default",
+    "updater:default"
   ]
 }

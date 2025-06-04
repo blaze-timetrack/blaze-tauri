@@ -21,9 +21,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-            let main_window = app
-                .get_webview_window("main")
-                .expect("no main window");
+            let main_window = app.get_webview_window("main").expect("no main window");
 
             main_window.show().unwrap();
             main_window.set_focus().unwrap();
@@ -42,14 +40,18 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     //     builder = builder.menu(|handle| Menu::default(handle))
     // }
 
-
     builder
+        .plugin(tauri_plugin_notification::init())
+        // upater not setup
+        // .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let main_window = app.get_webview_window("main").unwrap();
+            // style
             main_window.set_decorations(false)?;
             main_window.set_title_bar_style(TitleBarStyle::Transparent)?;
 
@@ -83,6 +85,12 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
                 });
             }
 
+            // utils::notification::create_notification_window(app.handle())?;
+            utils::notification::show_notification(app.handle())?;
+            // small settings
+            utils::store::create_store(app.handle())?;
+            // store secrets and keys
+            utils::stronghold::create_stronghold(app.handle())?;
             #[cfg(desktop)]
             {
                 app.handle().save_window_state(StateFlags::all())?;

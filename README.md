@@ -21,6 +21,7 @@
 - stoping distractions
 - go cloud
 - set client projects and tasks
+- widget
 
 **_Small updates_**
 
