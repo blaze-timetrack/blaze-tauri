@@ -2,11 +2,7 @@
 mod utils;
 
 use std::{env, result};
-use tauri::{
-    menu::{Menu, MenuItem},
-    utils::TitleBarStyle,
-    AppHandle,
-};
+use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, LogicalPosition, PhysicalSize};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
@@ -42,7 +38,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     builder
         .plugin(tauri_plugin_notification::init())
-        // upater not setup
+        // update not setup
         // .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -51,6 +47,25 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let main_window = app.get_webview_window("main").unwrap();
+            let widget_window = app.get_webview_window("widget").unwrap();
+
+            let size = PhysicalSize::new(420.0 as u32, 38.0 as u32);
+            widget_window.set_size(size).unwrap();
+
+            if let Some(monitor) = widget_window.primary_monitor().unwrap() {
+                let monitor_size = monitor.size();
+                let monitor_width = monitor_size.width as f64;
+
+                let window_size = widget_window.outer_size().unwrap();
+                let window_width = window_size.width as f64;
+
+                let x = monitor_width - window_width;
+                let y = 0.0;
+
+                let widget_position = LogicalPosition::new(x, y);
+                widget_window.set_position(widget_position).expect("failed to set position");
+            }
+
             // style
             main_window.set_decorations(false)?;
             main_window.set_title_bar_style(TitleBarStyle::Transparent)?;
@@ -85,14 +100,14 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
                 });
             }
 
-            // utils::notification::create_notification_window(app.handle())?;
-            utils::notification::show_notification(app.handle())?;
+            // utils::notification::show_notification(app.handle())?;
             // small settings
-            utils::store::create_store(app.handle())?;
+            // utils::store::create_store(app.handle())?;
             // store secrets and keys
             utils::stronghold::create_stronghold(app.handle())?;
             #[cfg(desktop)]
             {
+                // utils::notification::create_widget_window(app.handle())?;
                 app.handle().save_window_state(StateFlags::all())?;
                 utils::autostart::set_auto_start(app.handle())?;
                 utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();

@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "\U0001F381 Feature requests"
+    url: https://forum.blaze.net/c/features
+    about: Request and vote on features on the forum.
+  - name: "\u2753 Support"
+    url: https://forum.blaze.net/
+    about: Need help with something? Ask for help on the forum!
+  - name: "\U0001F4AD Discussion (on our forum)"
+    url: https://forum.blaze.net/
+    about: The preferred place for general discussion about Blaze Time Tracking
+  - name: "\U0001F4AD Discussion (on GitHub Discussions)"
+    url: https://github.com/blaze-timetrack/blaze-tauri/discussions
+    about: We're testing it out (but the forum is still the preferred place).
+  - name: "\U0001F4AC Chat with us on Discord"
+    url: https://discord.gg/
+    about: We love to see people who are active in issues on our Discord, come join us!

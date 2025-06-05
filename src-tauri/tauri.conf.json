@@ -22,6 +22,20 @@
         "titleBarStyle": "Transparent",
         "decorations": false,
         "focus": true
+      },
+      {
+        "label": "widget",
+        "title": "Blaze | Widget",
+        "closable": false,
+        "minimizable": false,
+        "maximizable": false,
+        "decorations": false,
+        "resizable": false,
+        "hiddenTitle": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "titleBarStyle": "Transparent",
+        "url": "/widget"
       }
     ],
     "security": {

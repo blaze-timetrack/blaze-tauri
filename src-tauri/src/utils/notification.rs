@@ -1,4 +1,5 @@
 use tauri::{Manager, Runtime, WebviewWindowBuilder};
+use tauri::ipc::RuntimeCapability;
 
 pub fn show_notification<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     use tauri_plugin_notification::NotificationExt;
@@ -13,23 +14,15 @@ pub fn show_notification<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result
 }
 
 fn create_widget() {}
-pub fn create_notification_window<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
-    let label = "custom_notification";
+pub fn create_widget_window<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
+    let label = "widget";
     // Avoid duplicate notification windows
     if app.get_webview_window(label).is_none() {
         let _ = WebviewWindowBuilder::new(
             app,
             label,
-            tauri::WebviewUrl::App("./notification.html".into()),
-        )
-            .title("Notification")
-            .decorations(false)
-            .always_on_top(true)
-            .resizable(false)
-            .skip_taskbar(true)
-            .inner_size(350.0, 80.0)
-            .position(1600.0, 900.0) // adjust for your screen
-            .build();
+            tauri::WebviewUrl::App("/widget".into()),
+        ).decorations(false).title("Notification").always_on_top(true).resizable(false).skip_taskbar(true).inner_size(800.0, 200.0).position(0.0, 40.0).build();
     }
 
     Ok(())

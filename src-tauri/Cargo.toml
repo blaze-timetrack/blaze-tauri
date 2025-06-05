@@ -14,9 +14,6 @@ edition = "2021"
 name = "blaze_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-[build-dependencies]
-tauri-build = { version = "2.1.1", features = [] }
-
 [dependencies]
 # general dependencies
 sysinfo = "0.35.1"
@@ -32,20 +29,25 @@ modql = "0.2.0"
 # NOTE: , features = ["format"] would be nice, but it is very heavy, and sometime have compiles issues with swc_ components
 ts-rs = { version = "6" }
 anyhow = "1"
+active-win-pos-rs = { version = "0.9.0", optional = true }
+dotenv = "0.15.0"
 
-# tauri dependencies 
+# tauri dependencies
 tauri = { version = "2.4.1", features = ["tray-icon"] }
 tauri-plugin-opener = "2"
-tauri-plugin-devtools = "2.0.0"
 tauri-plugin-log = "2.4.0"
-
-# Windows-specific dependencies
-active-win-pos-rs = { version = "0.9.0", optional = true }
 tauri-plugin-deep-link = "2"
-dotenv = "0.15.0"
 tauri-plugin-store = "2"
 tauri-plugin-stronghold = "2"
 tauri-plugin-notification = "2"
+
+[dev-dependencies]
+tauri-plugin-devtools = "2.0.0"
+
+[build-dependencies]
+tauri-build = { version = "2.1.1", features = [] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
 [dependencies.windows]
 version = "0.61.1"
 features = [
@@ -62,6 +64,10 @@ features = [
     "Win32_Networking_WinSock",
 ]
 
+# only macOS
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.26"
+
 # not for mobile
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
@@ -70,9 +76,11 @@ tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-window-state = "2"
 
-# only macOS
-[target.'cfg(target_os = "macos")'.dependencies]
-cocoa = "0.26"
+# android
+
+# ios
+
+# not for desktop
 
 [features]
 # by default Tauri runs in production mode

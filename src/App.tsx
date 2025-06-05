@@ -10,8 +10,12 @@ import Goals from "@/pages/productivity/goals.tsx";
 import Projects from "@/pages/work/projects.tsx";
 import Teams from "@/pages/teams/teams.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import Widget from "@/pages/widget.tsx";
+import Notification from "@/pages/notification.tsx";
 
 function App() {
+  // const [isWidget, setIsWidget] = useState(true);
+
   return (
     <Routes>
       <Route element={<RootLayout />}>
@@ -31,6 +35,8 @@ function App() {
         {/*  Errors */}
         <Route path="*" element={<NotFound />} />
       </Route>
+      <Route path={"widget"} element={<Widget />} />
+      <Route path={"notification"} element={<Notification />} />
     </Routes>
   );
 }
