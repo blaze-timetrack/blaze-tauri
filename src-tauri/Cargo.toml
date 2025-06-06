@@ -41,7 +41,7 @@ tauri-plugin-store = "2"
 tauri-plugin-stronghold = "2"
 tauri-plugin-notification = "2"
 
-[dev-dependencies]
+#[dev-dependencies]
 tauri-plugin-devtools = "2.0.0"
 
 [build-dependencies]

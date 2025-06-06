@@ -107,7 +107,6 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
             utils::stronghold::create_stronghold(app.handle())?;
             #[cfg(desktop)]
             {
-                // utils::notification::create_widget_window(app.handle())?;
                 app.handle().save_window_state(StateFlags::all())?;
                 utils::autostart::set_auto_start(app.handle())?;
                 utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();
