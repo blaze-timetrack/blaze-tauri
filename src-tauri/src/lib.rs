@@ -1,17 +1,25 @@
 // -- Sub-Modules
 mod utils;
+mod track;
 
+use crate::track::heartbeat::start_heartbeat;
+use crate::utils::db::{close_connection_db, connect_to_db, setup_schema};
+use serde_json::json;
+use std::borrow::Cow;
+use std::path::PathBuf;
+use std::time::Duration;
 use std::{env, result};
-use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, LogicalPosition, PhysicalSize};
+use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, LogicalPosition, PhysicalSize};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
+use tauri_plugin_sql::Migration;
+use tauri_plugin_sql::MigrationKind;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use utils::commands::{get_systems_timezone, greet};
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-#[tokio::main]
-pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+// #[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut builder = tauri::Builder::default();
 
     #[cfg(desktop)]
@@ -36,10 +44,22 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     //     builder = builder.menu(|handle| Menu::default(handle))
     // }
 
+    // update not setup
+    // .plugin(tauri_plugin_updater::Builder::new().build())
+
+    let migrations = vec![
+        // Define your migrations here
+        Migration {
+            version: 1,
+            description: "create_initial_tables",
+            sql: "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT);",
+            kind: MigrationKind::Up,
+        }
+    ];
+
     builder
         .plugin(tauri_plugin_notification::init())
-        // update not setup
-        // .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_sql::Builder::new().add_migrations("sqlite:test.db", migrations).build())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
@@ -63,7 +83,9 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
                 let y = 0.0;
 
                 let widget_position = LogicalPosition::new(x, y);
-                widget_window.set_position(widget_position).expect("failed to set position");
+                widget_window
+                    .set_position(widget_position)
+                    .expect("failed to set position");
             }
 
             // style
@@ -116,8 +138,40 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet, get_systems_timezone])
+        .setup(|app| {
+            let app_handle = app.handle().clone();
+            let app_data_dir = app_handle.path().app_data_dir().unwrap();
+
+            tauri::async_runtime::spawn(background_track(app_data_dir, app_handle));
+
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
     Ok(())
+}
+
+async fn background_track(app_data_dir: PathBuf, app_handle: AppHandle) {
+    match connect_to_db(app_data_dir).await {
+        Ok(db) => {
+            if let Err(e) = setup_schema(&db).await {
+                eprintln!("Failed to setup schema: {}", e);
+                return;
+            }
+            loop {
+                println!("tracker running in background");
+                tokio::time::sleep(Duration::from_micros(800)).await;
+                match start_heartbeat().await {
+                    Ok(data) => {
+                        let payload = json!(data);
+                        let _ = app_handle.emit("program_changed", payload);
+                    }
+                    Err(e) => eprintln!("Heartbeat error: {}", e),
+                }
+            }
+            let _ = close_connection_db(&db).await;
+        }
+        Err(e) => eprintln!("Database connection error: {}", e),
+    }
 }

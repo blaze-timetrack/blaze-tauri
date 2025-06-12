@@ -19,13 +19,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 sysinfo = "0.35.1"
 chrono = { version = "0.4.40", features = ["serde"] }
 chrono-tz = "0.10.3"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-serde_with_macros = "3"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+serde_with_macros = "3.12.0"
 supabase_rs = "0.4.2"
-tokio = { version = "1", features = ["full"] } # feature for surrealdb this macros,rt-multi-thread
-parking_lot = "0.12"
-modql = "0.2.0"
+tokio = { version = "1.45.1", features = ["full"] } # feature for surrealdb this macros,rt-multi-thread
+parking_lot = "0.12.4"
+modql = "0.4.1"
 # NOTE: , features = ["format"] would be nice, but it is very heavy, and sometime have compiles issues with swc_ components
 ts-rs = { version = "6" }
 anyhow = "1"
@@ -33,19 +33,21 @@ active-win-pos-rs = { version = "0.9.0", optional = true }
 dotenv = "0.15.0"
 
 # tauri dependencies
-tauri = { version = "2.4.1", features = ["tray-icon"] }
-tauri-plugin-opener = "2"
+tauri = { version = "2.5.1", features = ["tray-icon"] }
+tauri-plugin-opener = "2.2.7"
 tauri-plugin-log = "2.4.0"
-tauri-plugin-deep-link = "2"
-tauri-plugin-store = "2"
-tauri-plugin-stronghold = "2"
-tauri-plugin-notification = "2"
+tauri-plugin-deep-link = "2.3.0"
+tauri-plugin-store = "2.2.0"
+tauri-plugin-stronghold = "2.2.0"
+tauri-plugin-notification = "2.2.2"
 
 #[dev-dependencies]
 tauri-plugin-devtools = "2.0.0"
+tauri-plugin-sql = { version = "2.2.0", features = ["sqlite"] }
+sqlx = { version = "0.8.6", features = ['sqlite', 'runtime-tokio'] }
 
 [build-dependencies]
-tauri-build = { version = "2.1.1", features = [] }
+tauri-build = { version = "2.2.0", features = [] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 [dependencies.windows]
