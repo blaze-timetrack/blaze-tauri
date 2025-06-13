@@ -3,6 +3,7 @@
 /*@import url("https://fonts.googleapis.com");*/
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "tailwindcss-motion";
 
 @custom-variant dark (&:is(.dark *));
 
