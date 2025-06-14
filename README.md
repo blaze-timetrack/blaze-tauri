@@ -35,12 +35,18 @@
     - Day Cutoff Time
 - export data
 
+## Strategy
+
+- data store -> local then cloud
+- settings store -> store plugin (+category state)
+- settings of grouping rules(program category) -> sql
+
 ---
 
 **2nd Version**
 
 - music
-- privacy => tracking(url, title, schedule deletion, All data deletion, store-locally) + editor + browser + media
+- privacy => tracking(url, title, schedule deletion, All data deletion, store-locally) + editor + browser(web) + media
 - insights
 - leaderboard
 - Specific features
@@ -60,10 +66,6 @@
 - Payment Gateway
 - Authentication
 - Email Provider
-
-## Strategy
-
-- data store -> local or cloud
 
 ``` 
     let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())

@@ -6,9 +6,8 @@ import { isRouteErrorResponse, Outlet, type Route } from "react-router";
 
 import StateOfFlow from "@/components/shared/stage-of-flow";
 import Tabs from "@/components/shared/tabs";
-import TopBar from "@/components/shared/top-bar";
-import TopBar2 from "@/components/shared/top-bar2.tsx";
 import TitleBar from "@/components/backend components/title-bar.tsx";
+import TopBar from "@/components/shared/top-bar.tsx";
 
 // @ts-ignore
 function ThemeToggle() {
@@ -50,8 +49,7 @@ export function RootLayout() {
       <TopBar />
       <div className={"col-span-full row-span-19 grid grid-cols-[auto_1fr]"}>
         <Tabs />
-        <div className={"row-span-16 grid grid-rows-[auto_1fr] gap-4"}>
-          <TopBar2 />
+        <div className={"mx-8 my-4 lg:mx-12"}>
           <Outlet />
         </div>
       </div>

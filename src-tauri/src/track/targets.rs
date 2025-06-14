@@ -1,3 +1,4 @@
+use std::path::Path;
 use sysinfo::{Pid, System};
 use windows::core::Interface;
 use windows::Win32::Foundation::HWND;
@@ -55,7 +56,9 @@ pub fn get_active_pid_title() -> (HWND, u32, String) {
         let mut bytes: [u16; 500] = [0; 500];
         let len = GetWindowTextW(hwnd, &mut bytes);
         let title = String::from_utf16_lossy(&bytes[..len as usize]);
+        println!("-----");
         println!("title: {}", title);
+        println!("-----");
 
         (hwnd, pid, title)
     }
@@ -71,9 +74,9 @@ pub fn get_active_process_name() -> Option<(HWND, String, String)> {
     }
 
     let process = sys.processes().get(&Pid::from_u32(window_pid));
-    println!("process: {:?}", process?.exe());
-    println!("process: {:?}", process?.name());
-    println!("process: {:?}", process?.root());
+    // println!("process: {:?}", process?.exe());
+    // println!("process: {:?}", process?.name());
+    // println!("process: {:?}", process?.root());
 
     if let Some(process) = process {
         let name = format_name(window_title.as_str(), process.name().to_str().unwrap());
@@ -93,45 +96,64 @@ pub fn get_active_all() -> Option<(String, String, Option<String>)> {
 }
 
 pub fn get_browser_active_url(hwnd_process: &HWND, process_name: &String) -> Result<String, &'static str> {
-    if let Some(browser) = is_browser(&process_name) {
-        unsafe {
-            let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
 
-            let automation: IUIAutomation =
-                CoCreateInstance(&CUIAutomation8, None, CLSCTX_INPROC_SERVER).unwrap();
+        let automation: IUIAutomation =
+            CoCreateInstance(&CUIAutomation8, None, CLSCTX_INPROC_SERVER).unwrap();
 
-            let element = automation.ElementFromHandle(hwnd_process.clone()).unwrap();
+        let element = automation.ElementFromHandle(hwnd_process.clone()).unwrap();
 
-            let variant = VARIANT::from(UIA_EditControlTypeId.0 as i32);
-            let condition = automation
-                .CreatePropertyCondition(UIA_ControlTypePropertyId, &variant)
-                .unwrap();
+        let variant = VARIANT::from(UIA_EditControlTypeId.0 as i32);
+        let condition = automation
+            .CreatePropertyCondition(UIA_ControlTypePropertyId, &variant)
+            .unwrap();
 
-            let address_bar = match element.FindFirst(TreeScope_Subtree, &condition) {
-                Ok(address) => address,
-                Err(_) => return Err("Could not find address bar"),
-            };
+        let address_bar = match element.FindFirst(TreeScope_Subtree, &condition) {
+            Ok(address) => address,
+            Err(_) => return Err("Could not find address bar"),
+        };
 
-            let value_patter_obj = address_bar.GetCurrentPattern(UIA_ValuePatternId).unwrap();
+        let value_patter_obj = address_bar.GetCurrentPattern(UIA_ValuePatternId).unwrap();
 
-            let value_pattern: IUIAutomationValuePattern = value_patter_obj.cast().unwrap();
+        let value_pattern: IUIAutomationValuePattern = value_patter_obj.cast().unwrap();
 
-            let bstr_url = value_pattern.CurrentValue().unwrap(); // Returns BSTR
+        let bstr_url = value_pattern.CurrentValue().unwrap(); // Returns BSTR
 
-            let url = bstr_url.to_string();
+        let url = bstr_url.to_string();
 
-            CoUninitialize();
+        CoUninitialize();
+        println!("-----");
+        println!("url: {}", url);
+        println!("-----");
 
-            println!("url: {}", url);
-
-            return Ok(url);
-        }
+        return Ok(url);
     }
-    return Err("no active browser found.");
 }
 
 fn get_browser_active_content_title() {}
 
-fn get_media_player_active_title() {}
+use notify::{recommended_watcher, RecursiveMode, Watcher};
+use std::sync::mpsc::channel;
+use tokio::time::Duration;
+
+async fn get_media_player_active_title() {
+    let (tx, rx) = channel();
+    let mut watcher = recommended_watcher(tx).unwrap();
+    watcher.watch(Path::new("E:/music"), RecursiveMode::Recursive).unwrap();
+
+    loop {
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        match rx.recv() {
+            Ok(event) => {
+                // Handle the event (e.g., new file created, modified)
+                println!("{:?}", event);
+                // Here you could call a function to process the media file
+            }
+            Err(e) => println!("watch error: {:?}", e),
+        }
+        println!("Done!");
+    }
+}
 
 fn get_editor_active_title() {}

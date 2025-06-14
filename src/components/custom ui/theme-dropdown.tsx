@@ -34,7 +34,7 @@ function ThemeDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={"icon_label_btn"}>
+        <Button variant={"icon_label_btn_2"}>
           <SwatchBook />
           Theme
           <ChevronDown />

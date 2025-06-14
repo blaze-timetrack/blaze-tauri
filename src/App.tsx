@@ -12,6 +12,7 @@ import Teams from "@/pages/teams/teams.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import Widget from "@/pages/widget.tsx";
 import Notification from "@/pages/notification.tsx";
+import Settings from "@/pages/settings.tsx";
 
 function App() {
   // const [isWidget, setIsWidget] = useState(true);
@@ -31,6 +32,8 @@ function App() {
 
         {/* teams */}
         <Route path={"teams"} element={<Teams />} />
+
+        <Route path={"/settings"} element={<Settings />} />
 
         {/*  Errors */}
         <Route path="*" element={<NotFound />} />

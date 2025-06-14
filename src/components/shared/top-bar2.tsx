@@ -3,11 +3,7 @@ import { ChevronDown, LayoutGrid } from "lucide-react";
 
 export default function TopBar2() {
   return (
-    <div
-      className={
-        "row-span-1 flex w-full items-center justify-between px-8 pt-4 lg:px-12"
-      }
-    >
+    <div className={"row-span-1 flex w-full items-center justify-between"}>
       <div className="">
         <p className={"text-lg"}>Friday, May 26 2025 </p>
       </div>

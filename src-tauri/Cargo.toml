@@ -45,6 +45,7 @@ tauri-plugin-notification = "2.2.2"
 tauri-plugin-devtools = "2.0.0"
 tauri-plugin-sql = { version = "2.2.0", features = ["sqlite"] }
 sqlx = { version = "0.8.6", features = ['sqlite', 'runtime-tokio'] }
+notify = "8.0.0"
 
 [build-dependencies]
 tauri-build = { version = "2.2.0", features = [] }

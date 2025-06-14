@@ -3,6 +3,7 @@ import ScheduleDashboard from "src/components/schedule dashboard";
 import { connectToDB } from "@/db";
 import { useEffect, useState } from "react";
 import { Event, listen } from "@tauri-apps/api/event";
+import TopBar2 from "@/components/shared/top-bar2.tsx";
 
 function Home() {
   const [activities, setActivities] = useState<Array<any>>([]);
@@ -45,10 +46,13 @@ function Home() {
   }, []);
 
   return (
-    <div className={"row-span-16 w-full"}>
-      <div className="row-span-16 mx-8 flex justify-start gap-6 lg:mx-12">
-        <ScheduleDashboard />
-        <ActivitiesSummaryDemo />
+    <div className={"row-span-16 grid grid-rows-[auto_1fr] gap-4"}>
+      <TopBar2 />
+      <div className={"row-span-16 w-full"}>
+        <div className="row-span-16 flex justify-start gap-6">
+          <ScheduleDashboard />
+          <ActivitiesSummaryDemo />
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 mod utils;
 mod track;
 
+use crate::track::afk::away_from_keyboard;
 use crate::track::heartbeat::start_heartbeat;
 use crate::utils::db::{close_connection_db, connect_to_db, setup_schema};
 use serde_json::json;
@@ -124,7 +125,6 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             // utils::notification::show_notification(app.handle())?;
             // small settings
-            // utils::store::create_store(app.handle())?;
             // store secrets and keys
             utils::stronghold::create_stronghold(app.handle())?;
             #[cfg(desktop)]
@@ -161,7 +161,8 @@ async fn background_track(app_data_dir: PathBuf, app_handle: AppHandle) {
             }
             loop {
                 println!("tracker running in background");
-                tokio::time::sleep(Duration::from_micros(800)).await;
+                tokio::time::sleep(Duration::from_micros(80)).await;
+
                 match start_heartbeat().await {
                     Ok(data) => {
                         let payload = json!(data);

@@ -1,8 +1,9 @@
 import ThemeDropdown from "@/components/custom ui/theme-dropdown";
 import { Button } from "@/components/ui/button";
-import { Activity, Search } from "lucide-react";
+import { Activity } from "lucide-react";
 import { useEffect, useState } from "react";
 import { connectToDB } from "@/db";
+import DynamicSearch from "@/components/extented ui/dynamic-search";
 
 function TopBar() {
   const [content, setContent] = useState<any>();
@@ -27,7 +28,10 @@ function TopBar() {
   }, []);
 
   return (
-    <div className="bg-primary/10 border-border col-span-full row-span-2 flex items-center justify-between border-b px-4">
+    <div
+      data-tauri-drag-region={true}
+      className="bg-primary/10 border-border col-span-full row-span-2 flex items-center justify-between border-b px-4"
+    >
       {/* logo */}
       <div className="flex gap-8">
         {/*<Button variant={"icon_btn"} size={"icon"}>*/}
@@ -40,22 +44,18 @@ function TopBar() {
         {/*</Button>*/}
 
         {/* fast-command */}
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <ThemeDropdown />
-          <Button variant={"icon_label_btn"}>
+          <Button variant={"icon_label_btn_2"}>
             <Activity />
             Flow State
           </Button>
-          <Button variant={"icon_label_btn"} size={"icon"}>
-            <Search />
-          </Button>
+          <DynamicSearch outerLayerClassName={"pl-0"} />
         </div>
       </div>
 
       <div>
-        <p className={"pr-20 text-2xl font-bold uppercase lg:pr-36 xl:pr-40"}>
-          Blaze
-        </p>
+        <p className={"pr-36 text-2xl font-bold uppercase xl:pr-40"}>Blaze</p>
       </div>
 
       {/* profile */}
