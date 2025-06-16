@@ -12,12 +12,13 @@ export enum Keys {
   QUESTION = "?",
   COMMA = ",",
   CTRL_P = "ctrl+p",
+  CTRL_SHIFT_S = "ctrl+shift+s",
 }
 
 function useSetShortcuts<T extends HTMLElement>(
   ref: RefObject<T>,
   handler?: (event: MouseEvent | TouchEvent) => void,
-  keyHandler?: (event: Keys) => void,
+  keyHandler?: (keys: Keys, event: KeyboardEvent) => void,
 ): void {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -31,30 +32,30 @@ function useSetShortcuts<T extends HTMLElement>(
     const handleShortcuts = (event: KeyboardEvent) => {
       if (!keyHandler) return;
       if (event.key === "Escape") {
-        keyHandler(Keys.ESCAPE);
+        keyHandler(Keys.ESCAPE, event);
       } else if (event.key === "g") {
-        keyHandler(Keys.G);
+        keyHandler(Keys.G, event);
       } else if (event.key === "h") {
-        keyHandler(Keys.H);
+        keyHandler(Keys.H, event);
       } else if (event.key === "c") {
-        keyHandler(Keys.C);
+        keyHandler(Keys.C, event);
       } else if (event.key === "p") {
-        keyHandler(Keys.P);
+        keyHandler(Keys.P, event);
       } else if (event.key === "i") {
-        keyHandler(Keys.I);
+        keyHandler(Keys.I, event);
       } else if (event.key === "/") {
-        keyHandler(Keys.FORWARD_SLASH);
+        keyHandler(Keys.FORWARD_SLASH, event);
       } else if (event.key === "?") {
-        keyHandler(Keys.QUESTION);
+        keyHandler(Keys.QUESTION, event);
       } else if (event.key === ",") {
-        keyHandler(Keys.COMMA);
-      } else if (event.ctrlKey + event.key === "p") {
-      } else if (event.ctrlKey + event.key === "f") {
-      } else if (event.ctrlKey + event.key === "f" + event.shiftKey) {
-      } else if (event.ctrlKey + event.key === "b") {
-      } else if (event.ctrlKey + event.key === "b" + event.shiftKey) {
-      } else if (event.ctrlKey + event.key === "m") {
-      } else if (event.ctrlKey + event.key === "m" + event.shiftKey) {
+        keyHandler(Keys.COMMA, event);
+      } else if (event.ctrlKey && event.key === "p") {
+      } else if (event.ctrlKey && event.key === "f") {
+      } else if (event.ctrlKey && event.key === "f" && event.shiftKey) {
+      } else if (event.ctrlKey && event.key === "b") {
+      } else if (event.ctrlKey && event.key === "b" + event.shiftKey) {
+      } else if (event.ctrlKey && event.key === "m") {
+      } else if (event.ctrlKey && event.key === "m" && event.shiftKey) {
       }
     };
 

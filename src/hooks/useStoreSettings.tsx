@@ -1,26 +1,25 @@
 import { useEffect, useState } from "react";
-import { LazyStore, load } from "@tauri-apps/plugin-store";
+import { load, Store } from "@tauri-apps/plugin-store";
 import { ZodSchema } from "zod";
 
 export function useStoreSettings<G extends string, T>(
   key: G,
   defaultValue: T,
   schema: ZodSchema<T>,
-): [T, (newValue: T) => void, () => void] {
+): [T, (newValue: T) => void, () => void, () => void] {
   const [value, setValue] = useState<T>(defaultValue);
-  const [store, setStore] = useState<LazyStore | null>(null);
+  const [store, setStore] = useState<Store | null>(null);
 
   useEffect(() => {
     async function initStore() {
       try {
-        const s = await load(".settings.json");
+        const s = await load(".settings.json", { autoSave: true });
         setStore(s);
         const val = (await s.get(key)) as unknown;
         const result = schema.safeParse(val ?? defaultValue);
         if (!result.success) {
           console.error("Validation error:", result.error);
           await s.set(key, defaultValue);
-          await s.save();
           setValue(defaultValue);
           return;
         }
@@ -45,7 +44,6 @@ export function useStoreSettings<G extends string, T>(
 
     try {
       await store.set(key, result.data);
-      await store.save();
       setValue(result.data);
     } catch (error) {
       console.error("Store update error:", error);
@@ -63,12 +61,20 @@ export function useStoreSettings<G extends string, T>(
     try {
       await store.delete(key);
       await store.set(key, defaultValue);
-      await store.save();
       setValue(defaultValue);
     } catch (error) {
       console.error("Store reset error:", error);
     }
   };
 
-  return [value, set, reset];
+  const clearKey = async () => {
+    if (!store) return;
+    try {
+      await store.delete(key);
+    } catch (error) {
+      console.error("Store reset error:", error);
+    }
+  };
+
+  return [value, set, reset, clearKey];
 }

@@ -38,6 +38,7 @@ dependencies = [
  "tauri-plugin-window-state",
  "tokio",
  "ts-rs",
+ "webview2-com",
  "windows 0.61.1",
 ]
 

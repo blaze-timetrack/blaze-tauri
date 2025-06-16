@@ -6,10 +6,10 @@ import { isRouteErrorResponse, Outlet, type Route } from "react-router";
 
 import StateOfFlow from "@/components/shared/stage-of-flow";
 import Tabs from "@/components/shared/tabs";
-import TitleBar from "@/components/backend components/title-bar.tsx";
-import TopBar from "@/components/shared/top-bar.tsx";
 import { Commands } from "@/components/custom ui/commands.tsx";
 import { cn } from "@/lib/utils.ts";
+import TitleBar from "@/components/backend components/title-bar.tsx";
+import TopBar from "@/components/shared/top-bar.tsx";
 
 // @ts-ignore
 function ThemeToggle() {

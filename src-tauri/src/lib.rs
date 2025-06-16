@@ -1,6 +1,6 @@
 // -- Sub-Modules
-mod utils;
 mod track;
+mod utils;
 
 use crate::track::afk::away_from_keyboard;
 use crate::track::heartbeat::start_heartbeat;
@@ -10,7 +10,12 @@ use std::borrow::Cow;
 use std::path::PathBuf;
 use std::time::Duration;
 use std::{env, result};
-use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, LogicalPosition, PhysicalSize};
+use tauri::ipc::private::tracing::log;
+use tauri::{
+    menu::{Menu, MenuItem},
+    utils::TitleBarStyle,
+    AppHandle, Emitter, LogicalPosition, PhysicalSize,
+};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
@@ -18,6 +23,8 @@ use tauri_plugin_sql::Migration;
 use tauri_plugin_sql::MigrationKind;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use utils::commands::{get_systems_timezone, greet};
+use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
+use windows::core::Interface;
 
 // #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -55,14 +62,17 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             description: "create_initial_tables",
             sql: "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT);",
             kind: MigrationKind::Up,
-        }
+        },
     ];
 
     builder
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_sql::Builder::new().add_migrations("sqlite:test.db", migrations).build())
+        .plugin(
+            tauri_plugin_sql::Builder::new()
+                .add_migrations("sqlite:test.db", migrations)
+                .build(),
+        )
         .plugin(tauri_plugin_store::Builder::default().build())
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
@@ -72,6 +82,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             let size = PhysicalSize::new(420.0 as u32, 38.0 as u32);
             widget_window.set_size(size).unwrap();
+            widget_window.with_webview(|webview| unsafe {
+                let settings = webview.controller().CoreWebView2().unwrap().Settings().unwrap();
+                let settings: ICoreWebView2Settings6 = settings.cast::<ICoreWebView2Settings6>().unwrap();
+                settings.SetIsSwipeNavigationEnabled(false).unwrap();
+                settings.SetAreDefaultContextMenusEnabled(false).unwrap();
+                settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
+                settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+            }).unwrap();
 
             if let Some(monitor) = widget_window.primary_monitor().unwrap() {
                 let monitor_size = monitor.size();
@@ -92,6 +111,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             // style
             main_window.set_decorations(false)?;
             main_window.set_title_bar_style(TitleBarStyle::Transparent)?;
+            main_window.eval(r#"
+            document.addEventListener('contextmenu', event => event.preventDefault());
+                        "#).unwrap();
+            main_window.with_webview(|webview| unsafe {
+                let settings = webview.controller().CoreWebView2().unwrap().Settings().unwrap();
+                let settings: ICoreWebView2Settings6 = settings.cast::<ICoreWebView2Settings6>().unwrap();
+                settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
+                settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+            }).unwrap();
 
             // set background color only when building for macOS
             #[cfg(target_os = "macos")]
@@ -133,22 +162,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 utils::autostart::set_auto_start(app.handle())?;
                 utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();
                 utils::tray::create_tray(app.handle()).unwrap();
-                println!("building desktop essentials.");
             }
 
-            println!("building every thing.");
-
-            Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone])
-        .setup(|app| {
+            // background running task
             let app_handle = app.handle().clone();
             let app_data_dir = app_handle.path().app_data_dir().unwrap();
-
             tauri::async_runtime::spawn(background_track(app_data_dir, app_handle));
 
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

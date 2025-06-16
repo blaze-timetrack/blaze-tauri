@@ -95,40 +95,46 @@ pub fn get_active_all() -> Option<(String, String, Option<String>)> {
     }
 }
 
-pub fn get_browser_active_url(hwnd_process: &HWND, process_name: &String) -> Result<String, &'static str> {
-    unsafe {
-        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
+pub fn get_browser_active_url(
+    hwnd_process: &HWND,
+    process_name: &String,
+) -> Result<String, &'static str> {
+    if let Some(browser) = is_browser(process_name) {
+        unsafe {
+            let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
 
-        let automation: IUIAutomation =
-            CoCreateInstance(&CUIAutomation8, None, CLSCTX_INPROC_SERVER).unwrap();
+            let automation: IUIAutomation =
+                CoCreateInstance(&CUIAutomation8, None, CLSCTX_INPROC_SERVER).unwrap();
 
-        let element = automation.ElementFromHandle(hwnd_process.clone()).unwrap();
+            let element = automation.ElementFromHandle(hwnd_process.clone()).unwrap();
 
-        let variant = VARIANT::from(UIA_EditControlTypeId.0 as i32);
-        let condition = automation
-            .CreatePropertyCondition(UIA_ControlTypePropertyId, &variant)
-            .unwrap();
+            let variant = VARIANT::from(UIA_EditControlTypeId.0 as i32);
+            let condition = automation
+                .CreatePropertyCondition(UIA_ControlTypePropertyId, &variant)
+                .unwrap();
 
-        let address_bar = match element.FindFirst(TreeScope_Subtree, &condition) {
-            Ok(address) => address,
-            Err(_) => return Err("Could not find address bar"),
-        };
+            let address_bar = match element.FindFirst(TreeScope_Subtree, &condition) {
+                Ok(address) => address,
+                Err(_) => return Err("Could not find address bar"),
+            };
 
-        let value_patter_obj = address_bar.GetCurrentPattern(UIA_ValuePatternId).unwrap();
+            let value_patter_obj = address_bar.GetCurrentPattern(UIA_ValuePatternId).unwrap();
 
-        let value_pattern: IUIAutomationValuePattern = value_patter_obj.cast().unwrap();
+            let value_pattern: IUIAutomationValuePattern = value_patter_obj.cast().unwrap();
 
-        let bstr_url = value_pattern.CurrentValue().unwrap(); // Returns BSTR
+            let bstr_url = value_pattern.CurrentValue().unwrap(); // Returns BSTR
 
-        let url = bstr_url.to_string();
+            let url = bstr_url.to_string();
 
-        CoUninitialize();
-        println!("-----");
-        println!("url: {}", url);
-        println!("-----");
+            CoUninitialize();
+            println!("-----");
+            println!("url: {}", url);
+            println!("-----");
 
-        return Ok(url);
+            return Ok(url);
+        }
     }
+    Err("Not a browser")
 }
 
 fn get_browser_active_content_title() {}
@@ -140,7 +146,9 @@ use tokio::time::Duration;
 async fn get_media_player_active_title() {
     let (tx, rx) = channel();
     let mut watcher = recommended_watcher(tx).unwrap();
-    watcher.watch(Path::new("E:/music"), RecursiveMode::Recursive).unwrap();
+    watcher
+        .watch(Path::new("E:/music"), RecursiveMode::Recursive)
+        .unwrap();
 
     loop {
         tokio::time::sleep(Duration::from_secs(1)).await;

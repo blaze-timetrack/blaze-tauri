@@ -1,18 +1,36 @@
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "@/app.css";
 import { Menu as MenuIcon, PowerCircle } from "lucide-react";
 import { getCurrentWindow, LogicalPosition } from "@tauri-apps/api/window";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
   Menu,
   MenuItem,
   PredefinedMenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
+import { register } from "@tauri-apps/plugin-global-shortcut";
 
 function Widget() {
-  const appWindow = getCurrentWindow();
+  useEffect(() => {
+    register("Ctrl+Shift+S", () => {
+      console.log("Ctrl+Shift+S pressed");
+      // Your custom logic here
+      // If you want to prevent the default action, the API may not always allow it, but you can react to it
+    });
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Example: Override Ctrl+Shift+S (not system-wide)
+      console.log("triggered");
+      if (event.ctrlKey && event.shiftKey && event.key === "s") {
+        event.preventDefault();
+        console.log("nothing happened!!!");
+        // Your custom screenshot logic here
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
+  const appWindow = getCurrentWindow();
   const handleMenuClick = useCallback(async () => {
     const fileSubmenu = await Submenu.new({
       text: "File",
@@ -354,19 +372,19 @@ export default Widget;
 
 const NOTIFICATION_WINDOW_LABEL = "widget";
 
-export function create_widget_window() {
-  console.log("created widget");
-  new WebviewWindow(NOTIFICATION_WINDOW_LABEL, {
-    width: 350,
-    height: 80,
-    x: 1600, // adjust for your screen
-    y: 900, // adjust for your screen
-    decorations: false,
-    transparent: true,
-    alwaysOnTop: true,
-    resizable: false,
-    skipTaskbar: true,
-    visible: true,
-    url: "/widget", // a custom HTML file for the notification UI
-  });
-}
+// export function create_widget_window() {
+//   console.log("created widget");
+//   new WebviewWindow(NOTIFICATION_WINDOW_LABEL, {
+//     width: 350,
+//     height: 80,
+//     x: 1600, // adjust for your screen
+//     y: 900, // adjust for your screen
+//     decorations: false,
+//     transparent: true,
+//     alwaysOnTop: true,
+//     resizable: false,
+//     skipTaskbar: true,
+//     visible: true,
+//     url: "/widget", // a custom HTML file for the notification UI
+//   });
+// }

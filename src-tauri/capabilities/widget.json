@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "widget-capability",
+  "description": "Capability for the widget window",
+  "windows": [
+    "widget"
+  ],
+  "permissions": [
+    "global-shortcut:default",
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister"
+  ]
+}

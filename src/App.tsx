@@ -28,7 +28,7 @@ function App() {
     () => {
       setCommandsOpen(false);
     },
-    (key) => {
+    (key, event) => {
       if (key === Keys.ESCAPE) {
         console.log("escape");
         setCommandsOpen(false);

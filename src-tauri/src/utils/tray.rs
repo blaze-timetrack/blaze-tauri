@@ -1,3 +1,4 @@
+use tauri::ipc::private::tracing::log;
 use tauri::menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder};
 use tauri::{
     menu::MenuItem,
@@ -81,7 +82,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
                 button_state: MouseButtonState::Down,
                 ..
             } => {
-                println!("right click pressed and released");
+                log::info!("right click pressed and released");
                 let app = tray.app_handle();
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = window.show_menu();
@@ -91,7 +92,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         })
         .build(app)?;
 
-    println!("tray build");
+    log::info!("tray build");
 
     Ok(())
 }

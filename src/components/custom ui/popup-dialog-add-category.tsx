@@ -30,6 +30,7 @@ export function PopupDialogAddCategory({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // @ts-ignore
     const name = e.target?.categoryName.value
       .toLowerCase()
       .toString() as string;

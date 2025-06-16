@@ -7,8 +7,8 @@ pub async fn connect_to_db(path: PathBuf) -> Result<SqlitePool, sqlx::Error> {
     let db_url = format!("sqlite://{}", app_path.display());
     println!("{:?}", db_url);
     let options = SqliteConnectOptions::new()
-        .filename("test.db")          // Explicit filename
-        .create_if_missing(true);     // Enable auto-creation
+        .filename("test.db") // Explicit filename
+        .create_if_missing(true); // Enable auto-creation
 
     let pool = SqlitePool::connect_with(options).await?;
     Ok(pool)
