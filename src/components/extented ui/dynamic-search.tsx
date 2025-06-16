@@ -57,6 +57,7 @@ export default function DynamicSearch({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(containerRef, () => {
+    console.log("ese too much...");
     setIsOpen(false);
   });
 

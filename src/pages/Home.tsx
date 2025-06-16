@@ -11,7 +11,7 @@ function Home() {
     const db = await connectToDB();
     const res: Array<any> = await db.select("SELECT * FROM activity");
     setActivities(res);
-    console.log(res);
+    // console.log(res);
   };
 
   const listenProgramChange = async () => {

@@ -81,7 +81,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 let window_width = window_size.width as f64;
 
                 let x = monitor_width - window_width;
-                let y = 0.0;
+                let y = 40.0;
 
                 let widget_position = LogicalPosition::new(x, y);
                 widget_window
@@ -133,7 +133,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 utils::autostart::set_auto_start(app.handle())?;
                 utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();
                 utils::tray::create_tray(app.handle()).unwrap();
+                println!("building desktop essentials.");
             }
+
+            println!("building every thing.");
 
             Ok(())
         })

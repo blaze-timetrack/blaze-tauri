@@ -60,7 +60,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             }
         })
         .show_menu_on_left_click(false)
-        .tooltip("BLAZE")
+        .tooltip("Blaze")
         .on_tray_icon_event(|tray, event| match event {
             TrayIconEvent::Click {
                 button: MouseButton::Left,
@@ -90,6 +90,8 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             _ => {}
         })
         .build(app)?;
+
+    println!("tray build");
 
     Ok(())
 }

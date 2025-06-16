@@ -15,7 +15,7 @@ function TopBar() {
     //   "alice@example.com",
     // ]);
     const res: Array<any> = await db.select("SELECT * FROM users");
-    console.log(res);
+    // console.log(res);
     setContent(res[0]);
   };
 

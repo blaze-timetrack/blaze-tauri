@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, useNavigate } from "react-router";
 import { RootLayout } from "@/root";
 import HomePage from "@/pages/home.tsx";
 import CategoriesPage from "@/pages/categories.tsx";
@@ -13,13 +13,65 @@ import { Button } from "@/components/ui/button.tsx";
 import Widget from "@/pages/widget.tsx";
 import Notification from "@/pages/notification.tsx";
 import Settings from "@/pages/settings.tsx";
+import { useRef, useState } from "react";
+import useSetShortcuts, { Keys } from "@/hooks/useSetShortcuts.tsx";
 
 function App() {
   // const [isWidget, setIsWidget] = useState(true);
+  const [commandsOpen, setCommandsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  // shortcuts
+  useSetShortcuts(
+    containerRef,
+    () => {
+      setCommandsOpen(false);
+    },
+    (key) => {
+      if (key === Keys.ESCAPE) {
+        console.log("escape");
+        setCommandsOpen(false);
+      } else if (key == Keys.G) {
+        console.log("Go to Page");
+      } else if (key == Keys.H) {
+        console.log("home");
+        navigate("/");
+      } else if (key == Keys.C) {
+        console.log("Categories");
+        navigate("/categories");
+      } else if (key == Keys.P) {
+        console.log("Projects");
+        navigate("/work/projects");
+      } else if (key == Keys.I) {
+        console.log("Insights");
+        navigate("/insights");
+      } else if (key == Keys.FORWARD_SLASH) {
+        console.log("Commands");
+        // @error: undergoing loop what is the reason
+        // if (commandsOpen) {
+        //   setCommandsOpen(false);
+        // } else {
+        //   setCommandsOpen(true);
+        // }
+        setCommandsOpen(true);
+      } else if (key == Keys.QUESTION) {
+        console.log("Question");
+        navigate("/support");
+      } else if (key == Keys.COMMA) {
+        console.log("Settings");
+        navigate("/settings");
+      }
+    },
+  );
 
   return (
     <Routes>
-      <Route element={<RootLayout />}>
+      <Route
+        element={
+          <RootLayout commandsRef={containerRef} commandsOpen={commandsOpen} />
+        }
+      >
         <Route index element={<HomePage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path={"work/projects"} element={<Projects />} />

@@ -1,6 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 // @ts-ignore
 import { isRouteErrorResponse, Outlet, type Route } from "react-router";
 
@@ -8,6 +8,8 @@ import StateOfFlow from "@/components/shared/stage-of-flow";
 import Tabs from "@/components/shared/tabs";
 import TitleBar from "@/components/backend components/title-bar.tsx";
 import TopBar from "@/components/shared/top-bar.tsx";
+import { Commands } from "@/components/custom ui/commands.tsx";
+import { cn } from "@/lib/utils.ts";
 
 // @ts-ignore
 function ThemeToggle() {
@@ -42,7 +44,13 @@ function ThemeToggle() {
   );
 }
 
-export function RootLayout() {
+export function RootLayout({
+  commandsRef,
+  commandsOpen,
+}: {
+  commandsRef: React.MutableRefObject<HTMLDivElement | null>;
+  commandsOpen: boolean;
+}) {
   return (
     <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24 select-none">
       <TitleBar />
@@ -56,6 +64,14 @@ export function RootLayout() {
       {/*<div className={"row-span-20"}></div>*/}
       <StateOfFlow />
       {/*<ThemeToggle />*/}
+      <div
+        className={cn(
+          "absolute z-50 h-full w-full backdrop-blur-sm",
+          !commandsOpen && "hidden",
+        )}
+      >
+        <Commands commandsRef={commandsRef} commandsOpen={commandsOpen} />
+      </div>
     </div>
   );
 }
