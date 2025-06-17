@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// category states
 export enum CategoryActionTypes {
   DISABLE_CATEGORY = "DISABLE_CATEGORY",
   ENABLE_CATEGORY = "ENABLE_CATEGORY",
@@ -41,3 +42,13 @@ export const DefaultCategoryState: CategoryStateTypes = {
 };
 
 export const zodCategoryStateSchema = z.array(categoryStateTypeSchema).min(0);
+
+// application states
+
+export interface InstalledApplication {
+  name: string;
+  version?: string;
+  publisher?: string;
+  install_data?: string;
+  install_path?: string;
+}

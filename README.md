@@ -14,6 +14,7 @@
 
 **1st Version**
 
+- initial setup
 - Track (applications and history), Display (days, weeks, months, years) with categories (prebuilt, setup) => Tracking
   of window, title, urls, afk (store them locally)
 - default categories of programs (_program->categories_->states(flow,work,idle,distraction)) => Settings of categories

@@ -1,82 +1,81 @@
-use std::ffi::OsString;
-use std::ptr;
-use windows::core::{PCWSTR, PWSTR};
-use windows::Win32::Foundation::ERROR_NO_MORE_ITEMS;
-use windows::Win32::System::Registry::{RegCloseKey, RegEnumKeyExW, RegOpenKeyExW, RegQueryValueExW, HKEY, HKEY_LOCAL_MACHINE, KEY_READ, REG_SZ};
+use serde::{Deserialize, Serialize};
+use std::process::Command;
+use serde_json::json;
+use winreg::enums::HKEY_LOCAL_MACHINE;
+use winreg::RegKey;
 
-pub fn list_installed_app() {
-    let hklm = HKEY_LOCAL_MACHINE;
-    let mut uninstall_key = HKEY::default();
+#[derive(Serialize, Deserialize, Debug)]
+pub struct InstalledApp {
+    pub name: String,
+    pub version: Option<String>,
+    pub publisher: Option<String>,
+    pub install_date: Option<String>,
+    pub install_path: Option<String>,
+}
 
-    unsafe {
-        RegOpenKeyExW(
-            hklm,
-            PCWSTR("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\0".encode_utf16().collect::<Vec<_>>().as_ptr()),
-            Some(0),
-            KEY_READ,
-            &mut uninstall_key,
-        ).is_ok();
-    }
+#[tauri::command]
+pub fn get_installed_applications() -> Result<Vec<InstalledApp>, String> {
+    let mut apps = Vec::new();
+    // Query both native and WOW64 registry paths
+    let registry_paths = vec![
+        r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    ];
 
-    // Enumerate all subkeys
-    let mut index = 0;
-    loop {
-        let mut name = [0u16; 1024];
-        let mut name_len = name.len() as u32;
-        let result = unsafe {
-            RegEnumKeyExW(
-                uninstall_key,
-                index,
-                Some(PWSTR(name.as_mut_ptr())),
-                &mut name_len,
-                Some(ptr::null_mut()),
-                Some(PWSTR(name.as_mut_ptr())),
-                Some(ptr::null_mut()),
-                Some(ptr::null_mut()),
-            )
-        };
+    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
 
-        if result == ERROR_NO_MORE_ITEMS {
-            break;
-        }
-        if result.is_err() {
-            break;
-        }
-
-        let name = OsString::from_wide(&name[..name_len as usize]);
-        let name_str = name.to_string_lossy();
-
-        // Open the subkey
-        let mut subkey = HKEY::default();
-        unsafe {
-            if RegOpenKeyExW(
-                uninstall_key,
-                PCWSTR(name.encode_utf16().collect::<Vec<_>>().as_ptr()),
-                Some(0),
-                KEY_READ,
-                &mut subkey,
-            ).is_ok() {
-                // Read DisplayName value
-                let mut value_type = 0;
-                let mut value_data = [0u16; 1024];
-                let mut value_len = value_data.len() as u32;
-                if RegQueryValueExW(
-                    subkey,
-                    PCWSTR("DisplayName\0".encode_utf16().collect::<Vec<_>>().as_ptr()),
-                    Some(ptr::null_mut()),
-                    Some(&mut value_type),
-                    Some(value_data.as_mut_ptr() as *mut u8),
-                    Some(&mut value_len),
-                ).is_ok() && value_type == REG_SZ {
-                    let value = OsString::from_wide(&value_data[..(value_len as usize / 2)]);
-                    println!("{}", value.to_string_lossy());
+    for path in registry_paths {
+        if let Ok(uninstall_key) = hklm.open_subkey(path) {
+            for key_name in uninstall_key.enum_keys() {
+                if let Ok(key_name) = key_name {
+                    if let Ok(app_key) = uninstall_key.open_subkey(&key_name) {
+                        if let Ok(display_name) = app_key.get_value::<String, _>("DisplayName") {
+                            let app = InstalledApp {
+                                name: display_name,
+                                version: app_key.get_value("DisplayVersion").ok(),
+                                publisher: app_key.get_value("Publisher").ok(),
+                                install_date: app_key.get_value("InstallDate").ok(),
+                                install_path: app_key.get_value("InstallLocation").ok(),
+                            };
+                            apps.push(app);
+                        }
+                    }
                 }
-                unsafe { RegCloseKey(subkey); }
             }
         }
+    }
 
-        unsafe { RegCloseKey(uninstall_key); }
+    Ok(apps)
+}
 
-        index += 1;
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PowerShellApp {
+    pub name: String,
+    pub version: String,
+    pub publisher: String,
+}
+
+#[tauri::command]
+pub fn get_apps_via_powershell() -> Result<Vec<PowerShellApp>, String> {
+    let powershell_script = r#"
+        Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
+        Where-Object { $_.DisplayName -ne $null } |
+        Select-Object DisplayName, DisplayVersion, Publisher |
+        ConvertTo-Json
+    "#;
+
+    let output = Command::new("powershell")
+        .args(&["-Command", powershell_script])
+        .output()
+        .map_err(|e| format!("Failed to execute PowerShell: {}", e))?;
+
+    if output.status.success() {
+        let json_output = String::from_utf8_lossy(&output.stdout);
+        println!("json output {}", json_output);
+        let apps: Vec<PowerShellApp> = serde_json::from_str(&json_output)
+            .map_err(|e| format!("Failed to parse JSON: {}", e))?;
+        Ok(apps)
+    } else {
+        let error = String::from_utf8_lossy(&output.stderr);
+        Err(format!("PowerShell command failed: {}", error))
     }
 }

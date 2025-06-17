@@ -22,6 +22,7 @@ use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_sql::Migration;
 use tauri_plugin_sql::MigrationKind;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
+use track::installed_app::{get_apps_via_powershell, get_installed_applications};
 use utils::commands::{get_systems_timezone, greet};
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 use windows::core::Interface;
@@ -171,7 +172,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone])
+        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone, get_installed_applications, get_apps_via_powershell])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

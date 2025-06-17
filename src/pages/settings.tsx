@@ -1,31 +1,18 @@
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs.tsx";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import DynamicSearch from "@/components/extented ui/dynamic-search.tsx";
 import { useStoreSettings } from "@/hooks/useStoreSettings.tsx";
 import { Edit2, PlusCircle, RotateCcw, Trash } from "lucide-react";
-import {
-  CategoryStateTypes,
-  zodCategoryStateSchema,
-} from "@/lib/types/store-settings-types.ts";
+import { CategoryStateTypes, InstalledApplication, zodCategoryStateSchema } from "@/lib/types/store-settings-types.ts";
 import ToggleSwitchCategory from "@/components/custom ui/toggle-switch-category.tsx";
 import { PopupDialogAddCategory } from "@/components/custom ui/popup-dialog-add-category.tsx";
 import { PopupDialogResetCategory } from "@/components/custom ui/popup-dialog-reset-category.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
+import { useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 function Settings() {
   const [categoryStates, setCategoryStates] = useStoreSettings<
@@ -35,6 +22,21 @@ function Settings() {
   const sortedCategoryStates = categoryStates.sort((a, b) =>
     a.name.localeCompare(b.name),
   );
+
+  useEffect(() => {
+    async function initInstalledApp() {
+      try {
+        const res = await invoke<InstalledApplication[]>(
+          "get_installed_applications",
+        );
+        console.log("from winreg: ", res);
+      } catch (e) {
+        console.log(`Error ${e}`);
+      }
+    }
+
+    initInstalledApp();
+  }, []);
 
   const settingsList = [
     {

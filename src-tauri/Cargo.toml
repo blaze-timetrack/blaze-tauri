@@ -22,7 +22,6 @@ chrono-tz = "0.10.3"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 serde_with_macros = "3.12.0"
-supabase_rs = "0.4.2"
 tokio = { version = "1.45.1", features = ["full"] } # feature for surrealdb this macros,rt-multi-thread
 parking_lot = "0.12.4"
 modql = "0.4.1"
@@ -31,8 +30,13 @@ ts-rs = { version = "6" }
 anyhow = "1"
 active-win-pos-rs = { version = "0.9.0", optional = true }
 dotenv = "0.15.0"
-webview2-com = "0.37.0"
+sqlx = { version = "0.8.6", features = ['sqlite', 'runtime-tokio'] }
 
+# @todo can stop using
+webview2-com = "0.37.0"
+supabase_rs = "0.4.2"
+notify = "8.0.0"
+winreg = "0.55.0"
 
 # tauri dependencies
 tauri = { version = "2.5.1", features = ["tray-icon"] }
@@ -46,8 +50,6 @@ tauri-plugin-notification = "2.2.2"
 #[dev-dependencies]
 tauri-plugin-devtools = "2.0.0"
 tauri-plugin-sql = { version = "2.2.0", features = ["sqlite"] }
-sqlx = { version = "0.8.6", features = ['sqlite', 'runtime-tokio'] }
-notify = "8.0.0"
 
 [build-dependencies]
 tauri-build = { version = "2.2.0", features = [] }
@@ -67,7 +69,6 @@ features = [
     "Win32_UI_Shell",
     "Win32_NetworkManagement_IpHelper",
     "Win32_Networking_WinSock",
-    "Win32_System_Registry"
 ]
 
 # only macOS

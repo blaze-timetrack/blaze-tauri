@@ -1,13 +1,13 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { motion, MotionConfig } from "motion/react";
+import { motion, MotionConfig, Transition } from "motion/react";
 import useClickOutside from "@/hooks/useClickOutside";
 import { ArrowLeft, Search } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { cn } from "@/lib/utils.ts";
 
-const transition = {
+const transition: Transition = {
   type: "spring",
   bounce: 0.1,
   duration: 0.2,
@@ -57,7 +57,6 @@ export default function DynamicSearch({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(containerRef, () => {
-    console.log("ese too much...");
     setIsOpen(false);
   });
 
