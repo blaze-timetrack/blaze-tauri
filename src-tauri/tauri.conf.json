@@ -57,6 +57,9 @@
       "icons/icon.ico",
       "icons/icon.ico"
     ],
+    "resources": [
+      "./models/bert-mini2/pytorch_model.bin"
+    ],
     "windows": {
       "allowDowngrades": true,
       "certificateThumbprint": null,

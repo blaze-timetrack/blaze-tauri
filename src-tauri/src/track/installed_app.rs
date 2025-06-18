@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::process::Command;
-use serde_json::json;
 use winreg::enums::HKEY_LOCAL_MACHINE;
 use winreg::RegKey;
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct InstalledApp {

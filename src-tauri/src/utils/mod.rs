@@ -7,3 +7,4 @@ pub mod global_shortcut;
 pub mod notification;
 pub mod store;
 pub mod stronghold;
+

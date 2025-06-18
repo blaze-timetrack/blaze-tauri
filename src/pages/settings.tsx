@@ -1,12 +1,28 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs.tsx";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import DynamicSearch from "@/components/extented ui/dynamic-search.tsx";
 import { useStoreSettings } from "@/hooks/useStoreSettings.tsx";
 import { Edit2, PlusCircle, RotateCcw, Trash } from "lucide-react";
-import { CategoryStateTypes, InstalledApplication, zodCategoryStateSchema } from "@/lib/types/store-settings-types.ts";
+import {
+  CategoryStateTypes,
+  InstalledApplication,
+  zodCategoryStateSchema,
+} from "@/lib/types/store-settings-types.ts";
 import ToggleSwitchCategory from "@/components/custom ui/toggle-switch-category.tsx";
 import { PopupDialogAddCategory } from "@/components/custom ui/popup-dialog-add-category.tsx";
 import { PopupDialogResetCategory } from "@/components/custom ui/popup-dialog-reset-category.tsx";
@@ -30,6 +46,10 @@ function Settings() {
           "get_installed_applications",
         );
         console.log("from winreg: ", res);
+        const res2 = await invoke("classify_text", {
+          text: `what will be the group title of this app? app:\`${res[0].name}\``,
+        });
+        console.log("from model: ", res2);
       } catch (e) {
         console.log(`Error ${e}`);
       }

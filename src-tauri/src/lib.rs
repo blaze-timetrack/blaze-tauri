@@ -1,13 +1,17 @@
 // -- Sub-Modules
 mod track;
 mod utils;
+mod classifier;
 
 use crate::track::afk::away_from_keyboard;
 use crate::track::heartbeat::start_heartbeat;
 use crate::utils::db::{close_connection_db, connect_to_db, setup_schema};
+use classifier::classify_text;
+use classifier::Classifier;
 use serde_json::json;
 use std::borrow::Cow;
 use std::path::PathBuf;
+use std::sync::Mutex;
 use std::time::Duration;
 use std::{env, result};
 use tauri::ipc::private::tracing::log;
@@ -27,9 +31,12 @@ use utils::commands::{get_systems_timezone, greet};
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 use windows::core::Interface;
 
+
 // #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut builder = tauri::Builder::default();
+    let classifier = Classifier::new().expect("Failed to load model");
+
+    let mut builder = tauri::Builder::default().manage(Mutex::new(classifier));
 
     #[cfg(desktop)]
     {
@@ -172,7 +179,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone, get_installed_applications, get_apps_via_powershell])
+        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone, get_installed_applications, get_apps_via_powershell, classify_text])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

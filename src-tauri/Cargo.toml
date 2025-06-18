@@ -37,6 +37,14 @@ webview2-com = "0.37.0"
 supabase_rs = "0.4.2"
 notify = "8.0.0"
 winreg = "0.55.0"
+#candle-core = { git = "https://github.com/huggingface/candle.git" }
+#candle-nn = { git = "https://github.com/huggingface/candle.git" }
+#tokenizers = "0.21.1"
+#hf-hub = "0.4.3"
+
+rust-bert = { version = "0.23.0", features = ["remote", "download-libtorch"] }
+tch = "0.17.0"
+
 
 # tauri dependencies
 tauri = { version = "2.5.1", features = ["tray-icon"] }
