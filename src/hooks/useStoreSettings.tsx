@@ -21,9 +21,9 @@ export function useStoreSettings<G extends string, T>(
           console.error("Validation error:", result.error);
           await s.set(key, defaultValue);
           setValue(defaultValue);
-          return;
+        } else {
+          setValue(result.data);
         }
-        setValue(result.data);
       } catch (error) {
         console.error("Store initialization error:", error);
         setValue(defaultValue);
@@ -59,7 +59,6 @@ export function useStoreSettings<G extends string, T>(
       return;
     }
     try {
-      await store.delete(key);
       await store.set(key, defaultValue);
       setValue(defaultValue);
     } catch (error) {

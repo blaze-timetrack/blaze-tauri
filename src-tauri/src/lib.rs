@@ -15,11 +15,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 use std::{env, result};
 use tauri::ipc::private::tracing::log;
-use tauri::{
-    menu::{Menu, MenuItem},
-    utils::TitleBarStyle,
-    AppHandle, Emitter, LogicalPosition, PhysicalSize,
-};
+use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, LogicalPosition, PhysicalSize, Runtime};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
@@ -86,6 +82,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let main_window = app.get_webview_window("main").unwrap();
+            // @todo add only to desktop
             let widget_window = app.get_webview_window("widget").unwrap();
 
             let size = PhysicalSize::new(420.0 as u32, 38.0 as u32);
@@ -170,12 +167,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 utils::autostart::set_auto_start(app.handle())?;
                 utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();
                 utils::tray::create_tray(app.handle()).unwrap();
+
+                let app_data_dir = app.handle().path().app_data_dir().unwrap();
+                tauri::async_runtime::spawn(background_track(app_data_dir, app.handle().clone()));
             }
 
-            // background running task
-            let app_handle = app.handle().clone();
-            let app_data_dir = app_handle.path().app_data_dir().unwrap();
-            tauri::async_runtime::spawn(background_track(app_data_dir, app_handle));
 
             Ok(())
         })
@@ -186,7 +182,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn background_track(app_data_dir: PathBuf, app_handle: AppHandle) {
+async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::AppHandle<R>) {
     match connect_to_db(app_data_dir).await {
         Ok(db) => {
             if let Err(e) = setup_schema(&db).await {

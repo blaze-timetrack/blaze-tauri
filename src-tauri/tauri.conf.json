@@ -58,7 +58,10 @@
       "icons/icon.ico"
     ],
     "resources": [
-      "./models/bert-mini2/pytorch_model.bin"
+      "models/bert-mini/tokenizer_config.json",
+      "models/bert-mini/tokenizer.json",
+      "models/bert-mini/bert-mini-candle.safetensors",
+      "models/bert-mini/config.json"
     ],
     "windows": {
       "allowDowngrades": true,

@@ -1,5 +1,50 @@
 import { z } from "zod";
 
+// states
+export enum StateTypes {
+  FETCH = "FETCH",
+  TRACKING = "TRACKING",
+  FLOW = "FLOW",
+  BREAK = "BREAK",
+  MEETING = "MEETING",
+  WORKOUT = "WORKOUT",
+  NO_TRACKING = "NO_TRACKING",
+}
+
+// music
+export enum MusicTypes {
+  SILENT = "SILENT",
+  LO_FI = "LO_FI",
+  MEDITATION = "MEDITATION",
+  NATURE = "NATURE",
+  POP = "POP",
+  ROCK = "ROCK",
+  JAZZ = "JAZZ",
+  CLASSICAL = "CLASSICAL",
+  HIP_HOP = "HIP_HOP",
+  ELECTRONIC = "ELECTRONIC",
+  DANCE = "DANCE",
+  RAP = "RAP",
+  OTHER = "OTHER", // ADD YOUR OWN
+}
+
+// theme && theme mode
+export enum ThemeTypes {
+  LIGHT = "LIGHT",
+  DARK = "DARK",
+  SYSTEM = "SYSTEM",
+}
+
+export enum ThemeModeTypes {
+  DEFAULT = "DEFAULT",
+  MONO = "MONO",
+  CAFFEINE = "CAFFEINE",
+  CYBERPUNK = "CYBERPUNK",
+  NATURE = "NATURE",
+  PRODUCTIVE = "PRODUCTIVE",
+  NIGHT = "NIGHT",
+}
+
 // category states
 export enum CategoryActionTypes {
   DISABLE_CATEGORY = "DISABLE_CATEGORY",
@@ -10,7 +55,6 @@ const categoryStateSchema = z.object({
   state: z.boolean(),
   action: z.nativeEnum(CategoryActionTypes),
 });
-
 export const categoryStateTypeSchema = z.object({
   name: z.string().min(3).max(20),
   state_flow: categoryStateSchema,
@@ -18,37 +62,34 @@ export const categoryStateTypeSchema = z.object({
   state_idle: categoryStateSchema,
   state_block: categoryStateSchema,
 });
-
-export type CategoryStateTypes = z.infer<typeof categoryStateTypeSchema>;
-
-export const DefaultCategoryState: CategoryStateTypes = {
-  name: "",
-  state_flow: {
-    state: true,
-    action: CategoryActionTypes.ENABLE_CATEGORY,
-  },
-  state_work: {
-    state: true,
-    action: CategoryActionTypes.ENABLE_CATEGORY,
-  },
-  state_block: {
-    state: true,
-    action: CategoryActionTypes.ENABLE_CATEGORY,
-  },
-  state_idle: {
-    state: true,
-    action: CategoryActionTypes.ENABLE_CATEGORY,
-  },
-};
-
+export type categoryStateTypes = z.infer<typeof categoryStateTypeSchema>;
 export const zodCategoryStateSchema = z.array(categoryStateTypeSchema).min(0);
 
-// application states
+//  group programs (based on category)
+export enum GroupProgramsPlatformType {
+  WINDOWS = "windows",
+  MACOS = "macos",
+}
 
-export interface InstalledApplication {
-  name: string;
-  version?: string;
-  publisher?: string;
-  install_data?: string;
-  install_path?: string;
+export const groupProgramsTypeSchema = z.object({
+  name: z
+    .string()
+    .min(3, {
+      message: "program name must be at least 3 characters.",
+    })
+    .max(20),
+  publisher: z.string().min(3).max(20).optional(),
+  category: z.string().min(3).max(20),
+  platform: z.nativeEnum(GroupProgramsPlatformType),
+  point: z.number().optional(),
+});
+export type groupProgramsType = z.infer<typeof groupProgramsTypeSchema>;
+export const zodGroupProgramsSchema = z.array(groupProgramsTypeSchema).min(0);
+
+export enum ActionNameTypes {
+  SET = "SET",
+  UPDATE = "UPDATE",
+  "RESET" = "RESET",
+  "DELETE" = "DELETE",
+  "CLEAR" = "CLEAR",
 }

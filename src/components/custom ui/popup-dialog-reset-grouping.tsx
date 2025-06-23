@@ -7,25 +7,49 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import { ActionNameTypes } from "@/lib/types/store-settings-types.ts";
+import { useStoreSettings } from "@/hooks/useStoreSettings.tsx";
+import {
+  GroupProgramsPlatformType,
+  groupProgramsType,
+  zodGroupProgramsSchema,
+} from "@/lib/types/store-settings-types.ts";
 import { Button } from "@/components/ui/button.tsx";
-import { useSettingStore } from "@/lib/zustand/store.ts";
+import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
 
-export function PopupDialogResetCategory({
+export function PopupDialogResetGrouping({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [categoryStates, setCategoryStates] = useSettingStore((state) => [
-    state.categoryStates,
-    state.setCategoryState,
-  ]);
+  const [, , resetGroupedPrograms] = useStoreSettings<
+    string,
+    groupProgramsType[]
+  >(
+    SettingsKeys.GROUPING_PROGRAMS,
+    [
+      {
+        name: "zen browser",
+        publisher: "browser company",
+        category: "browser",
+        platform: GroupProgramsPlatformType.WINDOWS,
+        point: 0,
+      },
+      {
+        name: "key paint",
+        publisher: "Apple Inc.",
+        category: "paint",
+        platform: GroupProgramsPlatformType.MACOS,
+        point: 0,
+      },
+    ],
+    zodGroupProgramsSchema,
+  );
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setCategoryStates(categoryStates[0], ActionNameTypes.RESET);
+    resetGroupedPrograms();
     setIsOpen(false);
   };
 

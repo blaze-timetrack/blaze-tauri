@@ -8,15 +8,15 @@ import {
   PredefinedMenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
-import { register } from "@tauri-apps/plugin-global-shortcut";
 
 function Widget() {
   useEffect(() => {
-    register("Ctrl+Shift+S", () => {
-      console.log("Ctrl+Shift+S pressed");
-      // Your custom logic here
-      // If you want to prevent the default action, the API may not always allow it, but you can react to it
-    });
+    // does not work for swaping the shortcut it is set globally
+    // register("Ctrl+Shift+S", () => {
+    //   console.log("Ctrl+Shift+S pressed");
+    //   // Your custom logic here
+    //   // If you want to prevent the default action, the API may not always allow it, but you can react to it
+    // });
     const handleKeyDown = (event: KeyboardEvent) => {
       // Example: Override Ctrl+Shift+S (not system-wide)
       console.log("triggered");
