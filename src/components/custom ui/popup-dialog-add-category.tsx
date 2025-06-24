@@ -10,8 +10,10 @@ import {
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button.tsx";
 import { defaultCategoryState } from "@/lib/constants/settings-const.tsx";
-import { useSettingStore } from "@/lib/zustand/store.ts";
-import { ActionNameTypes } from "@/lib/types/store-settings-types.ts";
+import {
+  ActionNameTypes,
+  categoryStateTypes,
+} from "@/lib/types/store-settings-types.ts";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -27,15 +29,17 @@ import { Input } from "@/components/ui/input.tsx";
 
 export function PopupDialogAddCategory({
   children,
+  categoryStates,
+  setCategoryState,
 }: {
   children: React.ReactNode;
+  categoryStates: categoryStateTypes[];
+  setCategoryState: (
+    categoryStates: categoryStateTypes,
+    actionName?: ActionNameTypes,
+  ) => Promise<string | undefined>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const [categoryStates, setCategoryStates] = useSettingStore((state) => [
-    state.categoryStates,
-    state.setCategoryState,
-  ]);
 
   const formSchema = z.object({
     category: z.string().min(3).max(20),
@@ -45,7 +49,7 @@ export function PopupDialogAddCategory({
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     // @ts-ignore
-    const res = await setCategoryStates(
+    const res = await setCategoryState(
       {
         ...defaultCategoryState,
         name: value.category,

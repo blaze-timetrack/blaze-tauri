@@ -1,9 +1,4 @@
 import React from "react";
-import { useStoreSettings } from "@/hooks/useStoreSettings.tsx";
-import {
-  groupProgramsType,
-  zodGroupProgramsSchema,
-} from "@/lib/types/store-settings-types.ts";
 import {
   Card,
   CardContent,
@@ -21,42 +16,12 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { PopupDialogAddGrouping } from "@/components/custom ui/popup-dialog-add-grouping.tsx";
 import { PopupDialogResetGrouping } from "@/components/custom ui/popup-dialog-reset-grouping.tsx";
-import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
+import { useSettingStore } from "@/lib/zustand/store.ts";
 
 function GroupingTab() {
   // @todo @error: div component rendering continuously
-  const [groupPrograms, setGroupPrograms] = useStoreSettings<
-    string,
-    groupProgramsType[]
-  >(SettingsKeys.GROUPING_PROGRAMS, [], zodGroupProgramsSchema);
-  const sortedCategoryStates = groupPrograms.sort((a, b) =>
-    a.name.localeCompare(b.name),
-  ); //
-  // useEffect(() => {
-  //   async function initInstalledApp() {
-  //     try {
-  //       let res = await invoke<InstalledApplication[]>(
-  //         "get_installed_applications",
-  //       );
-  //       res = res.slice(0, 10);
-  //       console.log("from winreg: ", res);
-  //       setGroupPrograms([
-  //         ...res.map(({ name, publisher }) => ({
-  //           name,
-  //           publisher,
-  //           category: "browser",
-  //           platform: GroupProgramsPlatformType.WINDOWS,
-  //           point: 0,
-  //         })),
-  //       ]);
-  //       console.log(`sortedCategoryState: ${sortedCategoryStates}`);
-  //     } catch (e) {
-  //       console.log(`Error ${e}`);
-  //     }
-  //   }
-  //
-  //   initInstalledApp();
-  // }, []);
+  const groupPrograms = useSettingStore((state) => state.groupedPrograms);
+  const setGroupProgram = useSettingStore((state) => state.setGroupedProgram);
 
   return (
     <>
@@ -65,10 +30,16 @@ function GroupingTab() {
           <CardTitle className={"flex w-full justify-between"}>
             <p>Application Category</p>
             <div className={"flex flex-row-reverse gap-2"}>
-              <PopupDialogAddGrouping>
+              <PopupDialogAddGrouping
+                setGroupedProgram={setGroupProgram}
+                groupedPrograms={groupPrograms}
+              >
                 <PlusCircle className={"h-5 w-5"} />
               </PopupDialogAddGrouping>
-              <PopupDialogResetGrouping>
+              <PopupDialogResetGrouping
+                setGroupedProgram={setGroupProgram}
+                groupedPrograms={groupPrograms}
+              >
                 <RotateCcw className={"h-5 w-5"} />
               </PopupDialogResetGrouping>
             </div>
@@ -99,14 +70,14 @@ function GroupingTab() {
             <p className={"text-start"}>Publisher</p>
           </div>
           <div className={"flex w-full flex-col gap-2"}>
-            {sortedCategoryStates.map((v, i) => (
+            {groupPrograms.map((v, i) => (
               <div
                 key={i}
                 className={
                   "text-primary/80 flex items-center justify-between gap-4"
                 }
               >
-                <p className={"min-w-xs"}>{v.name}</p>
+                <p className={"min-w-xs lowercase"}>{v.name}</p>
                 <div className={"flex items-center gap-1"}>
                   {v.platform === "windows" ? (
                     <AppWindowIcon className={"h-4 w-4"} />

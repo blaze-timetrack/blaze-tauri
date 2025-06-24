@@ -93,3 +93,11 @@ export enum ActionNameTypes {
   "DELETE" = "DELETE",
   "CLEAR" = "CLEAR",
 }
+
+export interface InstalledApplication {
+  name: string;
+  version: string | undefined;
+  publisher: string | undefined;
+  install_date: string | undefined;
+  install_path: string | undefined;
+}

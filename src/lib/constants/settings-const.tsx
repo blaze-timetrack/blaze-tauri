@@ -6,6 +6,12 @@ import {
   categoryStateTypes,
 } from "@/lib/types/store-settings-types.ts";
 
+export enum SettingsKeys {
+  CATEGORY_STATES = "categoryStates",
+  GROUPING_PROGRAMS = "groupedPrograms",
+  THEME = "THEME",
+}
+
 export const settingsTabList = [
   {
     id: 1,
@@ -33,9 +39,45 @@ export const settingsTabList = [
   },
   {
     id: 5,
-    name: "App Category",
+    name: "Categorise Programs",
     value: "grouping",
     content: () => <GroupingTab />,
+  },
+  {
+    id: 6,
+    name: "Theme",
+    value: "theme",
+    content: () => <></>,
+  },
+  {
+    id: 7,
+    name: "Privacy",
+    value: "privacy",
+    content: () => <></>,
+  },
+  {
+    id: 8,
+    name: "Planning",
+    value: "planning",
+    content: () => <></>,
+  },
+  {
+    id: 9,
+    name: "Notification",
+    value: "notification",
+    content: () => <></>,
+  },
+  {
+    id: 10,
+    name: "Distraction Blocker",
+    value: "distraction_blocker",
+    content: () => <></>,
+  },
+  {
+    id: 11,
+    name: "Data Export",
+    value: "data_export",
+    content: () => <></>,
   },
 ];
 

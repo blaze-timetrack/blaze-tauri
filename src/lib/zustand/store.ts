@@ -9,12 +9,30 @@ import {
   StateTypes,
   ThemeModeTypes,
   ThemeTypes,
+  zodCategoryStateSchema,
+  zodGroupProgramsSchema,
 } from "@/lib/types/store-settings-types.ts";
 import { create } from "zustand/react";
 import { z } from "zod";
+import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
 
-const tauriStore = new LazyStore(".settings.dat");
+const tauriStore = new LazyStore(".settings.dat", { autoSave: true });
 
+//       let res = await invoke<InstalledApplication[]>(
+//         "get_installed_applications",
+//       );
+//       res = res.slice(0, 10);
+//       console.log("from winreg: ", res);
+//       setGroupPrograms([
+//         ...res.map(({ name, publisher }) => ({
+//           name,
+//           publisher,
+//           category: "browser",
+//           platform: GroupProgramsPlatformType.WINDOWS,
+//           point: 0,
+//         })),
+//       ]);
+// @todo setup the default states on setup of application
 export const defaultCategoryStates = [
   {
     name: "browser",
@@ -91,11 +109,6 @@ export const defaultGroupingPrograms = [
   },
 ];
 
-export enum SettingsKeys {
-  CATEGORY_STATES = "categoryStates",
-  GROUPING_PROGRAMS = "groupingPrograms",
-}
-
 export interface SettingsStore {
   categoryStates: categoryStateTypes[];
   groupedPrograms: groupProgramsType[];
@@ -108,7 +121,10 @@ export interface SettingsStore {
     categoryStates: categoryStateTypes,
     actionName?: ActionNameTypes,
   ) => Promise<string | undefined>;
-  setGroupedProgram: (groupedPrograms: groupProgramsType) => Promise<void>;
+  setGroupedProgram: (
+    groupedProgram: groupProgramsType,
+    actionName?: ActionNameTypes,
+  ) => Promise<string | undefined>;
   setTheme: (theme: ThemeTypes) => Promise<void>;
   setThemeMode: (themeMode: ThemeModeTypes) => Promise<void>;
   setState: (state: StateTypes) => Promise<void>;
@@ -130,21 +146,31 @@ export const useSettingStore = create<SettingsStore>((set) => ({
     let error = "";
     if (actionName === ActionNameTypes.SET) {
       set(({ categoryStates }) => {
-        const val = [...categoryStates, categoryState]
-          .filter((v) => {
-            if (v.name !== categoryState.name) return v;
-            error = "already_exists";
-            return;
-          })
-          .sort((a, b) => a.name.localeCompare(b.name));
+        let val = categoryStates.filter((v) => {
+          if (v.name.toLowerCase() !== categoryState.name.toLowerCase())
+            return v;
+          error = "already_exists";
+          return;
+        });
+        if (error === "already_exists") {
+          return { categoryStates: categoryStates };
+        }
+        val = [...val, categoryState].sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+
         tauriStore.set(tauriStoreKey, val);
         return { categoryStates: val };
       });
     } else if (actionName === ActionNameTypes.UPDATE) {
       set(({ categoryStates }) => {
-        const val = categoryStates
-          .filter((v) => v.name !== categoryState.name)
-          .sort((a, b) => a.name.localeCompare(b.name));
+        let val = categoryStates.filter(
+          (v) => v.name.toLowerCase() !== categoryState.name.toLowerCase(),
+        );
+        val = [...val, categoryState].sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+
         tauriStore.set(tauriStoreKey, val);
         return {
           categoryStates: val,
@@ -161,7 +187,44 @@ export const useSettingStore = create<SettingsStore>((set) => ({
     }
     return error;
   },
-  setGroupedProgram: async (groupedPrograms: groupProgramsType) => {},
+  setGroupedProgram: async (
+    groupedProgram: groupProgramsType,
+    actionName = ActionNameTypes.SET,
+  ) => {
+    const tauriStoreKey = SettingsKeys.GROUPING_PROGRAMS;
+    let error = "";
+
+    if (actionName === ActionNameTypes.SET) {
+      set(({ groupedPrograms }) => {
+        let val = groupedPrograms.filter((v) => {
+          if (v.name.toLowerCase() !== groupedProgram.name.toLowerCase())
+            return v;
+          error = "already_exists";
+          return;
+        });
+        if (error === "already_exists") {
+          return { groupedPrograms: groupedPrograms };
+        }
+        val = [...val, groupedProgram].sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+
+        tauriStore.set(tauriStoreKey, val);
+        return {
+          groupedPrograms: val,
+        };
+      });
+    } else if (actionName === ActionNameTypes.RESET) {
+      set(({ groupedPrograms }) => {
+        tauriStore.set(tauriStoreKey, defaultGroupingPrograms);
+        return { groupedPrograms: defaultGroupingPrograms };
+      });
+    }
+    if (error === "") {
+      return;
+    }
+    return error;
+  },
   setTheme: async (theme: ThemeTypes) => {
     set({ theme: theme });
 
@@ -179,11 +242,26 @@ export const useSettingStore = create<SettingsStore>((set) => ({
 }));
 
 const hydrate = async () => {
+  const categoryStates = (await tauriStore.get(
+    "categoryStates",
+  )) as categoryStateTypes[];
+  const groupedPrograms = (await tauriStore.get(
+    "groupedPrograms",
+  )) as groupProgramsType[];
   const theme = (await tauriStore.get("theme")) as ThemeTypes;
-  const parsedThem = z.nativeEnum(ThemeTypes).safeParse(theme);
 
-  if (parsedThem.success) {
-    useSettingStore.setState({ theme: parsedThem.data });
+  const parsedCategoryStates = zodCategoryStateSchema.safeParse(categoryStates);
+  const parseGroupedPrograms = zodGroupProgramsSchema.safeParse(categoryStates);
+  const parsedTheme = z.nativeEnum(ThemeTypes).safeParse(theme);
+
+  if (parsedCategoryStates.success) {
+    useSettingStore.setState({ categoryStates: parsedCategoryStates.data });
+  }
+  if (parseGroupedPrograms.success) {
+    useSettingStore.setState({ groupedPrograms: parseGroupedPrograms.data });
+  }
+  if (parsedTheme.success) {
+    useSettingStore.setState({ theme: parsedTheme.data });
 
     const root = window.document.documentElement;
     root.classList.value = "";

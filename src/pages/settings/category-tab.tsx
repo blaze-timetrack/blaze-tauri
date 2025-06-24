@@ -7,18 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { PopupDialogAddCategory } from "@/components/custom ui/popup-dialog-add-category.tsx";
 import { Edit2, PlusCircle, RotateCcw, Trash } from "lucide-react";
 import { PopupDialogResetCategory } from "@/components/custom ui/popup-dialog-reset-category.tsx";
 import ToggleSwitchCategory from "@/components/custom ui/toggle-switch-category.tsx";
 import { useSettingStore } from "@/lib/zustand/store.ts";
 import { ActionNameTypes } from "@/lib/types/store-settings-types.ts";
+import { PopupDialogAddCategory } from "@/components/custom ui/popup-dialog-add-category.tsx";
 
 function CategoryTab() {
-  const [categoryStates, setCategoryStates] = useSettingStore((state) => [
-    state.categoryStates,
-    state.setCategoryState,
-  ]);
+  const categoryStates = useSettingStore((state) => state.categoryStates);
+  const setCategoryState = useSettingStore((state) => state.setCategoryState);
 
   return (
     <>
@@ -27,10 +25,16 @@ function CategoryTab() {
           <CardTitle className={"flex w-full justify-between"}>
             <p>Category</p>
             <div className={"flex flex-row-reverse gap-2"}>
-              <PopupDialogAddCategory>
+              <PopupDialogAddCategory
+                setCategoryState={setCategoryState}
+                categoryStates={categoryStates}
+              >
                 <PlusCircle className={"h-5 w-5"} />
               </PopupDialogAddCategory>
-              <PopupDialogResetCategory>
+              <PopupDialogResetCategory
+                setCategoryState={setCategoryState}
+                categoryStates={categoryStates}
+              >
                 <RotateCcw className={"h-5 w-5"} />
               </PopupDialogResetCategory>
             </div>
@@ -63,9 +67,6 @@ function CategoryTab() {
 
             <tbody className={"flex w-full flex-col gap-4"}>
               {categoryStates.map((categoryState, id) => {
-                const filterCategoryStates = categoryStates.filter(
-                  (v) => v.name !== categoryState.name,
-                );
                 return (
                   <tr
                     key={id}
@@ -79,7 +80,7 @@ function CategoryTab() {
                     >
                       <ToggleSwitchCategory
                         onChange={(v) => {
-                          setCategoryStates(
+                          setCategoryState(
                             {
                               ...categoryState,
                               state_flow: {
@@ -101,7 +102,7 @@ function CategoryTab() {
                     >
                       <ToggleSwitchCategory
                         onChange={(v) => {
-                          setCategoryStates(
+                          setCategoryState(
                             {
                               ...categoryState,
                               state_work: {
@@ -123,7 +124,7 @@ function CategoryTab() {
                     >
                       <ToggleSwitchCategory
                         onChange={(v) => {
-                          setCategoryStates(
+                          setCategoryState(
                             {
                               ...categoryState,
                               state_idle: {
@@ -145,7 +146,7 @@ function CategoryTab() {
                     >
                       <ToggleSwitchCategory
                         onChange={(v) => {
-                          setCategoryStates(
+                          setCategoryState(
                             {
                               ...categoryState,
                               state_block: {

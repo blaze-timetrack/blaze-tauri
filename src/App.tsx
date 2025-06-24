@@ -15,6 +15,7 @@ import Notification from "@/pages/notification.tsx";
 import Settings from "@/pages/settings.tsx";
 import { useRef, useState } from "react";
 import useSetShortcuts, { Keys } from "@/hooks/useSetShortcuts.tsx";
+import { SettingsStoreLoaded } from "@/lib/zustand/settings-store-loaded.tsx";
 
 function App() {
   // const [isWidget, setIsWidget] = useState(true);
@@ -66,33 +67,38 @@ function App() {
   );
 
   return (
-    <Routes>
-      <Route
-        element={
-          <RootLayout commandsRef={containerRef} commandsOpen={commandsOpen} />
-        }
-      >
-        <Route index element={<HomePage />} />
-        <Route path="categories" element={<CategoriesPage />} />
-        <Route path={"work/projects"} element={<Projects />} />
-        <Route path={"work/tasks"} element={<Tasks />} />
-        <Route path={"work/clients"} element={<Clients />} />
-        {/* productivity */}
-        <Route path={"productivity/trends"} element={<Trends />} />
-        <Route path={"productivity/goals"} element={<Goals />} />
-        <Route path={"productivity/insights"} element={<Insights />} />
+    <SettingsStoreLoaded>
+      <Routes>
+        <Route
+          element={
+            <RootLayout
+              commandsRef={containerRef}
+              commandsOpen={commandsOpen}
+            />
+          }
+        >
+          <Route index element={<HomePage />} />
+          <Route path="categories" element={<CategoriesPage />} />
+          <Route path={"work/projects"} element={<Projects />} />
+          <Route path={"work/tasks"} element={<Tasks />} />
+          <Route path={"work/clients"} element={<Clients />} />
+          {/* productivity */}
+          <Route path={"productivity/trends"} element={<Trends />} />
+          <Route path={"productivity/goals"} element={<Goals />} />
+          <Route path={"productivity/insights"} element={<Insights />} />
 
-        {/* teams */}
-        <Route path={"teams"} element={<Teams />} />
+          {/* teams */}
+          <Route path={"teams"} element={<Teams />} />
 
-        <Route path={"/settings"} element={<Settings />} />
+          <Route path={"/settings"} element={<Settings />} />
 
-        {/*  Errors */}
-        <Route path="*" element={<NotFound />} />
-      </Route>
-      <Route path={"widget"} element={<Widget />} />
-      <Route path={"notification"} element={<Notification />} />
-    </Routes>
+          {/*  Errors */}
+          <Route path="*" element={<NotFound />} />
+        </Route>
+        <Route path={"widget"} element={<Widget />} />
+        <Route path={"notification"} element={<Notification />} />
+      </Routes>
+    </SettingsStoreLoaded>
   );
 }
 

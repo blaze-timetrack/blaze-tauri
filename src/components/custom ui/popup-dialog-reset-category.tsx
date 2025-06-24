@@ -7,25 +7,29 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import { ActionNameTypes } from "@/lib/types/store-settings-types.ts";
+import {
+  ActionNameTypes,
+  categoryStateTypes,
+} from "@/lib/types/store-settings-types.ts";
 import { Button } from "@/components/ui/button.tsx";
-import { useSettingStore } from "@/lib/zustand/store.ts";
 
 export function PopupDialogResetCategory({
   children,
+  categoryStates,
+  setCategoryState,
 }: {
   children: React.ReactNode;
+  categoryStates: categoryStateTypes[];
+  setCategoryState: (
+    categoryStates: categoryStateTypes,
+    actionName?: ActionNameTypes,
+  ) => Promise<string | undefined>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [categoryStates, setCategoryStates] = useSettingStore((state) => [
-    state.categoryStates,
-    state.setCategoryState,
-  ]);
-
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setCategoryStates(categoryStates[0], ActionNameTypes.RESET);
+    setCategoryState(categoryStates[0], ActionNameTypes.RESET);
     setIsOpen(false);
   };
 

@@ -8,12 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import { useStoreSettings } from "@/hooks/useStoreSettings.tsx";
 import {
+  ActionNameTypes,
   GroupProgramsPlatformType,
   groupProgramsType,
   groupProgramsTypeSchema,
-  zodGroupProgramsSchema,
 } from "@/lib/types/store-settings-types.ts";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,12 +26,18 @@ import {
 } from "@/components/ui/form.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
 
 export function PopupDialogAddGrouping({
   children,
+  groupedPrograms,
+  setGroupedProgram,
 }: {
   children: React.ReactNode;
+  groupedPrograms: groupProgramsType[];
+  setGroupedProgram: (
+    groupProgram: groupProgramsType,
+    actionName?: ActionNameTypes,
+  ) => Promise<string | undefined>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,14 +51,16 @@ export function PopupDialogAddGrouping({
     },
   });
 
-  const [groupedPrograms, setGroupedPrograms] = useStoreSettings<
-    string,
-    groupProgramsType[]
-  >(SettingsKeys.GROUPING_PROGRAMS, [], zodGroupProgramsSchema);
-
-  const onSubmit = (value: groupProgramsType) => {
+  const onSubmit = async (value: groupProgramsType) => {
     console.log(value);
-    setGroupedPrograms([...groupedPrograms, value]);
+    const res = await setGroupedProgram(value);
+    if (res === "already_exists") {
+      form.setError("name", {
+        type: "validate",
+        message: "the program is already present",
+      });
+      return;
+    }
     setIsOpen(false);
     form.reset();
   };

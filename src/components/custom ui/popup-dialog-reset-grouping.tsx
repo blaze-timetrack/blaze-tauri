@@ -7,49 +7,29 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import { useStoreSettings } from "@/hooks/useStoreSettings.tsx";
 import {
-  GroupProgramsPlatformType,
+  ActionNameTypes,
   groupProgramsType,
-  zodGroupProgramsSchema,
 } from "@/lib/types/store-settings-types.ts";
 import { Button } from "@/components/ui/button.tsx";
-import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
 
 export function PopupDialogResetGrouping({
   children,
+  groupedPrograms,
+  setGroupedProgram,
 }: {
   children: React.ReactNode;
+  groupedPrograms: groupProgramsType[];
+  setGroupedProgram: (
+    groupProgram: groupProgramsType,
+    actionName?: ActionNameTypes,
+  ) => Promise<string | undefined>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [, , resetGroupedPrograms] = useStoreSettings<
-    string,
-    groupProgramsType[]
-  >(
-    SettingsKeys.GROUPING_PROGRAMS,
-    [
-      {
-        name: "zen browser",
-        publisher: "browser company",
-        category: "browser",
-        platform: GroupProgramsPlatformType.WINDOWS,
-        point: 0,
-      },
-      {
-        name: "key paint",
-        publisher: "Apple Inc.",
-        category: "paint",
-        platform: GroupProgramsPlatformType.MACOS,
-        point: 0,
-      },
-    ],
-    zodGroupProgramsSchema,
-  );
-
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    resetGroupedPrograms();
+    setGroupedProgram(groupedPrograms[0], ActionNameTypes.RESET);
     setIsOpen(false);
   };
 
