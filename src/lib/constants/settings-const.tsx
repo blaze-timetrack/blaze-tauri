@@ -4,7 +4,8 @@ import GroupingTab from "@/pages/settings/grouping-tab.tsx";
 import {
   CategoryActionTypes,
   categoryStateTypes,
-} from "@/lib/types/store-settings-types.ts";
+} from "@/lib/types/store-settings.types.ts";
+import ThemeTab from "@/pages/settings/theme-tab.tsx";
 
 export enum SettingsKeys {
   CATEGORY_STATES = "categoryStates",
@@ -47,7 +48,7 @@ export const settingsTabList = [
     id: 6,
     name: "Theme",
     value: "theme",
-    content: () => <></>,
+    content: () => <ThemeTab />,
   },
   {
     id: 7,

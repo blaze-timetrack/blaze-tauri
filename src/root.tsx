@@ -1,6 +1,4 @@
-import { Moon, Sun } from "lucide-react";
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 // @ts-ignore
 import { isRouteErrorResponse, Outlet, type Route } from "react-router";
 
@@ -10,39 +8,6 @@ import { Commands } from "@/components/custom ui/commands.tsx";
 import { cn } from "@/lib/utils.ts";
 import TitleBar from "@/components/backend components/title-bar.tsx";
 import TopBar from "@/components/shared/top-bar.tsx";
-
-// @ts-ignore
-function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    return "light";
-  });
-
-  useEffect(() => {
-    // @ts-ignore/
-    const root = window.document.documentElement;
-    // root.classList = "";
-    // root.classList.add(theme);
-  }, [theme]);
-
-  return (
-    <button
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="bg-background border-border hover:bg-accent fixed right-4 bottom-4 rounded-full border p-2 transition-colors"
-      aria-label="Toggle theme"
-    >
-      {theme === "light" ? (
-        <Moon className="h-5 w-5" />
-      ) : (
-        <Sun className="h-5 w-5" />
-      )}
-    </button>
-  );
-}
 
 export function RootLayout({
   commandsRef,

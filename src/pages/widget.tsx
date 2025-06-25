@@ -8,9 +8,28 @@ import {
   PredefinedMenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
+import { listen } from "@tauri-apps/api/event";
 
 function Widget() {
+  const infoFromMain = async () => {
+    const unlisten = await listen("reload", (event: Event<any>) => {
+      if (event.payload.windowLabel === "widget") {
+        console.log("reloading");
+        window.location.reload();
+      }
+    });
+
+    return unlisten;
+  };
+
   useEffect(() => {
+    let cleanup: (() => void) | undefined;
+
+    const init = async () => {
+      cleanup = await infoFromMain();
+    };
+
+    init();
     // does not work for swaping the shortcut it is set globally
     // register("Ctrl+Shift+S", () => {
     //   console.log("Ctrl+Shift+S pressed");
@@ -27,10 +46,14 @@ function Widget() {
       }
     };
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (cleanup) cleanup();
+    };
   }, []);
 
   const appWindow = getCurrentWindow();
+
   const handleMenuClick = useCallback(async () => {
     const fileSubmenu = await Submenu.new({
       text: "File",
@@ -337,11 +360,7 @@ function Widget() {
   }, [appWindow]);
 
   return (
-    <div
-      className={
-        "bg-background text-foreground h-screen bg-black text-white select-none"
-      }
-    >
+    <div className={"bg-background text-foreground h-screen select-none"}>
       <div className={"mr-2 ml-4 flex h-full items-center justify-between"}>
         <p className={"flex items-center gap-2"}>
           <PowerCircle className={"h-5 w-5"} />

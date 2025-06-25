@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import {
   ActionNameTypes,
   categoryStateTypes,
-} from "@/lib/types/store-settings-types.ts";
+} from "@/lib/types/store-settings.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 
 export function PopupDialogResetCategory({

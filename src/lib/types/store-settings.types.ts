@@ -29,21 +29,9 @@ export enum MusicTypes {
 }
 
 // theme && theme mode
-export enum ThemeTypes {
-  LIGHT = "LIGHT",
-  DARK = "DARK",
-  SYSTEM = "SYSTEM",
-}
+export type ThemeTypes = "dark" | "light" | "system";
 
-export enum ThemeModeTypes {
-  DEFAULT = "DEFAULT",
-  MONO = "MONO",
-  CAFFEINE = "CAFFEINE",
-  CYBERPUNK = "CYBERPUNK",
-  NATURE = "NATURE",
-  PRODUCTIVE = "PRODUCTIVE",
-  NIGHT = "NIGHT",
-}
+export type ThemeModeTypes = "default" | "mono" | "catppuccin";
 
 // category states
 export enum CategoryActionTypes {

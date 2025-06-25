@@ -13,7 +13,7 @@ import { defaultCategoryState } from "@/lib/constants/settings-const.tsx";
 import {
   ActionNameTypes,
   categoryStateTypes,
-} from "@/lib/types/store-settings-types.ts";
+} from "@/lib/types/store-settings.types.ts";
 import { useForm } from "react-hook-form";
 import {
   Form,

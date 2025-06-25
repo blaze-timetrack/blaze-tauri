@@ -4,44 +4,58 @@ import { connectToDB } from "@/db";
 import { useEffect, useState } from "react";
 import { Event, listen } from "@tauri-apps/api/event";
 import TopBar2 from "@/components/shared/top-bar2.tsx";
+import {
+  HeartbeatStopTypes,
+  HeartbeatTypes,
+} from "@/lib/types/heartbeat.types.ts";
 
 function Home() {
   const [activities, setActivities] = useState<Array<any>>([]);
-  const setActivityFn = async () => {
-    const db = await connectToDB();
-    const res: Array<any> = await db.select("SELECT * FROM activity");
-    setActivities(res);
-    // console.log(res);
-  };
-
-  const listenProgramChange = async () => {
-    const db = await connectToDB();
-    const unlisten = listen("program_changed", async (event: Event<any>) => {
+  const awayFromKeyboard = async () => {
+    const unlisten = listen("afk", async (event: Event<HeartbeatStopTypes>) => {
       try {
-        await db.execute("INSERT INTO activity (name, time) VALUES ($1, $2)", [
-          event.payload.process_name,
-          event.payload.time,
-        ]);
-      } catch (error) {
-        console.error("Failed to insert user:", error);
+        console.log(
+          `afk event start:${event.payload.time.start} end:${event.payload.time.End} duration:${event.payload.time.duration}`,
+        );
+      } catch (e) {
+        console.log(`afk error ${e}`);
       }
     });
+
+    return unlisten;
+  };
+  const heartbeat = async () => {
+    const db = await connectToDB();
+    const unlisten = listen(
+      "heartbeat",
+      async (event: Event<HeartbeatTypes>) => {
+        try {
+          console.log(
+            `heartbeat event title: ${event.payload.title} duration:${event.payload.time.duration}`,
+          );
+        } catch (e) {
+          console.log(`heartbeat error ${e}`);
+        }
+      },
+    );
 
     return unlisten;
   };
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
+    let cleanup2: (() => void) | undefined;
 
     const init = async () => {
-      await setActivityFn();
-      cleanup = await listenProgramChange();
+      cleanup = await awayFromKeyboard();
+      cleanup2 = await heartbeat();
     };
 
     init();
 
     return () => {
       if (cleanup) cleanup();
+      if (cleanup2) cleanup2();
     };
   }, []);
 

@@ -11,7 +11,7 @@ import {
   ThemeTypes,
   zodCategoryStateSchema,
   zodGroupProgramsSchema,
-} from "@/lib/types/store-settings-types.ts";
+} from "@/lib/types/store-settings.types.ts";
 import { create } from "zustand/react";
 import { z } from "zod";
 import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
@@ -136,8 +136,8 @@ export interface SettingsStore {
 export const useSettingStore = create<SettingsStore>((set) => ({
   categoryStates: defaultCategoryStates,
   groupedPrograms: defaultGroupingPrograms,
-  theme: ThemeTypes.SYSTEM,
-  themeMode: ThemeModeTypes.DEFAULT,
+  theme: "system",
+  themeMode: "default",
   state: StateTypes.TRACKING,
   volume: 100,
   music: MusicTypes.SILENT,
@@ -227,14 +227,33 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   },
   setTheme: async (theme: ThemeTypes) => {
     set({ theme: theme });
-
     const root = window.document.documentElement;
-    root.classList.value = "";
-    root.classList.add(theme);
 
+    root.classList.remove("light", "dark");
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+
+      root.classList.add(systemTheme);
+      // @todo system here & window native theme also
+      // await tauriStore.set("theme", theme);
+      return;
+    }
+
+    root.classList.add(theme);
     await tauriStore.set("theme", theme);
   },
-  setThemeMode: async (themeMode: ThemeModeTypes) => {},
+  setThemeMode: async (themeMode: ThemeModeTypes) => {
+    set({ themeMode });
+    const root = window.document.getElementsByTagName("body")[0];
+
+    root.setAttribute("data-theme", themeMode);
+
+    await tauriStore.set("themeMode", themeMode);
+  },
   setState: async (state: StateTypes) => {},
   setVolume: async (volume: number) => {},
   setMusic: async (music: MusicTypes) => {},
@@ -249,10 +268,14 @@ const hydrate = async () => {
     "groupedPrograms",
   )) as groupProgramsType[];
   const theme = (await tauriStore.get("theme")) as ThemeTypes;
+  const themeMode = (await tauriStore.get("themeMode")) as ThemeModeTypes;
 
   const parsedCategoryStates = zodCategoryStateSchema.safeParse(categoryStates);
   const parseGroupedPrograms = zodGroupProgramsSchema.safeParse(categoryStates);
-  const parsedTheme = z.nativeEnum(ThemeTypes).safeParse(theme);
+  const parsedTheme = z.enum(["dark", "light", "system"]).safeParse(theme);
+  const parsedThemeMode = z
+    .enum(["default", "mono", "catppuccin"])
+    .safeParse(themeMode);
 
   if (parsedCategoryStates.success) {
     useSettingStore.setState({ categoryStates: parsedCategoryStates.data });
@@ -261,11 +284,33 @@ const hydrate = async () => {
     useSettingStore.setState({ groupedPrograms: parseGroupedPrograms.data });
   }
   if (parsedTheme.success) {
-    useSettingStore.setState({ theme: parsedTheme.data });
-
     const root = window.document.documentElement;
-    root.classList.value = "";
-    root.classList.add(theme);
+
+    root.classList.remove("light", "dark");
+
+    if (parsedTheme.data === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+
+      root.classList.add(systemTheme);
+      return;
+    }
+
+    root.classList.add(parsedTheme.data);
+
+    useSettingStore.setState({ theme: parsedTheme.data });
+  }
+  if (parsedThemeMode.success) {
+    useSettingStore.setState({ themeMode: parsedThemeMode.data });
+    const root = window.document.getElementsByTagName("body")[0];
+    root.setAttribute("data-theme", parsedThemeMode.data);
+  } else {
+    const root = window.document.getElementsByTagName("body")[0];
+
+    const val = useSettingStore.getState();
+    root.setAttribute("data-theme", val.themeMode);
   }
 
   useSettingStore.setState({ _hydrated: true });

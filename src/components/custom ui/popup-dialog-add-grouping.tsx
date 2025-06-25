@@ -13,7 +13,7 @@ import {
   GroupProgramsPlatformType,
   groupProgramsType,
   groupProgramsTypeSchema,
-} from "@/lib/types/store-settings-types.ts";
+} from "@/lib/types/store-settings.types.ts";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

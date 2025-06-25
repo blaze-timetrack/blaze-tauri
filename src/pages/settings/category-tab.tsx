@@ -11,7 +11,7 @@ import { Edit2, PlusCircle, RotateCcw, Trash } from "lucide-react";
 import { PopupDialogResetCategory } from "@/components/custom ui/popup-dialog-reset-category.tsx";
 import ToggleSwitchCategory from "@/components/custom ui/toggle-switch-category.tsx";
 import { useSettingStore } from "@/lib/zustand/store.ts";
-import { ActionNameTypes } from "@/lib/types/store-settings-types.ts";
+import { ActionNameTypes } from "@/lib/types/store-settings.types.ts";
 import { PopupDialogAddCategory } from "@/components/custom ui/popup-dialog-add-category.tsx";
 
 function CategoryTab() {

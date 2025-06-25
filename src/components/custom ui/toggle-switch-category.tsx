@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CategoryActionTypes } from "@/lib/types/store-settings-types.ts";
+import { CategoryActionTypes } from "@/lib/types/store-settings.types.ts";
 import { cn } from "@/lib/utils.ts";
 
 interface IToggleSwitchProps {

@@ -59,23 +59,19 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     // update not setup
     // .plugin(tauri_plugin_updater::Builder::new().build())
 
-    let migrations = vec![
-        // Define your migrations here
-        Migration {
-            version: 1,
-            description: "create_initial_tables",
-            sql: "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT);",
-            kind: MigrationKind::Up,
-        },
-    ];
+    // let migrations = vec![
+    //     // Define your migrations here
+    //     Migration {
+    //         version: 1,
+    //         description: "create_initial_tables",
+    //         sql: "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT);",
+    //         kind: MigrationKind::Up,
+    //     },
+    // ];
 
     builder
         .plugin(tauri_plugin_notification::init())
-        .plugin(
-            tauri_plugin_sql::Builder::new()
-                .add_migrations("sqlite:test.db", migrations)
-                .build(),
-        )
+        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
@@ -116,14 +112,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             // style
             main_window.set_decorations(false)?;
             main_window.set_title_bar_style(TitleBarStyle::Transparent)?;
-            main_window.eval(r#"
-            document.addEventListener('contextmenu', event => event.preventDefault());
-                        "#).unwrap();
+            // main_window.eval(r#"
+            // document.addEventListener('contextmenu', event => event.preventDefault());
+            //             "#).unwrap(); // @todo starts working after refesh
             main_window.with_webview(|webview| unsafe {
                 let settings = webview.controller().CoreWebView2().unwrap().Settings().unwrap();
                 let settings: ICoreWebView2Settings6 = settings.cast::<ICoreWebView2Settings6>().unwrap();
                 settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
                 settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                 // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
             }).unwrap();
 
@@ -168,6 +165,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 utils::global_shortcut::set_global_shortcut(app.handle()).unwrap();
                 utils::tray::create_tray(app.handle()).unwrap();
 
+                // let app_data_dir = app.handle().path().resource_dir().unwrap();
                 let app_data_dir = app.handle().path().app_data_dir().unwrap();
                 tauri::async_runtime::spawn(background_track(app_data_dir, app.handle().clone()));
             }
@@ -194,9 +192,14 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                 tokio::time::sleep(Duration::from_micros(80)).await;
 
                 match start_heartbeat().await {
-                    Ok(data) => {
-                        let payload = json!(data);
-                        let _ = app_handle.emit("program_changed", payload);
+                    Ok((heartbeat_blood, heartbeat_stop)) => {
+                        if let Some(heartbeat_blood) = heartbeat_blood {
+                            let payload = json!(heartbeat_blood);
+                            let _ = app_handle.emit("heartbeat", payload);
+                        } else {
+                            let payload = json!(heartbeat_stop);
+                            let _ = app_handle.emit("afk", payload);
+                        }
                     }
                     Err(e) => eprintln!("Heartbeat error: {}", e),
                 }
