@@ -9,8 +9,10 @@ import {
   Submenu,
 } from "@tauri-apps/api/menu";
 import { listen } from "@tauri-apps/api/event";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
 function Widget() {
+  const state = useSettingStore((state) => state.state);
   const infoFromMain = async () => {
     const unlisten = await listen("reload", (event: Event<any>) => {
       if (event.payload.windowLabel === "widget") {
@@ -364,7 +366,9 @@ function Widget() {
       <div className={"mr-2 ml-4 flex h-full items-center justify-between"}>
         <p className={"flex items-center gap-2"}>
           <PowerCircle className={"h-5 w-5"} />
-          <span className={"text-muted-foreground"}> Locked</span>
+          <span className={"text-muted-foreground capitalize"}>
+            {state.toString().toLowerCase()}
+          </span>
         </p>
         <p className={"text-blue-300"}>
           0%

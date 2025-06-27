@@ -6,6 +6,7 @@ import {
   categoryStateTypes,
 } from "@/lib/types/store-settings.types.ts";
 import ThemeTab from "@/pages/settings/theme-tab.tsx";
+import ActivityTab from "@/pages/settings/activity-tab.tsx";
 
 export enum SettingsKeys {
   CATEGORY_STATES = "categoryStates",
@@ -24,7 +25,7 @@ export const settingsTabList = [
     id: 2,
     name: "Activity",
     value: "activity",
-    content: () => <></>,
+    content: () => <ActivityTab />,
   },
   {
     id: 3,
@@ -101,3 +102,20 @@ export const defaultCategoryState: categoryStateTypes = {
     action: CategoryActionTypes.ENABLE_CATEGORY,
   },
 };
+
+export const shortcuts: string[] = [
+  "h",
+  "t",
+  "c",
+  "p",
+  "g",
+  ",", // invalid
+  "?",
+  "/", //
+  "ctrl+p",
+  "ctrl+f",
+  "ctrl+shift+f",
+  "ctrl+b",
+  "ctrl+shift+b",
+  "ctrl+s",
+];

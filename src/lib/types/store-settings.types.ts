@@ -1,15 +1,14 @@
 import { z } from "zod";
 
 // states
-export enum StateTypes {
-  FETCH = "FETCH",
-  TRACKING = "TRACKING",
-  FLOW = "FLOW",
-  BREAK = "BREAK",
-  MEETING = "MEETING",
-  WORKOUT = "WORKOUT",
-  NO_TRACKING = "NO_TRACKING",
-}
+export type StateTypes =
+  | "FETCH"
+  | "TRACKING"
+  | "FLOW"
+  | "BREAK"
+  | "MEETING"
+  | "WORKOUT"
+  | "NO_TRACKING";
 
 // music
 export enum MusicTypes {

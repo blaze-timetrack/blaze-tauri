@@ -1,21 +1,84 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 // @ts-ignore
-import { isRouteErrorResponse, Outlet, type Route } from "react-router";
+import {
+  isRouteErrorResponse,
+  Outlet,
+  type Route,
+  useNavigate,
+} from "react-router";
 
 import StateOfFlow from "@/components/shared/stage-of-flow";
 import Tabs from "@/components/shared/tabs";
 import { Commands } from "@/components/custom ui/commands.tsx";
-import { cn } from "@/lib/utils.ts";
-import TitleBar from "@/components/backend components/title-bar.tsx";
+import { cn, reloadWidget } from "@/lib/utils.ts";
+import { useHotkeys } from "react-hotkeys-hook";
+import { shortcuts } from "@/lib/constants/settings-const.tsx";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
+import { useBasicStore } from "@/lib/zustand/basic-store.ts";
 import TopBar from "@/components/shared/top-bar.tsx";
+import TitleBar from "@/components/backend components/title-bar.tsx";
 
-export function RootLayout({
-  commandsRef,
-  commandsOpen,
-}: {
-  commandsRef: React.MutableRefObject<HTMLDivElement | null>;
-  commandsOpen: boolean;
-}) {
+export function RootLayout() {
+  const [commandsOpen, setCommandsOpen] = useState(false);
+  const commandsRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const state = useSettingStore((state) => state.state);
+  const setState = useSettingStore((state) => state.setState);
+
+  const defaultFlowTimer = useSettingStore((state) => state.defaultFlowTimer);
+  const setStateFlowTimer = useBasicStore((state) => state.setStateFlowTimer);
+
+  useHotkeys(shortcuts, async (_, handler) => {
+    console.log(`hotkey: ${handler.keys}`);
+    if (handler.ctrl && handler.keys?.includes("p")) {
+      await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
+      await reloadWidget();
+      return;
+    }
+    if (handler.ctrl && handler.keys?.includes("s")) {
+      await setState("TRACKING");
+      await reloadWidget();
+    }
+    if (handler.ctrl && handler.keys?.includes("f")) {
+      await setState("FLOW");
+      setStateFlowTimer(defaultFlowTimer);
+      await reloadWidget();
+    }
+    if (handler.ctrl && handler.shift && handler.keys?.includes("f")) {
+    }
+    if (handler.ctrl && handler.keys?.includes("b")) {
+    }
+    if (handler.ctrl && handler.shift && handler.keys?.includes("b")) {
+    }
+    if (handler.ctrl && handler.keys?.includes("b")) {
+    }
+
+    switch (handler.keys?.join("")) {
+      case "h":
+        navigate("/");
+        break;
+      case "t":
+        navigate("/timer");
+        break;
+      case "c":
+        navigate("/categories");
+        break;
+      case "p":
+        navigate("/work/projects");
+        break;
+      case "g":
+        setCommandsOpen((state) => !state);
+        break;
+      case ",":
+        navigate("/settings");
+        break;
+      case "?":
+        navigate("/support");
+        break;
+    }
+  });
+
   return (
     <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24 select-none">
       <TitleBar />

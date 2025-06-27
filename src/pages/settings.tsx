@@ -6,11 +6,19 @@ import {
 } from "@/components/ui/tabs.tsx";
 import DynamicSearch from "@/components/extented ui/dynamic-search.tsx";
 import { settingsTabList } from "@/lib/constants/settings-const.tsx";
+import { useBasicStore } from "@/lib/zustand/basic-store.ts";
 
 function Settings() {
+  const settingsTab = useBasicStore((state) => state.settingTab);
+  const setSettingsTab = useBasicStore((state) => state.setSettingTab);
+
   return (
     <div className={"mt-4 flex w-full flex-col gap-4"}>
-      <Tabs defaultValue={"account"} className={"flex flex-row gap-4"}>
+      <Tabs
+        value={settingsTab}
+        onValueChange={setSettingsTab}
+        className={"flex flex-row gap-4"}
+      >
         <div className={"flex flex-col gap-4"}>
           <div className={"flex items-end py-2 pr-4 text-xl"}>
             <h2>Settings</h2>

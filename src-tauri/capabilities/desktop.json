@@ -9,10 +9,20 @@
     "main"
   ],
   "permissions": [
+    "opener:default",
+    "core:default",
+    "core:window:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-minimize",
+    "core:window:allow-close",
     "window-state:default",
-    "deep-link:default",
     "global-shortcut:default",
+    "deep-link:default",
     "autostart:default",
-    "updater:default"
+    "updater:default",
+    "store:default",
+    "sql:default",
+    "sql:allow-execute"
   ]
 }

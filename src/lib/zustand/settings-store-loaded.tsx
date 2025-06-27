@@ -1,4 +1,4 @@
-import { useSettingStore } from "@/lib/zustand/store.ts";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
 export interface StoreLoadedProps {
   children: React.ReactNode;

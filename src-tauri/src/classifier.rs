@@ -6,7 +6,6 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use tauri::ipc::private::tracing::log;
 use tauri::ipc::private::tracing::log::__private_api::log;
-use tauri::ipc::private::tracing::log::kv::Source;
 use tauri::Error::Setup;
 
 pub struct Classifier {

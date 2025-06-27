@@ -1,8 +1,11 @@
 use crate::track::afk::away_from_keyboard;
 use crate::track::targets::get_active_all;
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
+use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
+use tauri::Runtime;
+use tauri_plugin_store::StoreExt;
 use tokio::time::Duration;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -24,6 +27,10 @@ pub struct HeartbeatStop {
     pub time: Time,
 }
 
+pub struct Timezone {
+    pub value: String,
+}
+
 const TARGET_APP: [&str; 10] = [
     "zen.exe",
     "brave.exe",
@@ -39,50 +46,57 @@ const TARGET_APP: [&str; 10] = [
 
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
-pub async fn start_heartbeat() -> Result<(Option<HeartbeatBlood>, Option<HeartbeatStop>), String> {
+pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(Option<HeartbeatBlood>, Option<HeartbeatStop>), String> {
     let (title, past_blood, url) = get_active_all().unwrap();
+    let store = app.store(".settings.dat").expect("Failed to load settings.dat in heartbeat");
+    let tz: Tz = store.get("timezone").unwrap().as_object().unwrap().get("value").unwrap().as_str().unwrap().parse().unwrap();
+    let utc_now = Utc::now();
 
     let mut total_duration = Duration::ZERO;
     let mut last_check = Instant::now();
-    let start_time: DateTime<Local> = Local::now();
-    let end_time: DateTime<Local>;
+    let start_time: DateTime<Tz> = utc_now.with_timezone(&tz);
+    let mut end_time: DateTime<Tz>;
     let mut afk = false;
     let mut past_afk = false;
     let afk_duration_ms = 5 * 60 * 1000;
-    let afk_check_interval_ms = 30 * 1000;
+    // let afk_duration_ms = 60 * 1000;
+    let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
+    // let afk_check_interval_ms = 30 * 1000;
     let mut afk_check_interval_timer_ms = Duration::ZERO;
+    let mut end_afk = true;
 
     loop {
+        let mut past_blood_afk = None;
         let mut elapsed = last_check.elapsed();
         last_check = Instant::now();
 
         afk_check_interval_timer_ms += elapsed;
 
+        total_duration += elapsed;
+        println!("total duration: {}", total_duration.as_secs().to_string());
         if !afk {
-            total_duration += elapsed;
-            println!("total duration: {}", total_duration.as_secs().to_string());
             let (_, current_blood, _) = get_active_all().unwrap();
 
             if past_afk {
-                end_time = Local::now();
-                return Ok((None, Some(HeartbeatStop {
+                end_time = utc_now.with_timezone(&tz);
+                return Ok((past_blood_afk, Some(HeartbeatStop {
                     time: Time {
-                        start: start_time.to_string(),
-                        end: end_time.to_string(),
-                        duration: afk_check_interval_timer_ms.as_secs(),
+                        start: start_time.format("%I:%M:%S %p").to_string(),
+                        end: end_time.format("%I:%M:%S %p").to_string(),
+                        duration: total_duration.as_secs(),
                     }
                 })));
             }
 
             if past_blood != current_blood {
-                end_time = Local::now();
+                end_time = utc_now.with_timezone(&tz);
                 return Ok((Some(HeartbeatBlood {
                     process_name: past_blood.to_string(),
-                    title,
-                    url,
+                    title: title.clone(),
+                    url: url.clone(),
                     time: Time {
-                        start: start_time.to_string(),
-                        end: end_time.to_string(),
+                        start: start_time.format("%I:%M:%S %p").to_string(),
+                        end: end_time.format("%I:%M:%S %p").to_string(),
                         duration: total_duration.as_secs(),
                     },
                 }), None));
@@ -96,12 +110,25 @@ pub async fn start_heartbeat() -> Result<(Option<HeartbeatBlood>, Option<Heartbe
                 false
             });
 
-            if afk {
-                elapsed = Duration::ZERO;
+            if afk && end_afk {
                 past_afk = true;
-                println!("total duration: {}", afk_check_interval_timer_ms.as_secs().to_string());
+                end_afk = false;
+                end_time = utc_now.with_timezone(&tz);
+                past_blood_afk = Some(HeartbeatBlood {
+                    process_name: past_blood.to_string(),
+                    title: title.clone(),
+                    url: url.clone(),
+                    time: Time {
+                        start: start_time.format("%I:%M:%S %p").to_string(),
+                        end: end_time.format("%I:%M:%S %p").to_string(), // do be reduced 4:55s 
+                        duration: total_duration.as_secs() - 5 * 60 * 1000 + 5 * 1000,
+                    },
+                })
             }
-            afk_check_interval_timer_ms = Duration::ZERO;
+            // continues check of afk
+            if !afk {
+                afk_check_interval_timer_ms = Duration::ZERO;
+            }
         }
 
         tokio::time::sleep(POLL_INTERVAL).await;

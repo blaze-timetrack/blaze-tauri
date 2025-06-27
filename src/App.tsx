@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router";
+import { Route, Routes } from "react-router";
 import { RootLayout } from "@/root";
 import HomePage from "@/pages/home.tsx";
 import CategoriesPage from "@/pages/categories.tsx";
@@ -13,90 +13,40 @@ import { Button } from "@/components/ui/button.tsx";
 import Widget from "@/pages/widget.tsx";
 import Notification from "@/pages/notification.tsx";
 import Settings from "@/pages/settings.tsx";
-import { useRef, useState } from "react";
-import useSetShortcuts, { Keys } from "@/hooks/useSetShortcuts.tsx";
 import { SettingsStoreLoaded } from "@/lib/zustand/settings-store-loaded.tsx";
+import Support from "@/pages/support.tsx";
+import Timer from "@/pages/timer.tsx";
 
 function App() {
   // const [isWidget, setIsWidget] = useState(true);
-  const [commandsOpen, setCommandsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
-
-  // shortcuts
-  useSetShortcuts(
-    containerRef,
-    () => {
-      setCommandsOpen(false);
-    },
-    (key, event) => {
-      if (key === Keys.ESCAPE) {
-        console.log("escape");
-        setCommandsOpen(false);
-      } else if (key == Keys.G) {
-        console.log("Go to Page");
-      } else if (key == Keys.H) {
-        console.log("home");
-        navigate("/");
-      } else if (key == Keys.C) {
-        console.log("Categories");
-        navigate("/categories");
-      } else if (key == Keys.P) {
-        console.log("Projects");
-        navigate("/work/projects");
-      } else if (key == Keys.I) {
-        console.log("Insights");
-        navigate("/insights");
-      } else if (key == Keys.FORWARD_SLASH) {
-        console.log("Commands");
-        // @error: undergoing loop what is the reason
-        // if (commandsOpen) {
-        //   setCommandsOpen(false);
-        // } else {
-        //   setCommandsOpen(true);
-        // }
-        setCommandsOpen(true);
-      } else if (key == Keys.QUESTION) {
-        console.log("Question");
-        navigate("/support");
-      } else if (key == Keys.COMMA) {
-        console.log("Settings");
-        navigate("/settings");
-      }
-    },
-  );
 
   return (
     <SettingsStoreLoaded>
       <Routes>
-        <Route
-          element={
-            <RootLayout
-              commandsRef={containerRef}
-              commandsOpen={commandsOpen}
-            />
-          }
-        >
+        <Route element={<RootLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="categories" element={<CategoriesPage />} />
-          <Route path={"work/projects"} element={<Projects />} />
-          <Route path={"work/tasks"} element={<Tasks />} />
-          <Route path={"work/clients"} element={<Clients />} />
+          <Route path={"/timer"} element={<Timer />} />
+
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path={"/work/projects"} element={<Projects />} />
+          <Route path={"/work/tasks"} element={<Tasks />} />
+          <Route path={"/work/clients"} element={<Clients />} />
           {/* productivity */}
-          <Route path={"productivity/trends"} element={<Trends />} />
-          <Route path={"productivity/goals"} element={<Goals />} />
-          <Route path={"productivity/insights"} element={<Insights />} />
+          <Route path={"/productivity/trends"} element={<Trends />} />
+          <Route path={"/productivity/goals"} element={<Goals />} />
+          <Route path={"/productivity/insights"} element={<Insights />} />
 
           {/* teams */}
-          <Route path={"teams"} element={<Teams />} />
+          <Route path={"/teams"} element={<Teams />} />
 
           <Route path={"/settings"} element={<Settings />} />
+          <Route path={"/support"} element={<Support />} />
 
           {/*  Errors */}
           <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path={"widget"} element={<Widget />} />
-        <Route path={"notification"} element={<Notification />} />
+        <Route path={"/widget"} element={<Widget />} />
+        <Route path={"/notification"} element={<Notification />} />
       </Routes>
     </SettingsStoreLoaded>
   );

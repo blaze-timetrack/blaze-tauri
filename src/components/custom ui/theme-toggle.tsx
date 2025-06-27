@@ -7,18 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettingStore } from "@/lib/zustand/store.ts";
-import React, { useCallback } from "react";
-import { emit } from "@tauri-apps/api/event";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
+import React from "react";
+import { reloadWidget } from "@/lib/utils.ts";
 
 export function ThemeToggle() {
   const setTheme = useSettingStore((state) => state.setTheme);
   const theme = useSettingStore((state) => state.theme);
-
-  const reloadFn = useCallback(() => {
-    emit("reload", { windowLabel: "widget" });
-    console.log("sending reload...");
-  }, [theme]);
 
   return (
     <DropdownMenu>
@@ -44,7 +39,7 @@ export function ThemeToggle() {
         <DropdownMenuItem
           onClick={() => {
             setTheme("light");
-            reloadFn();
+            reloadWidget();
           }}
         >
           Light
@@ -52,7 +47,7 @@ export function ThemeToggle() {
         <DropdownMenuItem
           onClick={() => {
             setTheme("dark");
-            reloadFn();
+            reloadWidget();
           }}
         >
           Dark
@@ -60,7 +55,7 @@ export function ThemeToggle() {
         <DropdownMenuItem
           onClick={() => {
             setTheme("system");
-            reloadFn();
+            reloadWidget();
           }}
         >
           System

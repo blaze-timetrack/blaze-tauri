@@ -15,6 +15,8 @@ import {
 import { create } from "zustand/react";
 import { z } from "zod";
 import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
+import { ITimezone } from "react-timezone-select";
+import spacetime from "spacetime";
 
 const tauriStore = new LazyStore(".settings.dat", { autoSave: true });
 
@@ -109,12 +111,19 @@ export const defaultGroupingPrograms = [
   },
 ];
 
+export const defaultFlowTimer = 45 * 60;
+export const defaultBreakTimer = 5 * 60;
+
 export interface SettingsStore {
   categoryStates: categoryStateTypes[];
   groupedPrograms: groupProgramsType[];
   theme: ThemeTypes;
   themeMode: ThemeModeTypes;
+  timezone: ITimezone;
+  currentTime: string;
   state: StateTypes;
+  defaultFlowTimer: number;
+  defaultBreakTimer: number;
   volume: number;
   music: MusicTypes;
   setCategoryState: (
@@ -127,18 +136,36 @@ export interface SettingsStore {
   ) => Promise<string | undefined>;
   setTheme: (theme: ThemeTypes) => Promise<void>;
   setThemeMode: (themeMode: ThemeModeTypes) => Promise<void>;
+  setTimezone: (timezone: ITimezone) => Promise<void>;
+  setCurrentTime: (currentTime: string) => Promise<void>;
   setState: (state: StateTypes) => Promise<void>;
+  setDefaultFlowTimer: (defaultFlowTimer: number) => Promise<void>;
+  setDefaultBreakTimer: (defaultBreakTimer: number) => Promise<void>;
   setVolume: (volume: number) => Promise<void>;
   setMusic: (music: MusicTypes) => Promise<void>;
   _hydrated: boolean;
 }
+
+const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: true,
+};
+
+const now = new Date();
 
 export const useSettingStore = create<SettingsStore>((set) => ({
   categoryStates: defaultCategoryStates,
   groupedPrograms: defaultGroupingPrograms,
   theme: "system",
   themeMode: "default",
-  state: StateTypes.TRACKING,
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  currentTime: Intl.DateTimeFormat("en-US", dateTimeFormatOptions).format(now),
+  state: "TRACKING",
+  defaultFlowTimer: defaultFlowTimer,
+  defaultBreakTimer: defaultBreakTimer,
   volume: 100,
   music: MusicTypes.SILENT,
   setCategoryState: async (categoryState, actionName = ActionNameTypes.SET) => {
@@ -254,7 +281,29 @@ export const useSettingStore = create<SettingsStore>((set) => ({
 
     await tauriStore.set("themeMode", themeMode);
   },
-  setState: async (state: StateTypes) => {},
+  setTimezone: async (timezone: ITimezone) => {
+    set({ timezone });
+    await tauriStore.set("timezone", timezone);
+  },
+  setCurrentTime: async (currentTime: string) => {
+    set({ currentTime });
+  },
+  setState: async (state: StateTypes) => {
+    set({ state });
+    if (state === "TRACKING" || state === "NO_TRACKING") {
+      await tauriStore.set("state", state);
+    } else {
+      await tauriStore.set("state", "TRACKING");
+    }
+  },
+  setDefaultFlowTimer: async (defaultFlowTimer) => {
+    set({ defaultFlowTimer });
+    await tauriStore.set("defaultFlowTimer", defaultFlowTimer);
+  },
+  setDefaultBreakTimer: async (defaultBreakTimer) => {
+    set({ defaultBreakTimer });
+    await tauriStore.set("defaultBreakTimer", defaultBreakTimer);
+  },
   setVolume: async (volume: number) => {},
   setMusic: async (music: MusicTypes) => {},
   _hydrated: false,
@@ -269,6 +318,14 @@ const hydrate = async () => {
   )) as groupProgramsType[];
   const theme = (await tauriStore.get("theme")) as ThemeTypes;
   const themeMode = (await tauriStore.get("themeMode")) as ThemeModeTypes;
+  const timezone = (await tauriStore.get("timezone")) as ITimezone;
+  const state = (await tauriStore.get("state")) as StateTypes;
+  const defaultFlowTimerCheck = (await tauriStore.get(
+    "defaultFlowTimer",
+  )) as number;
+  const defaultBreakTimerCheck = (await tauriStore.get(
+    "defaultBreakTimer",
+  )) as number;
 
   const parsedCategoryStates = zodCategoryStateSchema.safeParse(categoryStates);
   const parseGroupedPrograms = zodGroupProgramsSchema.safeParse(categoryStates);
@@ -276,6 +333,33 @@ const hydrate = async () => {
   const parsedThemeMode = z
     .enum(["default", "mono", "catppuccin"])
     .safeParse(themeMode);
+  const parsedTimezone =
+    z
+      .object({
+        value: z.string(),
+        label: z.string(),
+        abbrev: z.string().optional(),
+        altName: z.string().optional(),
+        offset: z.number().optional(),
+      })
+      .safeParse(timezone) || z.string().safeParse(timezone);
+  const parsedState = z
+    .enum([
+      "FETCH",
+      "TRACKING",
+      "FLOW",
+      "BREAK",
+      "MEETING",
+      "WORKOUT",
+      "NO_TRACKING",
+    ])
+    .safeParse(state);
+  const parsedDefaultFlowTimerCheck = z
+    .number()
+    .safeParse(defaultFlowTimerCheck);
+  const parsedDefaultBreakTimerCheck = z
+    .number()
+    .safeParse(defaultBreakTimerCheck);
 
   if (parsedCategoryStates.success) {
     useSettingStore.setState({ categoryStates: parsedCategoryStates.data });
@@ -312,7 +396,31 @@ const hydrate = async () => {
     const val = useSettingStore.getState();
     root.setAttribute("data-theme", val.themeMode);
   }
-
+  if (parsedTimezone.success) {
+    useSettingStore.setState({ timezone: parsedTimezone.data });
+  }
+  if (parsedState.success) {
+    useSettingStore.setState({ state: parsedState.data });
+  } else {
+    await tauriStore.set("state", "TRACKING");
+  }
+  if (parsedDefaultFlowTimerCheck.success) {
+    useSettingStore.setState({
+      defaultFlowTimer: parsedDefaultFlowTimerCheck.data,
+    });
+  } else {
+    await tauriStore.set("defaultFlowTimer", defaultFlowTimer);
+  }
+  if (parsedDefaultBreakTimerCheck.success) {
+    useSettingStore.setState({
+      defaultBreakTimer: parsedDefaultBreakTimerCheck.data,
+    });
+  } else {
+    await tauriStore.set("defaultBreakTimer", defaultBreakTimer);
+  }
+  const tauriTimezone = useSettingStore.getState().timezone;
+  let d = spacetime(null, tauriTimezone?.value || tauriTimezone);
+  useSettingStore.setState({ currentTime: d.unixFmt("hh:mm:ss a") });
   useSettingStore.setState({ _hydrated: true });
 };
 

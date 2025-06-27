@@ -21,6 +21,7 @@ use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_sql::Migration;
 use tauri_plugin_sql::MigrationKind;
+use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use track::installed_app::{get_apps_via_powershell, get_installed_applications};
 use utils::commands::{get_systems_timezone, greet};
@@ -90,8 +91,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                 settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
                 settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
-                // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                // settings.SetAreDevToolsEnabled(true).unwrap();
             }).unwrap();
+            widget_window.open_devtools();
 
             if let Some(monitor) = widget_window.primary_monitor().unwrap() {
                 let monitor_size = monitor.size();
@@ -121,8 +124,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
                 settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
                 settings.SetAreDefaultContextMenusEnabled(false).unwrap();
-                // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                settings.SetIsGeneralAutofillEnabled(false).unwrap();
+                settings.SetIsWebMessageEnabled(false).unwrap();
+                settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                settings.SetAreDevToolsEnabled(true).unwrap();
             }).unwrap();
+
+            main_window.open_devtools();
 
             // set background color only when building for macOS
             #[cfg(target_os = "macos")]
@@ -187,16 +195,27 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                 eprintln!("Failed to setup schema: {}", e);
                 return;
             }
+            let _ = close_connection_db(&db).await;
             loop {
                 println!("tracker running in background");
                 tokio::time::sleep(Duration::from_micros(80)).await;
 
-                match start_heartbeat().await {
+                let store = &app_handle.store(".settings.dat").expect("Failed to load store.");
+                let state = store.get("state").expect("Failed to get state from setting store.").clone();
+                println!("state: {}", state);
+
+                if state == "NO_TRACKING" {
+                    tokio::time::sleep(Duration::from_secs(5)).await;
+                    continue;
+                }
+
+                match start_heartbeat(&app_handle).await {
                     Ok((heartbeat_blood, heartbeat_stop)) => {
                         if let Some(heartbeat_blood) = heartbeat_blood {
                             let payload = json!(heartbeat_blood);
                             let _ = app_handle.emit("heartbeat", payload);
-                        } else {
+                        }
+                        if let Some(heartbeat_stop) = heartbeat_stop {
                             let payload = json!(heartbeat_stop);
                             let _ = app_handle.emit("afk", payload);
                         }
@@ -204,7 +223,6 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                     Err(e) => eprintln!("Heartbeat error: {}", e),
                 }
             }
-            let _ = close_connection_db(&db).await;
         }
         Err(e) => eprintln!("Database connection error: {}", e),
     }

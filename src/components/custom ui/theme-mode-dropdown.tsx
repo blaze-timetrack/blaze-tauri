@@ -7,19 +7,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettingStore } from "@/lib/zustand/store.ts";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import { ThemeModeTypes } from "@/lib/types/store-settings.types.ts";
-import { useCallback } from "react";
-import { emit } from "@tauri-apps/api/event";
+import { reloadWidget } from "@/lib/utils.ts";
 
 function ThemeModeDropdown() {
   const themeMode = useSettingStore((state) => state.themeMode);
   const setThemeMode = useSettingStore((state) => state.setThemeMode);
-
-  const reloadFn = useCallback(() => {
-    emit("reload", { windowLabel: "widget" });
-    console.log("sending reload...");
-  }, [themeMode, setThemeMode]);
 
   return (
     <DropdownMenu>
@@ -35,7 +29,7 @@ function ThemeModeDropdown() {
           value={themeMode}
           onValueChange={(v) => {
             setThemeMode(v as ThemeModeTypes);
-            reloadFn();
+            reloadWidget();
           }}
         >
           <DropdownMenuRadioItem value="default">Default</DropdownMenuRadioItem>

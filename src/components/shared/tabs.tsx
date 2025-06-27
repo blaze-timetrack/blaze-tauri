@@ -7,6 +7,7 @@ import {
   FolderTree,
   Home,
   Settings,
+  TimerIcon,
   Zap,
 } from "lucide-react";
 import { NavLink } from "react-router";
@@ -26,6 +27,18 @@ function Tabs() {
               className={isActive ? "bg-accent" : ""}
             >
               <Home />
+            </Button>
+          )}
+        </NavLink>
+        <NavLink to="/timer">
+          {({ isActive }) => (
+            <Button
+              variant={"icon_btn"}
+              size={"icon"}
+              autoFocus={isActive}
+              className={isActive ? "bg-accent" : ""}
+            >
+              <TimerIcon />
             </Button>
           )}
         </NavLink>
@@ -65,7 +78,7 @@ function Tabs() {
             </Button>
           )}
         </NavLink>
-        <NavLink to="/insight">
+        <NavLink to="/productivity/insight">
           {({ isActive }) => (
             <Button
               variant={"icon_btn"}
@@ -92,7 +105,7 @@ function Tabs() {
             </Button>
           )}
         </NavLink>
-        <NavLink to="/help">
+        <NavLink to="/support">
           {({ isActive }) => (
             <Button
               variant={"icon_btn"}

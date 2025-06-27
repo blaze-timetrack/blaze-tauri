@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { PopupDialogAddGrouping } from "@/components/custom ui/popup-dialog-add-grouping.tsx";
 import { PopupDialogResetGrouping } from "@/components/custom ui/popup-dialog-reset-grouping.tsx";
-import { useSettingStore } from "@/lib/zustand/store.ts";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
 function GroupingTab() {
   // @todo @error: div component rendering continuously

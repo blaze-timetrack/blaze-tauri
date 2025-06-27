@@ -1,6 +1,6 @@
 interface Time {
   start: String;
-  End: String;
+  end: String;
   duration: Number;
 }
 

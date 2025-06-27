@@ -11,7 +11,7 @@ pub fn set_global_shortcut<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Resu
                 if shortcut == &super_shift_e {
                     match event.state() {
                         ShortcutState::Pressed => {
-                            if (main_window.is_focused().unwrap()) {
+                            if main_window.is_focused().unwrap() {
                                 main_window.close().unwrap();
                             } else {
                                 main_window.show().unwrap();

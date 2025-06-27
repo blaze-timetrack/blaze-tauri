@@ -1,5 +1,4 @@
 import ActivitiesSummaryDemo from "@/components/shared/activities-summary-demo.tsx";
-import ScheduleDashboard from "src/components/schedule dashboard";
 import { connectToDB } from "@/db";
 import { useEffect, useState } from "react";
 import { Event, listen } from "@tauri-apps/api/event";
@@ -8,6 +7,7 @@ import {
   HeartbeatStopTypes,
   HeartbeatTypes,
 } from "@/lib/types/heartbeat.types.ts";
+import ScheduleDashboard from "@/components/schedule dashboard";
 
 function Home() {
   const [activities, setActivities] = useState<Array<any>>([]);
@@ -15,7 +15,7 @@ function Home() {
     const unlisten = listen("afk", async (event: Event<HeartbeatStopTypes>) => {
       try {
         console.log(
-          `afk event start:${event.payload.time.start} end:${event.payload.time.End} duration:${event.payload.time.duration}`,
+          `afk event start:${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
         );
       } catch (e) {
         console.log(`afk error ${e}`);
@@ -31,7 +31,7 @@ function Home() {
       async (event: Event<HeartbeatTypes>) => {
         try {
           console.log(
-            `heartbeat event title: ${event.payload.title} duration:${event.payload.time.duration}`,
+            `heartbeat event start: ${event.payload.time.start} end:${event.payload.time.end}`,
           );
         } catch (e) {
           console.log(`heartbeat error ${e}`);
@@ -65,6 +65,7 @@ function Home() {
       <div className={"row-span-16 w-full"}>
         <div className="row-span-16 flex justify-start gap-6">
           <ScheduleDashboard />
+          {/*<Timeline />*/}
           <ActivitiesSummaryDemo />
         </div>
       </div>
