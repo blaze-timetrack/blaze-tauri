@@ -17,8 +17,15 @@ import { z } from "zod";
 import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
 import { ITimezone } from "react-timezone-select";
 import spacetime from "spacetime";
+import { timeFormat } from "@/app.tsx";
 
 const tauriStore = new LazyStore(".settings.dat", { autoSave: true });
+
+export interface defaultScheduleDashboardColVisibleTypes {
+  label: string;
+  value: string;
+  checkValue: boolean;
+}
 
 //       let res = await invoke<InstalledApplication[]>(
 //         "get_installed_applications",
@@ -114,6 +121,44 @@ export const defaultGroupingPrograms = [
 export const defaultFlowTimer = 45 * 60;
 export const defaultBreakTimer = 5 * 60;
 
+export const defaultScheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[] =
+  [
+    {
+      label: "Activities",
+      value: "activity",
+      checkValue: false,
+    },
+    {
+      label: "Flow Sessions",
+      value: "flow_session",
+      checkValue: true,
+    },
+    {
+      label: "Projects",
+      value: "project",
+      checkValue: true,
+    },
+    {
+      label: "Clients",
+      value: "client",
+      checkValue: true,
+    },
+    {
+      label: "Tasks",
+      value: "task",
+      checkValue: true,
+    },
+  ];
+
+const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+};
+
+const now = new Date();
+
 export interface SettingsStore {
   categoryStates: categoryStateTypes[];
   groupedPrograms: groupProgramsType[];
@@ -121,9 +166,12 @@ export interface SettingsStore {
   themeMode: ThemeModeTypes;
   timezone: ITimezone;
   currentTime: string;
+  currentTime12: boolean;
+  currentTimeStart: number;
   state: StateTypes;
   defaultFlowTimer: number;
   defaultBreakTimer: number;
+  scheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[];
   volume: number;
   music: MusicTypes;
   setCategoryState: (
@@ -138,23 +186,17 @@ export interface SettingsStore {
   setThemeMode: (themeMode: ThemeModeTypes) => Promise<void>;
   setTimezone: (timezone: ITimezone) => Promise<void>;
   setCurrentTime: (currentTime: string) => Promise<void>;
+  setCurrentTime12: (currentTime12: boolean) => Promise<void>;
   setState: (state: StateTypes) => Promise<void>;
   setDefaultFlowTimer: (defaultFlowTimer: number) => Promise<void>;
   setDefaultBreakTimer: (defaultBreakTimer: number) => Promise<void>;
+  setScheduleDashboardColVisible: (
+    scheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes,
+  ) => Promise<void>;
   setVolume: (volume: number) => Promise<void>;
   setMusic: (music: MusicTypes) => Promise<void>;
   _hydrated: boolean;
 }
-
-const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
-  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: true,
-};
-
-const now = new Date();
 
 export const useSettingStore = create<SettingsStore>((set) => ({
   categoryStates: defaultCategoryStates,
@@ -163,9 +205,12 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   themeMode: "default",
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   currentTime: Intl.DateTimeFormat("en-US", dateTimeFormatOptions).format(now),
+  currentTime12: true,
+  currentTimeStart: 12,
   state: "TRACKING",
   defaultFlowTimer: defaultFlowTimer,
   defaultBreakTimer: defaultBreakTimer,
+  scheduleDashboardColVisible: defaultScheduleDashboardColVisible,
   volume: 100,
   music: MusicTypes.SILENT,
   setCategoryState: async (categoryState, actionName = ActionNameTypes.SET) => {
@@ -288,6 +333,10 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   setCurrentTime: async (currentTime: string) => {
     set({ currentTime });
   },
+  setCurrentTime12: async (currentTime12: boolean) => {
+    set({ currentTime12 });
+    await tauriStore.set("currentTime12", currentTime12);
+  },
   setState: async (state: StateTypes) => {
     set({ state });
     if (state === "TRACKING" || state === "NO_TRACKING") {
@@ -303,6 +352,18 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   setDefaultBreakTimer: async (defaultBreakTimer) => {
     set({ defaultBreakTimer });
     await tauriStore.set("defaultBreakTimer", defaultBreakTimer);
+  },
+  setScheduleDashboardColVisible: async (scheduleDashboardColVisible) => {
+    let past_data = useSettingStore
+      .getState()
+      .scheduleDashboardColVisible.filter(
+        (v) => v.value !== scheduleDashboardColVisible.value,
+      );
+    past_data = [...past_data, scheduleDashboardColVisible].sort((a, b) =>
+      a.value.localeCompare(b.value),
+    );
+    set({ scheduleDashboardColVisible: past_data });
+    await tauriStore.set("scheduleDashboardColVisible", past_data);
   },
   setVolume: async (volume: number) => {},
   setMusic: async (music: MusicTypes) => {},
@@ -326,6 +387,10 @@ const hydrate = async () => {
   const defaultBreakTimerCheck = (await tauriStore.get(
     "defaultBreakTimer",
   )) as number;
+  const scheduleDashboardColVisible = (await tauriStore.get(
+    "scheduleDashboardColVisible",
+  )) as defaultScheduleDashboardColVisibleTypes[];
+  const currentTime12 = (await tauriStore.get("currentTime12")) as boolean;
 
   const parsedCategoryStates = zodCategoryStateSchema.safeParse(categoryStates);
   const parseGroupedPrograms = zodGroupProgramsSchema.safeParse(categoryStates);
@@ -360,6 +425,16 @@ const hydrate = async () => {
   const parsedDefaultBreakTimerCheck = z
     .number()
     .safeParse(defaultBreakTimerCheck);
+  const parsedScheduleDashboardColVisible = z
+    .array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+        checkValue: z.boolean(),
+      }),
+    )
+    .safeParse(scheduleDashboardColVisible);
+  const parsedCurrentTime12 = z.boolean().safeParse(currentTime12);
 
   if (parsedCategoryStates.success) {
     useSettingStore.setState({ categoryStates: parsedCategoryStates.data });
@@ -399,6 +474,9 @@ const hydrate = async () => {
   if (parsedTimezone.success) {
     useSettingStore.setState({ timezone: parsedTimezone.data });
   }
+  if (parsedCurrentTime12.success) {
+    useSettingStore.setState({ currentTime12: parsedCurrentTime12.data });
+  }
   if (parsedState.success) {
     useSettingStore.setState({ state: parsedState.data });
   } else {
@@ -418,9 +496,18 @@ const hydrate = async () => {
   } else {
     await tauriStore.set("defaultBreakTimer", defaultBreakTimer);
   }
+  if (parsedScheduleDashboardColVisible.success) {
+    const data = parsedScheduleDashboardColVisible.data.sort((a, b) =>
+      a.value.localeCompare(b.value),
+    );
+    useSettingStore.setState({
+      scheduleDashboardColVisible: data,
+    });
+  }
+
   const tauriTimezone = useSettingStore.getState().timezone;
   let d = spacetime(null, tauriTimezone?.value || tauriTimezone);
-  useSettingStore.setState({ currentTime: d.unixFmt("hh:mm:ss a") });
+  useSettingStore.setState({ currentTime: d.format(timeFormat) });
   useSettingStore.setState({ _hydrated: true });
 };
 

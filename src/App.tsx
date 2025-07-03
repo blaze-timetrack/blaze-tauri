@@ -17,6 +17,8 @@ import { SettingsStoreLoaded } from "@/lib/zustand/settings-store-loaded.tsx";
 import Support from "@/pages/support.tsx";
 import Timer from "@/pages/timer.tsx";
 
+export const timeFormat = "{hour-24-pad}:{minute-pad}:{second-pad}";
+
 function App() {
   // const [isWidget, setIsWidget] = useState(true);
 

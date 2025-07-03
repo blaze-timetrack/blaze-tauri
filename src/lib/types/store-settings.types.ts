@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { JSX } from "react";
 
 // states
 export type StateTypes =
@@ -87,4 +88,10 @@ export interface InstalledApplication {
   publisher: string | undefined;
   install_date: string | undefined;
   install_path: string | undefined;
+}
+
+export interface dropdownElementListTypes {
+  label: string;
+  icon: JSX.ElementType;
+  value: boolean;
 }

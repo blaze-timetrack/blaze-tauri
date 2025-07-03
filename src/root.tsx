@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 // @ts-ignore
 import {
   isRouteErrorResponse,
@@ -20,7 +20,6 @@ import TitleBar from "@/components/backend components/title-bar.tsx";
 
 export function RootLayout() {
   const [commandsOpen, setCommandsOpen] = useState(false);
-  const commandsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const state = useSettingStore((state) => state.state);
@@ -29,7 +28,7 @@ export function RootLayout() {
   const defaultFlowTimer = useSettingStore((state) => state.defaultFlowTimer);
   const setStateFlowTimer = useBasicStore((state) => state.setStateFlowTimer);
 
-  useHotkeys(shortcuts, async (_, handler) => {
+  useHotkeys(shortcuts, async (e, handler) => {
     console.log(`hotkey: ${handler.keys}`);
     if (handler.ctrl && handler.keys?.includes("p")) {
       await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
@@ -68,7 +67,8 @@ export function RootLayout() {
         navigate("/work/projects");
         break;
       case "g":
-        setCommandsOpen((state) => !state);
+        e.preventDefault();
+        setCommandsOpen(true);
         break;
       case ",":
         navigate("/settings");
@@ -98,7 +98,10 @@ export function RootLayout() {
           !commandsOpen && "hidden",
         )}
       >
-        <Commands commandsRef={commandsRef} commandsOpen={commandsOpen} />
+        <Commands
+          commandsOpen={commandsOpen}
+          setCommandsOpen={setCommandsOpen}
+        />
       </div>
     </div>
   );

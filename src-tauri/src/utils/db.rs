@@ -1,13 +1,13 @@
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use std::path::PathBuf;
+use std::str::FromStr;
 
 pub async fn connect_to_db(path: PathBuf) -> Result<SqlitePool, sqlx::Error> {
     let app_path = path.join("test.db");
-    let db_url = format!("sqlite://{}", app_path.display());
-    let options = SqliteConnectOptions::new()
-        .filename("test.db") // Explicit filename
-        .create_if_missing(true); // Enable auto-creation
+    let db_url = format!("sqlite:{}", app_path.display());
+    println!("{:?}", db_url);
+    let options = SqliteConnectOptions::from_str(&db_url)?.create_if_missing(true);
 
     let pool = SqlitePool::connect_with(options).await?;
     Ok(pool)

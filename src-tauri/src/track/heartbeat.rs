@@ -8,6 +8,8 @@ use tauri::Runtime;
 use tauri_plugin_store::StoreExt;
 use tokio::time::Duration;
 
+static TIME_FORMAT: &str = "%H:%M:%S";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Time {
     pub start: String,
@@ -78,25 +80,29 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
             let (_, current_blood, _) = get_active_all().unwrap();
 
             if past_afk {
-                end_time = utc_now.with_timezone(&tz);
+                let now = Utc
+                ::now();
+                end_time = now.with_timezone(&tz);
                 return Ok((past_blood_afk, Some(HeartbeatStop {
                     time: Time {
-                        start: start_time.format("%I:%M:%S %p").to_string(),
-                        end: end_time.format("%I:%M:%S %p").to_string(),
+                        start: start_time.format(TIME_FORMAT).to_string(),
+                        end: end_time.format(TIME_FORMAT).to_string(),
                         duration: total_duration.as_secs(),
                     }
                 })));
             }
 
             if past_blood != current_blood {
-                end_time = utc_now.with_timezone(&tz);
+                let now = Utc
+                ::now();
+                end_time = now.with_timezone(&tz);
                 return Ok((Some(HeartbeatBlood {
                     process_name: past_blood.to_string(),
                     title: title.clone(),
                     url: url.clone(),
                     time: Time {
-                        start: start_time.format("%I:%M:%S %p").to_string(),
-                        end: end_time.format("%I:%M:%S %p").to_string(),
+                        start: start_time.format(TIME_FORMAT).to_string(),
+                        end: end_time.format(TIME_FORMAT).to_string(),
                         duration: total_duration.as_secs(),
                     },
                 }), None));
@@ -113,14 +119,16 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
             if afk && end_afk {
                 past_afk = true;
                 end_afk = false;
-                end_time = utc_now.with_timezone(&tz);
+                let now = Utc
+                ::now();
+                end_time = now.with_timezone(&tz);
                 past_blood_afk = Some(HeartbeatBlood {
                     process_name: past_blood.to_string(),
                     title: title.clone(),
                     url: url.clone(),
                     time: Time {
-                        start: start_time.format("%I:%M:%S %p").to_string(),
-                        end: end_time.format("%I:%M:%S %p").to_string(), // do be reduced 4:55s 
+                        start: start_time.format(TIME_FORMAT).to_string(),
+                        end: end_time.format(TIME_FORMAT).to_string(), // do be reduced 4:55s
                         duration: total_duration.as_secs() - 5 * 60 * 1000 + 5 * 1000,
                     },
                 })

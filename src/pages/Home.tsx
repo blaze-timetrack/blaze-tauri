@@ -31,7 +31,7 @@ function Home() {
       async (event: Event<HeartbeatTypes>) => {
         try {
           console.log(
-            `heartbeat event start: ${event.payload.time.start} end:${event.payload.time.end}`,
+            `heartbeat event start: ${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
           );
         } catch (e) {
           console.log(`heartbeat error ${e}`);
@@ -65,7 +65,6 @@ function Home() {
       <div className={"row-span-16 w-full"}>
         <div className="row-span-16 flex justify-start gap-6">
           <ScheduleDashboard />
-          {/*<Timeline />*/}
           <ActivitiesSummaryDemo />
         </div>
       </div>

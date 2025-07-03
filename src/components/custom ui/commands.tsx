@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import {
   Calculator,
   Calendar,
@@ -8,70 +11,73 @@ import {
 } from "lucide-react";
 
 import {
-  Command,
+  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import React from "react";
+import { Command as CommandPrimitive } from "cmdk";
 import { cn } from "@/lib/utils.ts";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 
 export function Commands({
-  commandsRef,
   commandsOpen,
+  setCommandsOpen,
 }: {
-  commandsRef: React.Ref<HTMLDivElement>;
-  commandsOpen?: boolean;
+  commandsOpen: boolean;
+  setCommandsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <div
-      ref={commandsRef}
-      className={cn(
-        "relative top-1/6 left-2/6 flex w-[420px] min-w-[420px] items-center justify-center",
-      )}
-    >
-      <Command className="rounded-lg border shadow-md md:min-w-[420px]">
+    <>
+      <CommandDialog
+        open={commandsOpen}
+        onOpenChange={(v) => {
+          setCommandsOpen(v);
+        }}
+        className={"rounded-lg border shadow-md md:min-w-[450px]"}
+      >
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            <CommandItem>
-              <Calendar />
-              <span>Calendar</span>
-            </CommandItem>
-            <CommandItem>
-              <Smile />
-              <span>Search Emoji</span>
-            </CommandItem>
-            <CommandItem disabled>
-              <Calculator />
-              <span>Calculator</span>
-            </CommandItem>
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Settings">
-            <CommandItem>
-              <User />
-              <span>Profile</span>
-              <CommandShortcut>⌘P</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <CreditCard />
-              <span>Billing</span>
-              <CommandShortcut>⌘B</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <Settings />
-              <span>Settings</span>
-              <CommandShortcut>⌘S</CommandShortcut>
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </Command>
-    </div>
+        <ScrollArea className={"max-h-[300px]"} scrollHideDelay={0}>
+          <CommandPrimitive.List data-slot="command-list" className={cn("")}>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup heading="Suggestions">
+              <CommandItem>
+                <Calendar />
+                <span>Calendar</span>
+              </CommandItem>
+              <CommandItem>
+                <Smile />
+                <span>Search Emoji</span>
+              </CommandItem>
+              <CommandItem>
+                <Calculator />
+                <span>Calculator</span>
+              </CommandItem>
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup heading="Settings">
+              <CommandItem>
+                <User />
+                <span>Profile</span>
+                <CommandShortcut>⌘P</CommandShortcut>
+              </CommandItem>
+              <CommandItem>
+                <CreditCard />
+                <span>Billing</span>
+                <CommandShortcut>⌘B</CommandShortcut>
+              </CommandItem>
+              <CommandItem>
+                <Settings />
+                <span>Settings</span>
+                <CommandShortcut>⌘S</CommandShortcut>
+              </CommandItem>
+            </CommandGroup>
+          </CommandPrimitive.List>
+        </ScrollArea>
+      </CommandDialog>
+    </>
   );
 }

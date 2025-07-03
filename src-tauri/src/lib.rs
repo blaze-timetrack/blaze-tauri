@@ -28,7 +28,6 @@ use utils::commands::{get_systems_timezone, greet};
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 use windows::core::Interface;
 
-
 // #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let classifier = Classifier::new().expect("Failed to load model");
@@ -174,7 +173,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 utils::tray::create_tray(app.handle()).unwrap();
 
                 // let app_data_dir = app.handle().path().resource_dir().unwrap();
-                let app_data_dir = app.handle().path().app_data_dir().unwrap();
+                let app_data_dir = app.handle().path().app_config_dir().unwrap();
                 tauri::async_runtime::spawn(background_track(app_data_dir, app.handle().clone()));
             }
 

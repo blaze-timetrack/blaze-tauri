@@ -1,24 +1,37 @@
 import { cn } from "@/lib/utils";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
+import { useEffect, useState } from "react";
 
 const TimeColumn = () => {
-  // Generate time slots from 7 AM to 9 PM
-  const timeSlots = Array.from({ length: 15 }, (_, i) => {
-    const hour = i + 7;
-    return hour > 12
-      ? `${hour - 12}:00 PM`
-      : hour === 12
-        ? `${hour}:00 PM`
-        : `${hour}:00 AM`;
-  });
+  const currentTime12 = useSettingStore((state) => state.currentTime12);
+  const currentTimeStart = useSettingStore((state) => state.currentTimeStart);
+  let [timeSlots, setTimeSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!currentTime12) {
+      const time = Array.from({ length: 24 }, (_, i) => {
+        return `${String(i).padStart(2, "0")}:00`;
+      });
+      setTimeSlots(time);
+    }
+    if (currentTime12) {
+      const time = Array.from({ length: 24 }, (_, i) => {
+        const hour = i % currentTimeStart || currentTimeStart;
+        const period = i < 12 ? "AM" : "PM";
+        return `${hour}:00 ${period}`;
+      });
+      setTimeSlots(time);
+    }
+  }, [currentTime12]);
 
   return (
-    <div className="w-fit border-r border-gray-800">
+    <div className="border-border w-fit border-r">
       {timeSlots.map((time, index) => (
         <div
           key={time}
           className={cn(
-            "flex h-14 w-fit items-center px-2 text-xs text-gray-400",
-            index !== 0 && "border-t border-gray-800",
+            "flex h-15 w-fit items-center px-2 text-xs text-gray-400",
+            index !== 0 && "border-border border-t",
           )}
         >
           {time}

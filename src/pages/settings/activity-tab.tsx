@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -10,11 +10,13 @@ import {
 import TimezoneSelect from "react-timezone-select";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import spacetime from "spacetime";
+import { timeFormat } from "@/app.tsx";
+import { SelectedDropdownCurrentTime } from "@/components/custom ui/select-dropdown.tsx";
 
 function ActivityTab() {
   const selectedTimezone = useSettingStore((state) => state.timezone);
   const setSelectedTimezone = useSettingStore((state) => state.setTimezone);
-  const [] = useState<string | null>(null);
+
   const currentTime = useSettingStore((state) => state.currentTime);
   const setCurrentTime = useSettingStore((state) => state.setCurrentTime);
 
@@ -22,9 +24,8 @@ function ActivityTab() {
     if (!selectedTimezone?.value) return;
 
     const interval = setInterval(() => {
-      // !!! spacetime
       const d = spacetime(null, selectedTimezone?.value || selectedTimezone);
-      setCurrentTime(d.unixFmt("hh:mm:ss a"));
+      setCurrentTime(d.format(timeFormat));
     }, 1000);
 
     return () => clearInterval(interval);
@@ -58,6 +59,11 @@ function ActivityTab() {
           >
             {JSON.stringify(selectedTimezone, null, 2)}
           </pre>
+        </div>
+
+        <div className={"mt-8 flex items-center gap-4"}>
+          <p className={""}>Hours: </p>
+          <SelectedDropdownCurrentTime />
         </div>
       </CardContent>
       <CardFooter></CardFooter>

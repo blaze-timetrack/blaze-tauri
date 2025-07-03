@@ -1,20 +1,12 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TimeColumn from "./TimeColumn";
-import ActivitiesColumn from "./ActivitiesColumn";
-import FlowSessionsColumn from "./FlowSessionsColumn";
-import CalendarColumn from "./CalendarColumn";
-import ProjectsColumn from "./ProjectsColumn";
 import ColumnHeader from "./ColumnHeader";
-import {
-  DndContext,
-  DragEndEvent,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { restrictToVerticalAxis, snapCenterToCursor } from "@dnd-kit/modifiers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
+import spacetime from "spacetime";
+import BaseColumn from "@/components/schedule dashboard/BaseColumn.tsx";
+import { cn } from "@/lib/utils.ts";
+import { timeFormat } from "@/app.tsx";
 
 export interface Event {
   id: string;
@@ -25,12 +17,22 @@ export interface Event {
 }
 
 const ScheduleDashboard = () => {
+  const selectedTimezone = useSettingStore((state) => state.timezone);
+  const setSelectedTimezone = useSettingStore((state) => state.setTimezone);
+
+  const currentTime = useSettingStore((state) => state.currentTime);
+  const setCurrentTime = useSettingStore((state) => state.setCurrentTime);
+
+  const scheduleDashboardColVisible = useSettingStore(
+    (state) => state.scheduleDashboardColVisible,
+  );
+
   const [activities, setActivities] = useState<Event[]>([
     {
       id: "1",
       title: "Deep Work Session",
-      startTime: "09:00",
-      endTime: "12:00",
+      startTime: "01:00",
+      endTime: "05:00",
       color: "bg-purple-400",
     },
   ]);
@@ -93,121 +95,53 @@ const ScheduleDashboard = () => {
     },
   ]);
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    }),
-  );
+  useEffect(() => {
+    if (!selectedTimezone?.value) return;
+    const interval = setInterval(() => {
+      const d = spacetime(null, selectedTimezone?.value || selectedTimezone);
+      setCurrentTime(d.format(timeFormat));
+    }, 1000);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    const eventId = active.id.toString();
-    const sourceColumn = getColumnByEventId(eventId);
-    const targetColumn = over.id as string;
-
-    if (sourceColumn === targetColumn) return;
-
-    // Move event between columns
-    const draggedEvent = findAndRemoveEvent(eventId);
-    if (!draggedEvent) return;
-
-    // Add event to target column
-    switch (targetColumn) {
-      case "activities":
-        setActivities((prev) => [...prev, draggedEvent]);
-        break;
-      case "flowSessions":
-        setFlowSessions((prev) => [...prev, draggedEvent]);
-        break;
-      case "calendar":
-        setCalendarEvents((prev) => [...prev, draggedEvent]);
-        break;
-      case "projects":
-        setProjects((prev) => [...prev, draggedEvent]);
-        break;
-    }
-  };
-
-  const getColumnByEventId = (eventId: string): string => {
-    if (activities.find((e) => e.id === eventId)) return "activities";
-    if (flowSessions.find((e) => e.id === eventId)) return "flowSessions";
-    if (calendarEvents.find((e) => e.id === eventId)) return "calendar";
-    if (projects.find((e) => e.id === eventId)) return "projects";
-    return "";
-  };
-
-  const findAndRemoveEvent = (eventId: string): Event | undefined => {
-    const column = getColumnByEventId(eventId);
-    let event: Event | undefined;
-
-    switch (column) {
-      case "activities":
-        setActivities((prev) => {
-          event = prev.find((e) => e.id === eventId);
-          return prev.filter((e) => e.id !== eventId);
-        });
-        break;
-      case "flowSessions":
-        setFlowSessions((prev) => {
-          event = prev.find((e) => e.id === eventId);
-          return prev.filter((e) => e.id !== eventId);
-        });
-        break;
-      case "calendar":
-        setCalendarEvents((prev) => {
-          event = prev.find((e) => e.id === eventId);
-          return prev.filter((e) => e.id !== eventId);
-        });
-        break;
-      case "projects":
-        setProjects((prev) => {
-          event = prev.find((e) => e.id === eventId);
-          return prev.filter((e) => e.id !== eventId);
-        });
-        break;
-    }
-
-    return event;
-  };
+    return () => clearInterval(interval);
+  }, [selectedTimezone]);
 
   return (
-    <div className="border-border h-full w-full overflow-hidden rounded-lg border bg-gray-900 text-white shadow-2xl">
+    <div className="border-border bg-background text-foreground h-full w-full overflow-hidden rounded-lg border shadow-2xl">
       <div className="grid grid-cols-[auto_1fr]">
-        <div className="w-16 border-r border-gray-800"></div>
-        <div className={"ml-1.5 grid grid-cols-4"}>
-          <ColumnHeader title="Activities" />
-          <ColumnHeader title="Flow Sessions" />
-          <ColumnHeader title="Projects" />
-          <ColumnHeader title="Calendar" />
+        <div className="border-border w-16.5 border-r"></div>
+        <div
+          className={cn("grid")}
+          style={{
+            gridTemplateColumns: `repeat(${scheduleDashboardColVisible.filter((v) => v.checkValue).length}, minmax(0, 1fr))`,
+          }}
+        >
+          {scheduleDashboardColVisible.map(({ label, checkValue }, i) => (
+            <span key={i} className={`${!checkValue && "hidden"}`}>
+              <ColumnHeader title={label} />
+            </span>
+          ))}
         </div>
       </div>
       <ScrollArea className="ssc overflow-hidden" scrollHideDelay={0}>
-        <DndContext
-          sensors={sensors}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToVerticalAxis, snapCenterToCursor]}
-        >
-          <div className="grid grid-cols-[auto_1fr]">
-            <TimeColumn />
-            <div className="grid grid-cols-4">
-              <ActivitiesColumn events={activities} />
-              <FlowSessionsColumn events={flowSessions} />
-              <ProjectsColumn events={projects} />
-              <CalendarColumn events={calendarEvents} />
-            </div>
+        <div className="grid grid-cols-[auto_1fr]">
+          <TimeColumn />
+          <div
+            className={cn("grid grid-cols-5")}
+            style={{
+              gridTemplateColumns: `repeat(${scheduleDashboardColVisible.filter((v) => v.checkValue).length}, minmax(0, 1fr))`,
+            }}
+          >
+            {scheduleDashboardColVisible.map((v, i) => (
+              <span key={i} className={`${!v.checkValue && "hidden"}`}>
+                <BaseColumn
+                  events={activities}
+                  className={`bg-background`}
+                  id={v.value}
+                />
+              </span>
+            ))}
           </div>
-        </DndContext>
+        </div>
       </ScrollArea>
     </div>
   );
