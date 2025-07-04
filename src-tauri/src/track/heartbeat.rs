@@ -68,6 +68,9 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
     let mut end_afk = true;
 
     loop {
+        let store = app.store(".settings.dat").expect("Failed to load store.");
+        let state = store.get("state").expect("Failed to get state from setting store.").clone();
+
         let mut past_blood_afk = None;
         let mut elapsed = last_check.elapsed();
         last_check = Instant::now();
@@ -92,7 +95,7 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
                 })));
             }
 
-            if past_blood != current_blood {
+            if past_blood != current_blood || state == "NO_TRACKING" {
                 let now = Utc
                 ::now();
                 end_time = now.with_timezone(&tz);

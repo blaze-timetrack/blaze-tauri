@@ -16,8 +16,6 @@ import { create } from "zustand/react";
 import { z } from "zod";
 import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
 import { ITimezone } from "react-timezone-select";
-import spacetime from "spacetime";
-import { timeFormat } from "@/app.tsx";
 
 const tauriStore = new LazyStore(".settings.dat", { autoSave: true });
 
@@ -165,7 +163,6 @@ export interface SettingsStore {
   theme: ThemeTypes;
   themeMode: ThemeModeTypes;
   timezone: ITimezone;
-  currentTime: string;
   currentTime12: boolean;
   currentTimeStart: number;
   state: StateTypes;
@@ -185,7 +182,6 @@ export interface SettingsStore {
   setTheme: (theme: ThemeTypes) => Promise<void>;
   setThemeMode: (themeMode: ThemeModeTypes) => Promise<void>;
   setTimezone: (timezone: ITimezone) => Promise<void>;
-  setCurrentTime: (currentTime: string) => Promise<void>;
   setCurrentTime12: (currentTime12: boolean) => Promise<void>;
   setState: (state: StateTypes) => Promise<void>;
   setDefaultFlowTimer: (defaultFlowTimer: number) => Promise<void>;
@@ -204,7 +200,6 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   theme: "system",
   themeMode: "default",
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  currentTime: Intl.DateTimeFormat("en-US", dateTimeFormatOptions).format(now),
   currentTime12: true,
   currentTimeStart: 12,
   state: "TRACKING",
@@ -329,9 +324,6 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   setTimezone: async (timezone: ITimezone) => {
     set({ timezone });
     await tauriStore.set("timezone", timezone);
-  },
-  setCurrentTime: async (currentTime: string) => {
-    set({ currentTime });
   },
   setCurrentTime12: async (currentTime12: boolean) => {
     set({ currentTime12 });
@@ -505,9 +497,6 @@ const hydrate = async () => {
     });
   }
 
-  const tauriTimezone = useSettingStore.getState().timezone;
-  let d = spacetime(null, tauriTimezone?.value || tauriTimezone);
-  useSettingStore.setState({ currentTime: d.format(timeFormat) });
   useSettingStore.setState({ _hydrated: true });
 };
 

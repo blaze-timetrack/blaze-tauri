@@ -6,10 +6,12 @@ export interface BasicStore {
   stateFlowTimer: number;
   stateBreakTimer: number;
   stateFlowValue: StateFlowValueTypes | null;
+  commandOpen: boolean;
   setSettingTab: (settingTab: string) => void;
   setStateFlowValue: (stateFlowValue: StateFlowValueTypes) => void;
   setStateTrackingTimer: (stateTrackingTimer: number) => void;
   setStateFlowTimer: (stateFlowTimer: number) => void;
+  setCommandOpen: (commandOpen: boolean) => void;
 }
 
 interface StateFlowValueTypes {
@@ -31,6 +33,7 @@ export const useBasicStore = create<BasicStore>((set) => ({
   stateTrackingTimer: 0,
   stateFlowTimer: 0,
   stateBreakTimer: 0,
+  commandOpen: false,
   setSettingTab: (settingTab) => {
     set({ settingTab });
   },
@@ -42,5 +45,8 @@ export const useBasicStore = create<BasicStore>((set) => ({
   },
   setStateFlowTimer: (stateFlowTimer) => {
     set({ stateFlowTimer });
+  },
+  setCommandOpen: (commandOpen: boolean) => {
+    set({ commandOpen });
   },
 }));

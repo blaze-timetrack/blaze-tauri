@@ -19,7 +19,9 @@ import TopBar from "@/components/shared/top-bar.tsx";
 import TitleBar from "@/components/backend components/title-bar.tsx";
 
 export function RootLayout() {
-  const [commandsOpen, setCommandsOpen] = useState(false);
+  const [] = useState(false);
+  const commandsOpen = useBasicStore((state) => state.commandOpen);
+  const setCommandsOpen = useBasicStore((state) => state.setCommandOpen);
   const navigate = useNavigate();
 
   const state = useSettingStore((state) => state.state);

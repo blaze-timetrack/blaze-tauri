@@ -13,6 +13,8 @@
   "permissions": [
     "global-shortcut:default",
     "store:default",
-    "core:event:default"
+    "core:event:default",
+    "sql:default",
+    "sql:allow-execute"
   ]
 }

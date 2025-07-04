@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -9,27 +9,25 @@ import {
 } from "@/components/ui/card.tsx";
 import TimezoneSelect from "react-timezone-select";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
-import spacetime from "spacetime";
-import { timeFormat } from "@/app.tsx";
 import { SelectedDropdownCurrentTime } from "@/components/custom ui/select-dropdown.tsx";
 
 function ActivityTab() {
   const selectedTimezone = useSettingStore((state) => state.timezone);
   const setSelectedTimezone = useSettingStore((state) => state.setTimezone);
 
-  const currentTime = useSettingStore((state) => state.currentTime);
-  const setCurrentTime = useSettingStore((state) => state.setCurrentTime);
-
-  useEffect(() => {
-    if (!selectedTimezone?.value) return;
-
-    const interval = setInterval(() => {
-      const d = spacetime(null, selectedTimezone?.value || selectedTimezone);
-      setCurrentTime(d.format(timeFormat));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [selectedTimezone]);
+  // const currentTime = useHydrateStore((state) => state.currentTime);
+  // const setCurrentTime = useHydrateStore((state) => state.setCurrentTime);
+  //
+  // useEffect(() => {
+  //   if (!selectedTimezone?.value) return;
+  //
+  //   const interval = setInterval(() => {
+  //     const d = spacetime(null, selectedTimezone?.value || selectedTimezone);
+  //     setCurrentTime(d.format(timeFormat));
+  //   }, 1000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [selectedTimezone]);
 
   return (
     <Card>
@@ -47,7 +45,7 @@ function ActivityTab() {
           />
         </div>
         <p className={"my-4"}>
-          current time: <span className={"font-semibold"}>{currentTime}</span>
+          {/*current time: <span className={"font-semibold"}>{currentTime}</span>*/}
         </p>
         <div className={"border-border mt-4 rounded-lg border"}>
           <pre

@@ -12,8 +12,11 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router";
 import "./shared.module.css";
+import { useBasicStore } from "@/lib/zustand/basic-store.ts";
 
 function Tabs() {
+  const setCommandOpen = useBasicStore((state) => state.setCommandOpen);
+
   return (
     <div className="bg-primary/10 row-span-19 flex w-16 flex-col items-center justify-between border-r py-6">
       {/* top-tabs */}
@@ -93,18 +96,13 @@ function Tabs() {
       </div>
       {/* bottom-tabs */}
       <div className="flex flex-col gap-3">
-        <NavLink to="/command">
-          {({ isActive }) => (
-            <Button
-              variant={"icon_btn"}
-              size={"icon"}
-              autoFocus={isActive}
-              className={isActive ? "bg-accent" : ""}
-            >
-              <Command />
-            </Button>
-          )}
-        </NavLink>
+        <Button
+          variant={"icon_btn"}
+          size={"icon"}
+          onClick={() => setCommandOpen(true)}
+        >
+          <Command />
+        </Button>
         <NavLink to="/support">
           {({ isActive }) => (
             <Button

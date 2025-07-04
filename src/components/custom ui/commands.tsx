@@ -28,7 +28,7 @@ export function Commands({
   setCommandsOpen,
 }: {
   commandsOpen: boolean;
-  setCommandsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setCommandsOpen: (commandOpen: boolean) => void;
 }) {
   return (
     <>

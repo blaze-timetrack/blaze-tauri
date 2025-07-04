@@ -3,10 +3,8 @@ import TimeColumn from "./TimeColumn";
 import ColumnHeader from "./ColumnHeader";
 import { useEffect, useState } from "react";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
-import spacetime from "spacetime";
 import BaseColumn from "@/components/schedule dashboard/BaseColumn.tsx";
 import { cn } from "@/lib/utils.ts";
-import { timeFormat } from "@/app.tsx";
 
 export interface Event {
   id: string;
@@ -17,12 +15,6 @@ export interface Event {
 }
 
 const ScheduleDashboard = () => {
-  const selectedTimezone = useSettingStore((state) => state.timezone);
-  const setSelectedTimezone = useSettingStore((state) => state.setTimezone);
-
-  const currentTime = useSettingStore((state) => state.currentTime);
-  const setCurrentTime = useSettingStore((state) => state.setCurrentTime);
-
   const scheduleDashboardColVisible = useSettingStore(
     (state) => state.scheduleDashboardColVisible,
   );
@@ -95,15 +87,7 @@ const ScheduleDashboard = () => {
     },
   ]);
 
-  useEffect(() => {
-    if (!selectedTimezone?.value) return;
-    const interval = setInterval(() => {
-      const d = spacetime(null, selectedTimezone?.value || selectedTimezone);
-      setCurrentTime(d.format(timeFormat));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [selectedTimezone]);
+  useEffect(() => {}, []);
 
   return (
     <div className="border-border bg-background text-foreground h-full w-full overflow-hidden rounded-lg border shadow-2xl">
