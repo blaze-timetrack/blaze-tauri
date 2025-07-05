@@ -3,12 +3,13 @@ import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import spacetime from "spacetime";
 import { getPositionInDash } from "@/lib/utils.ts";
 import { Separator } from "@/components/ui/separator.tsx";
+import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 
 const CurrentTimeLine = () => {
   const selectedTimezone = useSettingStore((state) => state.timezone);
 
-  const currentTime = useSettingStore((state) => state.currentTime);
-  const setCurrentTime = useSettingStore((state) => state.setCurrentTime);
+  const currentTime = useHydrateStore((state) => state.currentTime);
+  const setCurrentTime = useHydrateStore((state) => state.setCurrentTime);
 
   const [topPosition, setTop] = useState<number>(0);
 
@@ -16,7 +17,7 @@ const CurrentTimeLine = () => {
     if (!selectedTimezone?.value) return;
 
     const timer = setInterval(() => {
-      const d = spacetime(null, selectedTimezone?.value || selectedTimezone);
+      const d = spacetime(null, selectedTimezone.value);
       const { top } = getPositionInDash(d.unixFmt("hh:mm:ss"));
       setTop(top);
     }, 1000);

@@ -24,7 +24,7 @@ const ScheduleDashboard = () => {
       id: "1",
       title: "Deep Work Session",
       startTime: "01:00",
-      endTime: "05:00",
+      endTime: "05:45",
       color: "bg-purple-400",
     },
   ]);
@@ -94,11 +94,14 @@ const ScheduleDashboard = () => {
       <div className="grid grid-cols-[auto_1fr]">
         <div className="border-border w-16.5 border-r"></div>
         <div
-          className={cn("grid")}
+          className={cn("grid grid-cols-2")}
           style={{
-            gridTemplateColumns: `repeat(${scheduleDashboardColVisible.filter((v) => v.checkValue).length}, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${scheduleDashboardColVisible.filter((v) => v.checkValue).length + 2}, minmax(0, 1fr))`,
           }}
         >
+          <span className={"col-span-2"}>
+            <ColumnHeader title={"Activities"} />
+          </span>
           {scheduleDashboardColVisible.map(({ label, checkValue }, i) => (
             <span key={i} className={`${!checkValue && "hidden"}`}>
               <ColumnHeader title={label} />
@@ -110,15 +113,22 @@ const ScheduleDashboard = () => {
         <div className="grid grid-cols-[auto_1fr]">
           <TimeColumn />
           <div
-            className={cn("grid grid-cols-5")}
+            className={cn("grid grid-cols-2")}
             style={{
-              gridTemplateColumns: `repeat(${scheduleDashboardColVisible.filter((v) => v.checkValue).length}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${scheduleDashboardColVisible.filter((v) => v.checkValue).length + 2}, minmax(0, 1fr))`,
             }}
           >
+            <span className={`col-span-2`}>
+              <BaseColumn
+                events={activities}
+                className={`bg-background`}
+                id={"activity"}
+              />
+            </span>
             {scheduleDashboardColVisible.map((v, i) => (
               <span key={i} className={`${!v.checkValue && "hidden"}`}>
                 <BaseColumn
-                  events={activities}
+                  events={flowSessions}
                   className={`bg-background`}
                   id={v.value}
                 />

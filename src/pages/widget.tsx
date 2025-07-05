@@ -14,14 +14,13 @@ import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 function Widget() {
   const state = useSettingStore((state) => state.state);
   const infoFromMain = async () => {
-    const unlisten = await listen("reload", (event: Event<any>) => {
+    // @ts-ignore
+    return await listen("reload", (event: Event<any>) => {
       if (event.payload.windowLabel === "widget") {
         console.log("reloading");
         window.location.reload();
       }
     });
-
-    return unlisten;
   };
 
   useEffect(() => {

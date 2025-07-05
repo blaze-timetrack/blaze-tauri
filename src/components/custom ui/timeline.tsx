@@ -5,6 +5,7 @@ const HOUR_HEIGHT = 60; // px per hour
 const VISIBLE_HOURS = 8;
 const TIMELINE_WIDTH = 400; // px (adjust as needed)
 
+// @ts-ignore
 function getTimeAtPosition(x, startTime, hourWidth) {
   // Returns spacetime object for the given position
   const minutesFromStart = (x / hourWidth) * 60;
@@ -35,6 +36,7 @@ export default function Timeline() {
   }, []);
 
   // Handle scroll (horizontal)
+  // @ts-ignore
   const handleScroll = useCallback((e) => {
     setScrollLeft(e.target.scrollLeft);
   }, []);
@@ -107,6 +109,7 @@ export default function Timeline() {
         }}
         onScroll={handleScroll}
         onMouseMove={(e) => {
+          // @ts-ignore
           const rect = timelineRef.current.getBoundingClientRect();
           setHoverX(e.clientX - rect.left);
         }}

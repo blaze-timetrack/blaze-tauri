@@ -12,7 +12,7 @@ import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 
 function Home() {
   const awayFromKeyboard = async () => {
-    const unlisten = listen("afk", async (event: Event<HeartbeatStopTypes>) => {
+    return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
       try {
         const currentActiveDay = useHydrateStore(
           (state) => state.currentActiveDay,
@@ -34,39 +34,32 @@ function Home() {
         console.log(`afk error ${e}`);
       }
     });
-
-    return unlisten;
   };
   const heartbeat = async () => {
     const db = await connectToDB();
-    const unlisten = listen(
-      "heartbeat",
-      async (event: Event<HeartbeatTypes>) => {
-        try {
-          // check program category
-          const program_name = event.payload.process_name.split(".")[0];
-          await db.execute(
-            "INSERT INTO programs (name, title, url, duration, start_time, end_time, category) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [
-              program_name,
-              event.payload.title,
-              event.payload.url,
-              event.payload.time.duration,
-              event.payload.time.start,
-              event.payload.time.end,
-              "uncategorized",
-            ],
-          );
-          console.log(
-            `heartbeat event start: ${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
-          );
-        } catch (e) {
-          console.log(`heartbeat error ${e}`);
-        }
-      },
-    );
-
-    return unlisten;
+    return listen("heartbeat", async (event: Event<HeartbeatTypes>) => {
+      try {
+        // check program category
+        const program_name = event.payload.process_name.split(".")[0];
+        await db.execute(
+          "INSERT INTO programs (name, title, url, duration, start_time, end_time, category) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+          [
+            program_name,
+            event.payload.title,
+            event.payload.url,
+            event.payload.time.duration,
+            event.payload.time.start,
+            event.payload.time.end,
+            "uncategorized",
+          ],
+        );
+        console.log(
+          `heartbeat event start: ${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
+        );
+      } catch (e) {
+        console.log(`heartbeat error ${e}`);
+      }
+    });
   };
 
   useEffect(() => {
@@ -79,6 +72,8 @@ function Home() {
     };
 
     init();
+
+    // creating activity every 5min
 
     return () => {
       if (cleanup) cleanup();

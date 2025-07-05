@@ -109,9 +109,8 @@ export const shortcuts: string[] = [
   "c",
   "p",
   "g",
-  ",", // invalid
   "?",
-  "/", //
+  ".",
   "ctrl+p",
   "ctrl+f",
   "ctrl+shift+f",

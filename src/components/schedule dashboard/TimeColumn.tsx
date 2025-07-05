@@ -30,7 +30,7 @@ const TimeColumn = () => {
         <div
           key={time}
           className={cn(
-            "flex h-15 w-fit items-center px-2 text-xs text-gray-400",
+            "flex h-15 w-16.5 items-center justify-center text-xs text-gray-400",
             index !== 0 && "border-border border-t",
           )}
         >

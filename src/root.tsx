@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 // @ts-ignore
 import {
   isRouteErrorResponse,
@@ -19,7 +19,6 @@ import TopBar from "@/components/shared/top-bar.tsx";
 import TitleBar from "@/components/backend components/title-bar.tsx";
 
 export function RootLayout() {
-  const [] = useState(false);
   const commandsOpen = useBasicStore((state) => state.commandOpen);
   const setCommandsOpen = useBasicStore((state) => state.setCommandOpen);
   const navigate = useNavigate();
@@ -30,56 +29,60 @@ export function RootLayout() {
   const defaultFlowTimer = useSettingStore((state) => state.defaultFlowTimer);
   const setStateFlowTimer = useBasicStore((state) => state.setStateFlowTimer);
 
-  useHotkeys(shortcuts, async (e, handler) => {
-    console.log(`hotkey: ${handler.keys}`);
-    if (handler.ctrl && handler.keys?.includes("p")) {
-      await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
-      await reloadWidget();
-      return;
-    }
-    if (handler.ctrl && handler.keys?.includes("s")) {
-      await setState("TRACKING");
-      await reloadWidget();
-    }
-    if (handler.ctrl && handler.keys?.includes("f")) {
-      await setState("FLOW");
-      setStateFlowTimer(defaultFlowTimer);
-      await reloadWidget();
-    }
-    if (handler.ctrl && handler.shift && handler.keys?.includes("f")) {
-    }
-    if (handler.ctrl && handler.keys?.includes("b")) {
-    }
-    if (handler.ctrl && handler.shift && handler.keys?.includes("b")) {
-    }
-    if (handler.ctrl && handler.keys?.includes("b")) {
-    }
+  useHotkeys(
+    shortcuts,
+    async (e, handler) => {
+      console.log(`hotkey: ${handler.keys}`);
+      if (handler.ctrl && handler.keys?.includes("p")) {
+        await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
+        await reloadWidget();
+        return;
+      }
+      if (handler.ctrl && handler.keys?.includes("s")) {
+        await setState("TRACKING");
+        await reloadWidget();
+      }
+      if (handler.ctrl && handler.keys?.includes("f")) {
+        await setState("FLOW");
+        setStateFlowTimer(defaultFlowTimer);
+        await reloadWidget();
+      }
+      if (handler.ctrl && handler.shift && handler.keys?.includes("f")) {
+      }
+      if (handler.ctrl && handler.keys?.includes("b")) {
+      }
+      if (handler.ctrl && handler.shift && handler.keys?.includes("b")) {
+      }
+      if (handler.ctrl && handler.keys?.includes("b")) {
+      }
 
-    switch (handler.keys?.join("")) {
-      case "h":
-        navigate("/");
-        break;
-      case "t":
-        navigate("/timer");
-        break;
-      case "c":
-        navigate("/categories");
-        break;
-      case "p":
-        navigate("/work/projects");
-        break;
-      case "g":
-        e.preventDefault();
-        setCommandsOpen(true);
-        break;
-      case ",":
-        navigate("/settings");
-        break;
-      case "?":
-        navigate("/support");
-        break;
-    }
-  });
+      switch (handler.keys?.join("")) {
+        case "h":
+          navigate("/");
+          break;
+        case "t":
+          navigate("/timer");
+          break;
+        case "c":
+          navigate("/categories");
+          break;
+        case "p":
+          navigate("/work/projects");
+          break;
+        case "g":
+          e.preventDefault();
+          setCommandsOpen(true);
+          break;
+        case "?":
+          navigate("/support");
+          break;
+        case ".":
+          navigate("/settings");
+          break;
+      }
+    },
+    { useKey: true },
+  );
 
   return (
     <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24 select-none">

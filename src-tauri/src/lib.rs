@@ -89,11 +89,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 settings.SetIsSwipeNavigationEnabled(false).unwrap();
                 settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                 settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
-                settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                // settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
                 settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                 // settings.SetAreDevToolsEnabled(true).unwrap();
             }).unwrap();
-            widget_window.open_devtools();
 
             if let Some(monitor) = widget_window.primary_monitor().unwrap() {
                 let monitor_size = monitor.size();
@@ -125,11 +124,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                 settings.SetIsGeneralAutofillEnabled(false).unwrap();
                 settings.SetIsWebMessageEnabled(false).unwrap();
-                settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                 settings.SetAreDevToolsEnabled(true).unwrap();
             }).unwrap();
 
-            main_window.open_devtools();
+            #[cfg(debug_assertions)]
+            {
+                widget_window.open_devtools();
+                main_window.open_devtools();
+            }
+
 
             // set background color only when building for macOS
             #[cfg(target_os = "macos")]

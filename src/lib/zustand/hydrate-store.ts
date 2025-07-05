@@ -33,7 +33,7 @@ export const useHydrateStore = create<HydrateStoreTypes>((set) => ({
 
 const hydrate = async () => {
   const tauriTimezone = useSettingStore.getState().timezone;
-  let d = spacetime(null, tauriTimezone?.value || tauriTimezone);
+  let d = spacetime(null, tauriTimezone.value);
   useHydrateStore.setState({ currentTime: d.format(timeFormat) });
   useHydrateStore.setState({ currentDay: d.format("date-pad") });
 

@@ -22,13 +22,13 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
   const duration = endPosition - startPosition;
 
   // Each hour is timeScale pixels tall
-  const top = (relativeStart / 60) * timeScale;
+  // const top = relativeStart * timeScale;
   const height = (duration / 60) * timeScale;
 
   return (
     <div
       style={{
-        top: `${top}px`,
+        top: `${startPosition}px`,
         height: `${height}px`,
         width: "calc(100% - 16px)",
         left: "8px",

@@ -7,7 +7,7 @@ import DropdownAnimateScheduleCol from "@/components/custom ui/dropdown-animate-
 export default function TopBar2() {
   const timezone = useSettingStore((state) => state.timezone);
 
-  const d = spacetime(null, timezone?.value || timezone);
+  const d = spacetime(null, timezone.value);
 
   return (
     <div className={"row-span-1 flex w-full items-center justify-between"}>

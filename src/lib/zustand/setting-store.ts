@@ -15,7 +15,7 @@ import {
 import { create } from "zustand/react";
 import { z } from "zod";
 import { SettingsKeys } from "@/lib/constants/settings-const.tsx";
-import { ITimezone } from "react-timezone-select";
+import { ITimezone, ITimezoneOption } from "react-timezone-select";
 
 const tauriStore = new LazyStore(".settings.dat", { autoSave: true });
 
@@ -122,11 +122,6 @@ export const defaultBreakTimer = 5 * 60;
 export const defaultScheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[] =
   [
     {
-      label: "Activities",
-      value: "activity",
-      checkValue: false,
-    },
-    {
       label: "Flow Sessions",
       value: "flow_session",
       checkValue: true,
@@ -162,7 +157,7 @@ export interface SettingsStore {
   groupedPrograms: groupProgramsType[];
   theme: ThemeTypes;
   themeMode: ThemeModeTypes;
-  timezone: ITimezone;
+  timezone: ITimezoneOption;
   currentTime12: boolean;
   currentTimeStart: number;
   state: StateTypes;
@@ -181,7 +176,7 @@ export interface SettingsStore {
   ) => Promise<string | undefined>;
   setTheme: (theme: ThemeTypes) => Promise<void>;
   setThemeMode: (themeMode: ThemeModeTypes) => Promise<void>;
-  setTimezone: (timezone: ITimezone) => Promise<void>;
+  setTimezone: (timezone: ITimezoneOption) => Promise<void>;
   setCurrentTime12: (currentTime12: boolean) => Promise<void>;
   setState: (state: StateTypes) => Promise<void>;
   setDefaultFlowTimer: (defaultFlowTimer: number) => Promise<void>;
@@ -199,7 +194,10 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   groupedPrograms: defaultGroupingPrograms,
   theme: "system",
   themeMode: "default",
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  timezone: {
+    value: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    label: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  },
   currentTime12: true,
   currentTimeStart: 12,
   state: "TRACKING",
@@ -321,7 +319,7 @@ export const useSettingStore = create<SettingsStore>((set) => ({
 
     await tauriStore.set("themeMode", themeMode);
   },
-  setTimezone: async (timezone: ITimezone) => {
+  setTimezone: async (timezone: ITimezoneOption) => {
     set({ timezone });
     await tauriStore.set("timezone", timezone);
   },
