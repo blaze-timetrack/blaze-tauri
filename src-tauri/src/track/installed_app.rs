@@ -3,7 +3,6 @@ use std::process::Command;
 use winreg::enums::HKEY_LOCAL_MACHINE;
 use winreg::RegKey;
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct InstalledApp {
     pub name: String,
@@ -17,9 +16,7 @@ pub struct InstalledApp {
 pub fn get_installed_applications() -> Result<Vec<InstalledApp>, String> {
     let mut apps = Vec::new();
     // Query both native and WOW64 registry paths
-    let registry_paths = vec![
-        r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-    ];
+    let registry_paths = vec![r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"];
 
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
 

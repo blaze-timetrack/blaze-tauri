@@ -18,7 +18,7 @@ function Tabs() {
   const setCommandOpen = useBasicStore((state) => state.setCommandOpen);
 
   return (
-    <div className="bg-primary/10 row-span-19 flex w-16 flex-col items-center justify-between border-r py-6">
+    <div className="bg-primary/10 flex w-14 flex-col items-center justify-between border-r py-6">
       {/* top-tabs */}
       <div className="flex flex-col gap-3">
         <NavLink to="/">

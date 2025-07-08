@@ -12,11 +12,11 @@ pub struct Classifier {
     model: HashMap<String, Tensor>,
 }
 
-
 impl Classifier {
     pub fn new() -> Result<Self> {
         let device = Device::Cpu;
-        let resource_dir = std::env::current_dir()?.join("models/bert-mini/bert-mini-candle.safetensors");
+        let resource_dir =
+            std::env::current_dir()?.join("models/bert-mini/bert-mini-candle.safetensors");
 
         let model = candle_core::safetensors::load(resource_dir, &device)?;
 
@@ -38,9 +38,17 @@ impl Classifier {
 
     pub fn classify(&self, text: &str) -> Result<String, String> {
         let device = Device::Cpu;
-        let resource_dir = std::env::current_dir().unwrap().join("models/bert-mini/tokenizer.json");
-        let weight = self.model.get("bert.encoder.layer.0.attention.self.query.weight").unwrap();
-        let bias = self.model.get("bert.encoder.layer.0.attention.self.query.bias").unwrap();
+        let resource_dir = std::env::current_dir()
+            .unwrap()
+            .join("models/bert-mini/tokenizer.json");
+        let weight = self
+            .model
+            .get("bert.encoder.layer.0.attention.self.query.weight")
+            .unwrap();
+        let bias = self
+            .model
+            .get("bert.encoder.layer.0.attention.self.query.bias")
+            .unwrap();
 
         let linear = Linear::new(weight.clone(), Some(bias.clone()));
 
@@ -66,7 +74,6 @@ impl Classifier {
         let logits = output.squeeze(0).unwrap(); // [seq_len, num_labels]
         let logits_vec: Vec<Vec<f32>> = logits.to_vec2().unwrap();
 
-
         // For each token, find the predicted label
         let label_map = vec!["coding", "design", "productivity", "browser", "marketing"]; // Example
         let predictions: Vec<&str> = logits_vec
@@ -86,7 +93,10 @@ impl Classifier {
 }
 
 #[tauri::command]
-pub async fn classify_text(text: String, classifier: tauri::State<'_, Mutex<Classifier>>) -> tauri::Result<String> {
+pub async fn classify_text(
+    text: String,
+    classifier: tauri::State<'_, Mutex<Classifier>>,
+) -> tauri::Result<String> {
     log::info!("in to classify text");
     println!("in to classify text");
     let classifier = match classifier.lock() {

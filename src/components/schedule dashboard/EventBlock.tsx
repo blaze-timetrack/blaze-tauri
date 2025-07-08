@@ -18,7 +18,7 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
 
   // Convert 7:00 AM to 0 position (420 minutes from midnight)
   const startOffset = 420;
-  const relativeStart = startPosition - startOffset;
+  // const relativeStart = startPosition - startOffset;
   const duration = endPosition - startPosition;
 
   // Each hour is timeScale pixels tall
@@ -34,7 +34,7 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
         left: "8px",
       }}
       className={cn(
-        "absolute rounded-md p-3 transition-all hover:brightness-110",
+        "text-background/80 absolute rounded-md p-3 transition-all hover:brightness-110",
         event.color,
       )}
     >

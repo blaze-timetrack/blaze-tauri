@@ -63,6 +63,9 @@
       "models/bert-mini/bert-mini-candle.safetensors",
       "models/bert-mini/config.json"
     ],
+    "externalBin": [
+      "sidecar/app"
+    ],
     "windows": {
       "allowDowngrades": true,
       "certificateThumbprint": null,

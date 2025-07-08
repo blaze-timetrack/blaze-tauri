@@ -18,21 +18,30 @@ pub async fn close_connection_db(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 }
 
 pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
-    sqlx::query(r#"CREATE TABLE IF NOT EXISTS user
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS user
     (id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     username VARCHAR(20) NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE)
-"#).execute(pool).await?;
+"#,
+    )
+    .execute(pool)
+    .await?;
 
-    sqlx::query(r#"CREATE TABLE IF NOT EXISTS days (
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS days (
         date_id DATE UNIQUE,
         category_total BLOB NOT NULL DEFAULT '[]',
         flow_total INTEGER NOT NULL DEFAULT 0,
         break_total INTEGER NOT NULL DEFAULT 0)
-    "#).execute(pool).await?;
+    "#,
+    )
+    .execute(pool)
+    .await?;
 
-    sqlx::query(r#"CREATE TABLE IF NOT EXISTS activities
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS activities
         (id INTEGER PRIMARY KEY,
         name TEXT NULL,
         duration INT NOT NULL DEFAULT 0,
@@ -45,9 +54,13 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         FOREIGN KEY (date_id) REFERENCES days(date_id),
         FOREIGN KEY (id) REFERENCES flows(flow_states),
         FOREIGN KEY (id) REFERENCES programs(programs_id)
-    )"#).execute(pool).await?;
+    )"#,
+    )
+    .execute(pool)
+    .await?;
 
-    sqlx::query(r#"CREATE TABLE IF NOT EXISTS programs (
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS programs (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         title TEXT,
@@ -55,24 +68,38 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         duration INTEGER NOT NULL DEFAULT 0,
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
-        category TEXT NOT NULL DEFAULT 'uncategorized')"#).execute(pool).await?;
+        category TEXT NOT NULL DEFAULT 'uncategorized',
+        date_id DATE,
+        FOREIGN KEY (date_id) REFERENCES days(date_id)
+    )"#,
+    )
+    .execute(pool)
+    .await?;
 
-    sqlx::query(r#"CREATE TABLE IF NOT EXISTS flows
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS flows
         (id INT PRIMARY KEY,
         duration INT NOT NULL DEFAULT 0,
         start_time DATETIME NOT NULL,
-        end_time DATETIME NOT NULL)"#).execute(pool).await?;
+        end_time DATETIME NOT NULL)"#,
+    )
+    .execute(pool)
+    .await?;
 
     // activity_id INT UNIQUE NOT NULL REFERENCES activities(id),
 
-    sqlx::query(r#"CREATE TABLE IF NOT EXISTS breaks (
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS breaks (
         id INT PRIMARY KEY,
         duration INT NOT NULL DEFAULT 0,
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
-        day_id DATE NOT NULL,
-        FOREIGN KEY (date_id) REFERENCES days(day_id)
-    )"#).execute(pool).await?;
+        date_id DATE NOT NULL,
+        FOREIGN KEY (date_id) REFERENCES days(date_id)
+    )"#,
+    )
+    .execute(pool)
+    .await?;
 
     println!("created Schema of table");
     Ok(())

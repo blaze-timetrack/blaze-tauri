@@ -11,6 +11,7 @@ import ScheduleDashboard from "@/components/schedule dashboard";
 import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 
 function Home() {
+  const currentDay = useHydrateStore((state) => state.currentDay);
   const awayFromKeyboard = async () => {
     return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
       try {
@@ -42,7 +43,7 @@ function Home() {
         // check program category
         const program_name = event.payload.process_name.split(".")[0];
         await db.execute(
-          "INSERT INTO programs (name, title, url, duration, start_time, end_time, category) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+          "INSERT INTO programs (name, title, url, duration, start_time, end_time, category, date_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
           [
             program_name,
             event.payload.title,
@@ -51,6 +52,7 @@ function Home() {
             event.payload.time.start,
             event.payload.time.end,
             "uncategorized",
+            currentDay,
           ],
         );
         console.log(
@@ -60,6 +62,29 @@ function Home() {
         console.log(`heartbeat error ${e}`);
       }
     });
+  };
+
+  const createActivity = async () => {
+    try {
+      const db = await connectToDB();
+
+      const programs = await db.select(
+        "SELECT category, SUM(total_duration) AS category_total FROM " +
+          "(" +
+          "SELECT SUM(duration) AS total_duration, * FROM programs WHERE date_id = $1 GROUP BY name, category" +
+          ") GROUP BY category",
+        [currentDay],
+      );
+
+      console.log(JSON.parse(JSON.stringify(programs)));
+      // console.log(
+      //   `programs: ${programs.map((v) => {
+      //     console.log(v);
+      //   })}`,
+      // );
+    } catch (e) {
+      console.log(`error form createActivity: ${e}`);
+    }
   };
 
   useEffect(() => {
@@ -74,8 +99,15 @@ function Home() {
     init();
 
     // creating activity every 5min
+    const interval = setInterval(
+      async () => {
+        await createActivity();
+      },
+      1000 * 60 * 5,
+    );
 
     return () => {
+      clearInterval(interval);
       if (cleanup) cleanup();
       if (cleanup2) cleanup2();
     };

@@ -15,8 +15,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { shortcuts } from "@/lib/constants/settings-const.tsx";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import { useBasicStore } from "@/lib/zustand/basic-store.ts";
-import TopBar from "@/components/shared/top-bar.tsx";
 import TitleBar from "@/components/backend components/title-bar.tsx";
+import TopBar from "@/components/shared/top-bar.tsx";
 
 export function RootLayout() {
   const commandsOpen = useBasicStore((state) => state.commandOpen);
@@ -29,50 +29,56 @@ export function RootLayout() {
   const defaultFlowTimer = useSettingStore((state) => state.defaultFlowTimer);
   const setStateFlowTimer = useBasicStore((state) => state.setStateFlowTimer);
 
-  useHotkeys(
-    shortcuts,
-    async (e, handler) => {
-      console.log(`hotkey: ${handler.keys}`);
-      if (handler.ctrl && handler.keys?.includes("p")) {
-        await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
-        await reloadWidget();
-        return;
-      }
-      if (handler.ctrl && handler.keys?.includes("s")) {
-        await setState("TRACKING");
-        await reloadWidget();
-      }
-      if (handler.ctrl && handler.keys?.includes("f")) {
-        await setState("FLOW");
-        setStateFlowTimer(defaultFlowTimer);
-        await reloadWidget();
-      }
-      if (handler.ctrl && handler.shift && handler.keys?.includes("f")) {
-      }
-      if (handler.ctrl && handler.keys?.includes("b")) {
-      }
-      if (handler.ctrl && handler.shift && handler.keys?.includes("b")) {
-      }
-      if (handler.ctrl && handler.keys?.includes("b")) {
-      }
+  useHotkeys(shortcuts, async (e, handler) => {
+    console.log(`hotkey: ${handler.keys}`);
+    if (handler.ctrl && handler.keys?.includes("p")) {
+      await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
+      await reloadWidget();
+      return;
+    }
+    if (handler.ctrl && handler.keys?.includes("s")) {
+      await setState("NO_TRACKING");
+      await reloadWidget();
+    }
+    if (handler.ctrl && handler.keys?.includes("f")) {
+      await setState("FLOW");
+      setStateFlowTimer(defaultFlowTimer);
+      await reloadWidget();
+    }
+    if (handler.ctrl && handler.shift && handler.keys?.includes("f")) {
+    }
+    if (handler.ctrl && handler.keys?.includes("b")) {
+    }
+    if (handler.ctrl && handler.shift && handler.keys?.includes("b")) {
+    }
+    if (handler.ctrl && handler.keys?.includes("b")) {
+    }
 
-      switch (handler.keys?.join("")) {
-        case "h":
-          navigate("/");
-          break;
-        case "t":
-          navigate("/timer");
-          break;
-        case "c":
-          navigate("/categories");
-          break;
-        case "p":
-          navigate("/work/projects");
-          break;
-        case "g":
-          e.preventDefault();
-          setCommandsOpen(true);
-          break;
+    switch (handler.keys?.join("")) {
+      case "h":
+        navigate("/");
+        break;
+      case "t":
+        navigate("/timer");
+        break;
+      case "c":
+        navigate("/categories");
+        break;
+      case "p":
+        navigate("/work/projects");
+        break;
+      case "g":
+        e.preventDefault();
+        setCommandsOpen(true);
+        break;
+    }
+  });
+
+  useHotkeys(
+    [".", "?", ","],
+    async function (event, handle) {
+      console.log(`handle: ${handle.keys}`);
+      switch (handle.keys?.join("")) {
         case "?":
           navigate("/support");
           break;
@@ -85,12 +91,12 @@ export function RootLayout() {
   );
 
   return (
-    <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-24 select-none">
+    <div className="grid h-screen grid-flow-row-dense grid-cols-12 grid-rows-26 select-none">
       <TitleBar />
       <TopBar />
-      <div className={"col-span-full row-span-19 grid grid-cols-[auto_1fr]"}>
+      <div className={"col-span-full row-span-21 grid grid-cols-[auto_1fr]"}>
         <Tabs />
-        <div className={"mx-8 my-4 lg:mx-12"}>
+        <div className={"mx-6 my-4"}>
           <Outlet />
         </div>
       </div>

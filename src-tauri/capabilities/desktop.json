@@ -23,6 +23,24 @@
     "updater:default",
     "store:default",
     "sql:default",
-    "sql:allow-execute"
+    "sql:allow-execute",
+    "shell:allow-open",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "sidecar/app",
+          "cmd": "ping",
+          "sidecar": true,
+          "args": true
+        },
+        {
+          "name": "sidecar/app",
+          "cmd": "pong",
+          "sidecar": true,
+          "args": true
+        }
+      ]
+    }
   ]
 }

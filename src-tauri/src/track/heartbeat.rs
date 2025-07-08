@@ -48,10 +48,24 @@ const TARGET_APP: [&str; 10] = [
 
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
-pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(Option<HeartbeatBlood>, Option<HeartbeatStop>), String> {
+pub async fn start_heartbeat<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> Result<(Option<HeartbeatBlood>, Option<HeartbeatStop>), String> {
     let (title, past_blood, url) = get_active_all().unwrap();
-    let store = app.store(".settings.dat").expect("Failed to load settings.dat in heartbeat");
-    let tz: Tz = store.get("timezone").unwrap().as_object().unwrap().get("value").unwrap().as_str().unwrap().parse().unwrap();
+    let store = app
+        .store(".settings.dat")
+        .expect("Failed to load settings.dat in heartbeat");
+    let tz: Tz = store
+        .get("timezone")
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get("value")
+        .unwrap()
+        .as_str()
+        .unwrap()
+        .parse()
+        .unwrap();
     let utc_now = Utc::now();
 
     let mut total_duration = Duration::ZERO;
@@ -69,7 +83,10 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
 
     loop {
         let store = app.store(".settings.dat").expect("Failed to load store.");
-        let state = store.get("state").expect("Failed to get state from setting store.").clone();
+        let state = store
+            .get("state")
+            .expect("Failed to get state from setting store.")
+            .clone();
 
         let mut past_blood_afk = None;
         let mut elapsed = last_check.elapsed();
@@ -83,32 +100,36 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
             let (_, current_blood, _) = get_active_all().unwrap();
 
             if past_afk {
-                let now = Utc
-                ::now();
+                let now = Utc::now();
                 end_time = now.with_timezone(&tz);
-                return Ok((past_blood_afk, Some(HeartbeatStop {
-                    time: Time {
-                        start: start_time.format(TIME_FORMAT).to_string(),
-                        end: end_time.format(TIME_FORMAT).to_string(),
-                        duration: total_duration.as_secs(),
-                    }
-                })));
+                return Ok((
+                    past_blood_afk,
+                    Some(HeartbeatStop {
+                        time: Time {
+                            start: start_time.format(TIME_FORMAT).to_string(),
+                            end: end_time.format(TIME_FORMAT).to_string(),
+                            duration: total_duration.as_secs(),
+                        },
+                    }),
+                ));
             }
 
             if past_blood != current_blood || state == "NO_TRACKING" {
-                let now = Utc
-                ::now();
+                let now = Utc::now();
                 end_time = now.with_timezone(&tz);
-                return Ok((Some(HeartbeatBlood {
-                    process_name: past_blood.to_string(),
-                    title: title.clone(),
-                    url: url.clone(),
-                    time: Time {
-                        start: start_time.format(TIME_FORMAT).to_string(),
-                        end: end_time.format(TIME_FORMAT).to_string(),
-                        duration: total_duration.as_secs(),
-                    },
-                }), None));
+                return Ok((
+                    Some(HeartbeatBlood {
+                        process_name: past_blood.to_string(),
+                        title: title.clone(),
+                        url: url.clone(),
+                        time: Time {
+                            start: start_time.format(TIME_FORMAT).to_string(),
+                            end: end_time.format(TIME_FORMAT).to_string(),
+                            duration: total_duration.as_secs(),
+                        },
+                    }),
+                    None,
+                ));
             }
         }
 
@@ -122,8 +143,7 @@ pub async fn start_heartbeat<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(O
             if afk && end_afk {
                 past_afk = true;
                 end_afk = false;
-                let now = Utc
-                ::now();
+                let now = Utc::now();
                 end_time = now.with_timezone(&tz);
                 past_blood_afk = Some(HeartbeatBlood {
                     process_name: past_blood.to_string(),

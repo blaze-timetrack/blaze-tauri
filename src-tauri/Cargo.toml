@@ -50,6 +50,7 @@ tauri-plugin-notification = "2.2.2"
 #[dev-dependencies]
 tauri-plugin-devtools = "2.0.0"
 tauri-plugin-sql = { version = "2.2.0", features = ["sqlite"] }
+tauri-plugin-shell = "2"
 
 [build-dependencies]
 tauri-build = { version = "2.2.0", features = [] }

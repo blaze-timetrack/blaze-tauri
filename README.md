@@ -169,3 +169,8 @@ useEffect(() => {
 
 - remove the start screen white background or display when ready (visible: false, focus: true -> check this as this may
   not work in all platforms)  = visible: true, focus: true
+
+# handle every edge case
+
+- autostart every time if enable
+- while changing db schema make this in a way that old to new without losing data 

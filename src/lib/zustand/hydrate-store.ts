@@ -35,20 +35,20 @@ const hydrate = async () => {
   const tauriTimezone = useSettingStore.getState().timezone;
   let d = spacetime(null, tauriTimezone.value);
   useHydrateStore.setState({ currentTime: d.format(timeFormat) });
-  useHydrateStore.setState({ currentDay: d.format("date-pad") });
-
   useHydrateStore.setState({
-    currentActiveDay: d.format("{year}-{date-pad}-{month-pad}-{timezone}"),
+    currentDay: d.format("{date-pad}-{month-pad}-{year}-{timezone}"),
   });
 
-  console.log(`date: ${d.format("{year}-{date-pad}-{month-pad}-{timezone}")}`);
+  useHydrateStore.setState({
+    currentActiveDay: d.format("{date-pad}-{month-pad}-{year}-{timezone}"),
+  });
 
   const currentDay = useHydrateStore.getState().currentActiveDay;
 
   try {
     const db = await connectToDB();
     // check if today row present handle edge case like (change the day, timezone change)
-    await db.execute("INSERT INTO day (date_id) VALUES ($1)", [currentDay]);
+    await db.execute("INSERT INTO days (date_id) VALUES ($1)", [currentDay]);
   } catch (e) {
     console.log(`error from hydratestore: ${e}`);
   }

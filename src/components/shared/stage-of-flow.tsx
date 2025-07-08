@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Power } from "lucide-react";
-import MusicPlayer from "@/components/shared/music-player.tsx";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import { useEffect } from "react";
 import { FlowStateSession } from "@/components/extented ui/flow-state-session.tsx";
 import { reloadWidget } from "@/lib/utils.ts";
 import { useBasicStore } from "@/lib/zustand/basic-store.ts";
+import MusicPlayer from "@/components/shared/music-player.tsx";
 
 function StateOfFlow() {
   const state = useSettingStore((state) => state.state);

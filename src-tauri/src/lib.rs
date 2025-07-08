@@ -1,7 +1,7 @@
 // -- Sub-Modules
+mod classifier;
 mod track;
 mod utils;
-mod classifier;
 
 use crate::track::afk::away_from_keyboard;
 use crate::track::heartbeat::start_heartbeat;
@@ -15,7 +15,11 @@ use std::sync::Mutex;
 use std::time::Duration;
 use std::{env, result};
 use tauri::ipc::private::tracing::log;
-use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, LogicalPosition, PhysicalSize, Runtime};
+use tauri::{
+    menu::{Menu, MenuItem},
+    utils::TitleBarStyle,
+    AppHandle, Emitter, LogicalPosition, PhysicalSize, Runtime,
+};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
@@ -71,6 +75,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     builder
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_deep_link::init())
@@ -83,16 +88,24 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             let size = PhysicalSize::new(420.0 as u32, 38.0 as u32);
             widget_window.set_size(size).unwrap();
-            widget_window.with_webview(|webview| unsafe {
-                let settings = webview.controller().CoreWebView2().unwrap().Settings().unwrap();
-                let settings: ICoreWebView2Settings6 = settings.cast::<ICoreWebView2Settings6>().unwrap();
-                settings.SetIsSwipeNavigationEnabled(false).unwrap();
-                settings.SetAreDefaultContextMenusEnabled(false).unwrap();
-                settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
-                // settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
-                settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
-                // settings.SetAreDevToolsEnabled(true).unwrap();
-            }).unwrap();
+            widget_window
+                .with_webview(|webview| unsafe {
+                    let settings = webview
+                        .controller()
+                        .CoreWebView2()
+                        .unwrap()
+                        .Settings()
+                        .unwrap();
+                    let settings: ICoreWebView2Settings6 =
+                        settings.cast::<ICoreWebView2Settings6>().unwrap();
+                    settings.SetIsSwipeNavigationEnabled(false).unwrap();
+                    settings.SetAreDefaultContextMenusEnabled(false).unwrap();
+                    settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
+                    // settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                    settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    // settings.SetAreDevToolsEnabled(true).unwrap();
+                })
+                .unwrap();
 
             if let Some(monitor) = widget_window.primary_monitor().unwrap() {
                 let monitor_size = monitor.size();
@@ -116,24 +129,31 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             // main_window.eval(r#"
             // document.addEventListener('contextmenu', event => event.preventDefault());
             //             "#).unwrap(); // @todo starts working after refesh
-            main_window.with_webview(|webview| unsafe {
-                let settings = webview.controller().CoreWebView2().unwrap().Settings().unwrap();
-                let settings: ICoreWebView2Settings6 = settings.cast::<ICoreWebView2Settings6>().unwrap();
-                settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
-                settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
-                settings.SetAreDefaultContextMenusEnabled(false).unwrap();
-                settings.SetIsGeneralAutofillEnabled(false).unwrap();
-                settings.SetIsWebMessageEnabled(false).unwrap();
-                // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
-                settings.SetAreDevToolsEnabled(true).unwrap();
-            }).unwrap();
+            main_window
+                .with_webview(|webview| unsafe {
+                    let settings = webview
+                        .controller()
+                        .CoreWebView2()
+                        .unwrap()
+                        .Settings()
+                        .unwrap();
+                    let settings: ICoreWebView2Settings6 =
+                        settings.cast::<ICoreWebView2Settings6>().unwrap();
+                    settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
+                    settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                    settings.SetAreDefaultContextMenusEnabled(false).unwrap();
+                    settings.SetIsGeneralAutofillEnabled(false).unwrap();
+                    settings.SetIsWebMessageEnabled(false).unwrap();
+                    // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    settings.SetAreDevToolsEnabled(true).unwrap();
+                })
+                .unwrap();
 
             #[cfg(debug_assertions)]
             {
                 widget_window.open_devtools();
                 main_window.open_devtools();
             }
-
 
             // set background color only when building for macOS
             #[cfg(target_os = "macos")]
@@ -181,10 +201,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 tauri::async_runtime::spawn(background_track(app_data_dir, app.handle().clone()));
             }
 
-
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, get_systems_timezone, get_installed_applications, get_apps_via_powershell, classify_text])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            get_systems_timezone,
+            get_installed_applications,
+            get_apps_via_powershell,
+            classify_text
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
@@ -203,8 +228,13 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                 println!("tracker running in background");
                 tokio::time::sleep(Duration::from_micros(80)).await;
 
-                let store = &app_handle.store(".settings.dat").expect("Failed to load store.");
-                let state = store.get("state").expect("Failed to get state from setting store.").clone();
+                let store = &app_handle
+                    .store(".settings.dat")
+                    .expect("Failed to load store.");
+                let state = store
+                    .get("state")
+                    .expect("Failed to get state from setting store.")
+                    .clone();
                 println!("state: {}", state);
 
                 if state == "NO_TRACKING" {
