@@ -7,10 +7,10 @@ import { Command } from "@tauri-apps/plugin-shell";
 
 export const searchMusic = async () => {
   try {
-    // const helpCommand = Command.sidecar("sidecar/app", "help");
-    // const helpOutput = await helpCommand.execute();
-    // const helpResult = helpOutput.stdout;
-    // console.log("help result", helpResult);
+    const helpCommand = Command.sidecar("sidecar/app", "help");
+    const helpOutput = await helpCommand.execute();
+    const helpResult = helpOutput.stdout;
+    console.log("help result", helpResult);
 
     const pingMessage = "Tauri";
     const pingCommand = Command.sidecar("sidecar/app", ["ping", pingMessage]);
@@ -43,7 +43,9 @@ export const searchMusic = async () => {
 
     if (ytmusicOutput.code === 0) {
       const musicResult = ytmusicOutput.stdout;
-      console.log("got musicResult", JSON.parse(JSON.stringify(musicResult)));
+      const videoId = musicResult;
+      console.log("got musicResult", musicResult);
+      return videoId;
     } else {
       console.error(
         `sidecar error (ytmusic, exit code ${ytmusicOutput.code}): ${ytmusicOutput.stderr}`,

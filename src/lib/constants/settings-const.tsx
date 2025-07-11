@@ -118,3 +118,30 @@ export const shortcuts: string[] = [
   "ctrl+shift+b",
   "ctrl+s",
 ];
+
+export const availableMusic = [
+  {
+    name: "Silent",
+    value: "silent",
+  },
+  {
+    name: "Lo-Fi Beats",
+    value: "jfKfPfyJRdk",
+  },
+  {
+    name: "Jazz Lounge",
+    value: "I_2sAr9hIuc",
+  },
+  {
+    name: "Dark Red",
+    value: "5da3D9ZfMQo",
+  },
+  {
+    name: "Blinding Lights",
+    value: "4NRXx6U8ABQ",
+  },
+  {
+    name: "Pal Pal",
+    value: "8of5w7RgcTc",
+  },
+];

@@ -14,7 +14,6 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::Duration;
 use std::{env, result};
-use tauri::ipc::private::tracing::log;
 use tauri::{
     menu::{Menu, MenuItem},
     utils::TitleBarStyle,

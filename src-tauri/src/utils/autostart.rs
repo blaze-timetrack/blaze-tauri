@@ -13,5 +13,8 @@ pub fn set_auto_start<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()
     // Enable autostart
     let _ = autostart_manager.enable();
 
+    println!("is _auto_start {}", autostart_manager.is_enabled().unwrap());
+
+
     Ok(())
 }

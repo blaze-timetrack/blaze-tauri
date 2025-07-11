@@ -12,20 +12,9 @@ export type StateTypes =
   | "NO_TRACKING";
 
 // music
-export enum MusicTypes {
-  SILENT = "SILENT",
-  LO_FI = "LO_FI",
-  MEDITATION = "MEDITATION",
-  NATURE = "NATURE",
-  POP = "POP",
-  ROCK = "ROCK",
-  JAZZ = "JAZZ",
-  CLASSICAL = "CLASSICAL",
-  HIP_HOP = "HIP_HOP",
-  ELECTRONIC = "ELECTRONIC",
-  DANCE = "DANCE",
-  RAP = "RAP",
-  OTHER = "OTHER", // ADD YOUR OWN
+export interface MusicTypes {
+  name: string;
+  value: string;
 }
 
 // theme && theme mode

@@ -2,6 +2,19 @@ import React, { useEffect } from "react";
 import { useBasicStore } from "@/lib/zustand/basic-store.ts";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
+const opts = {
+  height: "400", // Hide video
+  width: "800",
+  playerVars: {
+    loop: 1,
+    playlist: "8of5w7RgcTc",
+    autoplay: 1,
+    controls: 0,
+    disablekb: 1,
+    rel: 0,
+  },
+};
+
 export default function Timer() {
   const state = useSettingStore((state) => state.state);
   const setState = useSettingStore((state) => state.setState);
@@ -30,6 +43,7 @@ export default function Timer() {
       <p
         className={"flex w-full justify-center"}
       >{`${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</p>
+      {/*<YouTube videoId={"8of5w7RgcTc"} opts={opts} />*/}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   Submenu,
 } from "@tauri-apps/api/menu";
 import { useCallback } from "react";
+import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 
 function TitleBar() {
   const appWindow = getCurrentWindow();
@@ -25,8 +26,15 @@ function TitleBar() {
         await MenuItem.new({
           id: "startup_launch",
           text: "Launch on Startup",
-          action: () => {
+          action: async () => {
             console.log("Open launch at startup clicked");
+            if (await isEnabled()) {
+              await disable();
+              console.log("is disabled");
+              return;
+            }
+            await enable();
+            console.log("is enabled");
           },
         }),
         await MenuItem.new({

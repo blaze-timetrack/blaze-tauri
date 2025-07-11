@@ -164,8 +164,9 @@ export interface SettingsStore {
   defaultFlowTimer: number;
   defaultBreakTimer: number;
   scheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[];
+  currentMusic: MusicTypes;
   volume: number;
-  music: MusicTypes;
+  isPlaying: boolean;
   setCategoryState: (
     categoryStates: categoryStateTypes,
     actionName?: ActionNameTypes,
@@ -184,8 +185,9 @@ export interface SettingsStore {
   setScheduleDashboardColVisible: (
     scheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes,
   ) => Promise<void>;
+  setCurrentMusic: (currentMusic: MusicTypes) => Promise<void>;
   setVolume: (volume: number) => Promise<void>;
-  setMusic: (music: MusicTypes) => Promise<void>;
+  setIsPlaying: (isPlaying: boolean) => Promise<void>;
   _hydrated: boolean;
 }
 
@@ -204,8 +206,12 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   defaultFlowTimer: defaultFlowTimer,
   defaultBreakTimer: defaultBreakTimer,
   scheduleDashboardColVisible: defaultScheduleDashboardColVisible,
+  currentMusic: {
+    name: "Silent",
+    value: "silent",
+  },
   volume: 100,
-  music: MusicTypes.SILENT,
+  isPlaying: false,
   setCategoryState: async (categoryState, actionName = ActionNameTypes.SET) => {
     const tauriStoreKey = SettingsKeys.CATEGORY_STATES;
     let error = "";
@@ -355,8 +361,18 @@ export const useSettingStore = create<SettingsStore>((set) => ({
     set({ scheduleDashboardColVisible: past_data });
     await tauriStore.set("scheduleDashboardColVisible", past_data);
   },
-  setVolume: async (volume: number) => {},
-  setMusic: async (music: MusicTypes) => {},
+  setCurrentMusic: async (currentMusic: MusicTypes) => {
+    set({ currentMusic });
+    await tauriStore.set("currentMusic", currentMusic);
+  },
+  setVolume: async (volume: number) => {
+    set({ volume });
+    await tauriStore.set("volume", volume);
+  },
+  setIsPlaying: async (isPlaying: boolean) => {
+    set({ isPlaying });
+    await tauriStore.set("isPlaying", isPlaying);
+  },
   _hydrated: false,
 }));
 
@@ -381,6 +397,9 @@ const hydrate = async () => {
     "scheduleDashboardColVisible",
   )) as defaultScheduleDashboardColVisibleTypes[];
   const currentTime12 = (await tauriStore.get("currentTime12")) as boolean;
+  const currentMusic = (await tauriStore.get("currentMusic")) as MusicTypes;
+  const volume = (await tauriStore.get("volume")) as number;
+  const isPlaying = (await tauriStore.get("isPlaying")) as boolean;
 
   const parsedCategoryStates = zodCategoryStateSchema.safeParse(categoryStates);
   const parseGroupedPrograms = zodGroupProgramsSchema.safeParse(categoryStates);
@@ -425,6 +444,14 @@ const hydrate = async () => {
     )
     .safeParse(scheduleDashboardColVisible);
   const parsedCurrentTime12 = z.boolean().safeParse(currentTime12);
+  const parsedCurrentMusic = z
+    .object({
+      name: z.string(),
+      value: z.string(),
+    })
+    .safeParse(currentMusic);
+  const parsedVolume = z.number().safeParse(volume);
+  const parsedIsPlaying = z.boolean().safeParse(isPlaying);
 
   if (parsedCategoryStates.success) {
     useSettingStore.setState({ categoryStates: parsedCategoryStates.data });
@@ -492,6 +519,22 @@ const hydrate = async () => {
     );
     useSettingStore.setState({
       scheduleDashboardColVisible: data,
+    });
+  }
+
+  if (parsedCurrentMusic.success) {
+    useSettingStore.setState({
+      currentMusic: parsedCurrentMusic.data,
+    });
+  }
+  if (parsedVolume.success) {
+    useSettingStore.setState({
+      volume: parsedVolume.data,
+    });
+  }
+  if (parsedIsPlaying.success) {
+    useSettingStore.setState({
+      isPlaying: parsedIsPlaying.data,
     });
   }
 

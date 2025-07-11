@@ -30,6 +30,12 @@
       "allow": [
         {
           "name": "sidecar/app",
+          "cmd": "help",
+          "sidecar": true,
+          "args": true
+        },
+        {
+          "name": "sidecar/app",
           "cmd": "ping",
           "sidecar": true,
           "args": true

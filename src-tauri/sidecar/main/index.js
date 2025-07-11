@@ -19939,8 +19939,12 @@ switch (command) {
   case "ytmusic":
     const ytmusic = new YTMusic();
     ytmusic.initialize(/* Optional: Custom cookies */).then((v) => {
-      v.search("Never gonna give you up").then(songs => {
-        console.log(songs);  // Response sent to stdout
+      v.search("Afusic - Pal Pal").then(songs => {
+        songs.map((song) => {
+          if (song.type === "SONG") {
+            console.log(song.videoId);
+          }
+        });
       });
     });
     break;
