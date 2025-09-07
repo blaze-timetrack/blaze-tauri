@@ -27,7 +27,7 @@ use tauri_plugin_sql::MigrationKind;
 use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use track::installed_app::{get_apps_via_powershell, get_installed_applications};
-use utils::commands::{get_systems_timezone, greet};
+use utils::commands::{freeze_mouse, get_systems_timezone, greet};
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 use windows::core::Interface;
 
@@ -100,7 +100,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     settings.SetIsSwipeNavigationEnabled(false).unwrap();
                     settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                     settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
-                    // settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
+                    settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
                     settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                     // settings.SetAreDevToolsEnabled(true).unwrap();
                 })
@@ -143,7 +143,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                     settings.SetIsGeneralAutofillEnabled(false).unwrap();
                     settings.SetIsWebMessageEnabled(false).unwrap();
-                    // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                     settings.SetAreDevToolsEnabled(true).unwrap();
                 })
                 .unwrap();
@@ -207,6 +207,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             get_systems_timezone,
             get_installed_applications,
             get_apps_via_powershell,
+            freeze_mouse,
             classify_text
         ])
         .run(tauri::generate_context!())

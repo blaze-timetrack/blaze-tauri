@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Power } from "lucide-react";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FlowStateSession } from "@/components/extented ui/flow-state-session.tsx";
 import { reloadWidget } from "@/lib/utils.ts";
 import { useBasicStore } from "@/lib/zustand/basic-store.ts";
@@ -14,11 +14,19 @@ function StateOfFlow() {
   const secondsLeft = useBasicStore((state) => state.stateFlowTimer);
   const setSecondsLeft = useBasicStore((state) => state.setStateFlowTimer);
 
+  const [flowEndBell, setFlowEndBell] = useState(false);
+
   useEffect(() => {
     if (secondsLeft <= 0 || state !== "FLOW") return;
 
+    setFlowEndBell(false);
+
     const timer = setInterval(() => {
       setSecondsLeft(secondsLeft - 1);
+      if (secondsLeft <= 5 * 60) {
+        setFlowEndBell(true);
+        console.log("ringing bell");
+      }
     }, 1000);
 
     return () => clearInterval(timer);
@@ -45,26 +53,26 @@ function StateOfFlow() {
           </Button>
           {/* <Activity className="text-green-400" /> */}
         </div>
-        <p className="capitalize">
+        <div className="capitalize">
           {state === "TRACKING" || state === "NO_TRACKING"
             ? state.toString().toLowerCase()
             : ""}
           {state === "FLOW" && (
-            <div className={"flex items-center gap-4"}>
+            <p className={"flex items-center gap-4"}>
               {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
               <FlowStateSession />
-            </div>
+            </p>
           )}
-        </p>
+        </div>
       </div>
 
       {/* music */}
       <div className="flex h-full items-center gap-2">
         <MusicPlayer />
-        {/*<Button></Button>*/}
-        {/*<p className="">Silent</p>*/}
-        {/*<Volume2Icon className="size-6" />*/}
       </div>
+      {flowEndBell && (
+        <audio src={"/music/BHUVI - HALDIGHATI RAP 3.mp3"} autoPlay></audio>
+      )}
     </div>
   );
 }

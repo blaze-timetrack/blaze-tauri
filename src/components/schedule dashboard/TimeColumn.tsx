@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 const TimeColumn = () => {
   const currentTime12 = useSettingStore((state) => state.currentTime12);
   const currentTimeStart = useSettingStore((state) => state.currentTimeStart);
+  const zoomLevel = useSettingStore((state) => state.zoomLevel);
   let [timeSlots, setTimeSlots] = useState<string[]>([]);
 
   useEffect(() => {
@@ -29,8 +30,11 @@ const TimeColumn = () => {
       {timeSlots.map((time, index) => (
         <div
           key={time}
+          style={{
+            height: `${zoomLevel}px`,
+          }}
           className={cn(
-            "flex h-15 w-16.5 items-center justify-center text-xs text-gray-400",
+            "flex w-16.5 items-center justify-center text-xs text-gray-400",
             index !== 0 && "border-border border-t",
           )}
         >

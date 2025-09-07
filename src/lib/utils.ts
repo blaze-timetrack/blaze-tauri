@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { emit } from "@tauri-apps/api/event";
+import { useEffect } from "react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -8,6 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export const reloadWidget = async () => {
   await emit("reload", { windowLabel: "widget" });
+};
+
+export const reloadMain = async () => {
+  await emit("reload", { windowLabel: "main" });
 };
 
 const getTimePosition = (timeString: string) => {
@@ -26,4 +31,19 @@ export const getPositionInDash = (currentTime: string) => {
   return {
     top,
   };
+};
+
+export const useDebounce = (fn: () => void, delay: number) => {
+  useEffect(() => {
+    // Set a timeout to update the debounced value after the delay.
+    const handler = setTimeout(() => {
+      fn();
+    }, delay);
+
+    // Clean up the timeout if the value or delay changes before the timer completes.
+    // This ensures that the value is only updated once the user has paused their input for the desired delay.
+    return () => {
+      clearTimeout(handler); //
+    };
+  }, [fn, delay]); // Re-run effect if value or delay changes.
 };

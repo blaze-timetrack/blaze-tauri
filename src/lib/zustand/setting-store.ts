@@ -116,7 +116,8 @@ export const defaultGroupingPrograms = [
   },
 ];
 
-export const defaultFlowTimer = 45 * 60;
+// export const defaultFlowTimer = 45 * 60;
+export const defaultFlowTimer = 5 * 60;
 export const defaultBreakTimer = 5 * 60;
 
 export const defaultScheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[] =
@@ -167,6 +168,7 @@ export interface SettingsStore {
   currentMusic: MusicTypes;
   volume: number;
   isPlaying: boolean;
+  zoomLevel: number;
   setCategoryState: (
     categoryStates: categoryStateTypes,
     actionName?: ActionNameTypes,
@@ -188,6 +190,7 @@ export interface SettingsStore {
   setCurrentMusic: (currentMusic: MusicTypes) => Promise<void>;
   setVolume: (volume: number) => Promise<void>;
   setIsPlaying: (isPlaying: boolean) => Promise<void>;
+  setZoomLevel: (zoomLevel: number) => Promise<void>;
   _hydrated: boolean;
 }
 
@@ -212,6 +215,7 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   },
   volume: 100,
   isPlaying: false,
+  zoomLevel: 60,
   setCategoryState: async (categoryState, actionName = ActionNameTypes.SET) => {
     const tauriStoreKey = SettingsKeys.CATEGORY_STATES;
     let error = "";
@@ -373,6 +377,10 @@ export const useSettingStore = create<SettingsStore>((set) => ({
     set({ isPlaying });
     await tauriStore.set("isPlaying", isPlaying);
   },
+  setZoomLevel: async (zoomLevel) => {
+    set({ zoomLevel });
+    await tauriStore.set("zoomLevel", zoomLevel);
+  },
   _hydrated: false,
 }));
 
@@ -400,6 +408,7 @@ const hydrate = async () => {
   const currentMusic = (await tauriStore.get("currentMusic")) as MusicTypes;
   const volume = (await tauriStore.get("volume")) as number;
   const isPlaying = (await tauriStore.get("isPlaying")) as boolean;
+  const zoomLevel = (await tauriStore.get("zoomLevel")) as number;
 
   const parsedCategoryStates = zodCategoryStateSchema.safeParse(categoryStates);
   const parseGroupedPrograms = zodGroupProgramsSchema.safeParse(categoryStates);
@@ -452,6 +461,7 @@ const hydrate = async () => {
     .safeParse(currentMusic);
   const parsedVolume = z.number().safeParse(volume);
   const parsedIsPlaying = z.boolean().safeParse(isPlaying);
+  const parsedZoomLevel = z.number().safeParse(zoomLevel);
 
   if (parsedCategoryStates.success) {
     useSettingStore.setState({ categoryStates: parsedCategoryStates.data });
@@ -496,22 +506,16 @@ const hydrate = async () => {
   }
   if (parsedState.success) {
     useSettingStore.setState({ state: parsedState.data });
-  } else {
-    await tauriStore.set("state", "TRACKING");
   }
   if (parsedDefaultFlowTimerCheck.success) {
     useSettingStore.setState({
       defaultFlowTimer: parsedDefaultFlowTimerCheck.data,
     });
-  } else {
-    await tauriStore.set("defaultFlowTimer", defaultFlowTimer);
   }
   if (parsedDefaultBreakTimerCheck.success) {
     useSettingStore.setState({
       defaultBreakTimer: parsedDefaultBreakTimerCheck.data,
     });
-  } else {
-    await tauriStore.set("defaultBreakTimer", defaultBreakTimer);
   }
   if (parsedScheduleDashboardColVisible.success) {
     const data = parsedScheduleDashboardColVisible.data.sort((a, b) =>
@@ -535,6 +539,12 @@ const hydrate = async () => {
   if (parsedIsPlaying.success) {
     useSettingStore.setState({
       isPlaying: parsedIsPlaying.data,
+    });
+  }
+
+  if (parsedZoomLevel.success) {
+    useSettingStore.setState({
+      zoomLevel: parsedZoomLevel.data,
     });
   }
 

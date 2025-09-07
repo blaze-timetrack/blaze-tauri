@@ -52,6 +52,7 @@ const MusicPlayer = () => {
     width: "0",
     playerVars: {
       loop: 1,
+      playlist: currentMusic.value,
       autoplay: 1,
       controls: 0,
     },

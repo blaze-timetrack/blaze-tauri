@@ -104,6 +104,9 @@ export const defaultCategoryState: categoryStateTypes = {
 };
 
 export const shortcuts: string[] = [
+  // general hotkeys
+  "ctrl+r",
+
   "h",
   "t",
   "c",

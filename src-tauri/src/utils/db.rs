@@ -26,8 +26,8 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     email TEXT NOT NULL UNIQUE)
 "#,
     )
-    .execute(pool)
-    .await?;
+        .execute(pool)
+        .await?;
 
     sqlx::query(
         r#"CREATE TABLE IF NOT EXISTS days (
@@ -37,8 +37,8 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         break_total INTEGER NOT NULL DEFAULT 0)
     "#,
     )
-    .execute(pool)
-    .await?;
+        .execute(pool)
+        .await?;
 
     sqlx::query(
         r#"CREATE TABLE IF NOT EXISTS activities
@@ -50,17 +50,16 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         date_id DATE,
         flow_states INT,
         categories BLOB NOT NULL DEFAULT '[]',
-        programs_id INT,
+        programs_ids BLOB NOT NULL DEFAULT '[]',
         FOREIGN KEY (date_id) REFERENCES days(date_id),
-        FOREIGN KEY (id) REFERENCES flows(flow_states),
-        FOREIGN KEY (id) REFERENCES programs(programs_id)
+        FOREIGN KEY (id) REFERENCES flows(flow_states)
     )"#,
     )
-    .execute(pool)
-    .await?;
+        .execute(pool)
+        .await?;
 
     sqlx::query(
-        r#"CREATE TABLE IF NOT EXISTS programs (
+        r#"CREATE TABLE IF NOT EXISTS bloods (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         title TEXT,
@@ -73,8 +72,8 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         FOREIGN KEY (date_id) REFERENCES days(date_id)
     )"#,
     )
-    .execute(pool)
-    .await?;
+        .execute(pool)
+        .await?;
 
     sqlx::query(
         r#"CREATE TABLE IF NOT EXISTS flows
@@ -83,8 +82,8 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL)"#,
     )
-    .execute(pool)
-    .await?;
+        .execute(pool)
+        .await?;
 
     // activity_id INT UNIQUE NOT NULL REFERENCES activities(id),
 
@@ -96,10 +95,21 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         end_time DATETIME NOT NULL,
         date_id DATE NOT NULL,
         FOREIGN KEY (date_id) REFERENCES days(date_id)
+    )"#).execute(pool)
+        .await?;
+
+    sqlx::query(
+        r#"CREATE TABLE IF NOT EXISTS afks (
+        id INT PRIMARY KEY,
+        duration INT NOT NULL DEFAULT 0,
+        start_time DATETIME NOT NULL,
+        end_time DATETIME NOT NULL,
+        date_id DATE NOT NULL,
+        FOREIGN KEY (date_id) REFERENCES days(date_id)
     )"#,
     )
-    .execute(pool)
-    .await?;
+        .execute(pool)
+        .await?;
 
     println!("created Schema of table");
     Ok(())

@@ -81,6 +81,8 @@ pub async fn start_heartbeat<R: Runtime>(
     let mut afk_check_interval_timer_ms = Duration::ZERO;
     let mut end_afk = true;
 
+    let mut continue_afk = false;
+
     loop {
         let store = app.store(".settings.dat").expect("Failed to load store.");
         let state = store
@@ -99,6 +101,7 @@ pub async fn start_heartbeat<R: Runtime>(
         if !afk {
             let (_, current_blood, _) = get_active_all().unwrap();
 
+            // || total_duration == Duration::from_millis(5 * 60 * 1000) put here
             if past_afk {
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
@@ -114,7 +117,7 @@ pub async fn start_heartbeat<R: Runtime>(
                 ));
             }
 
-            if past_blood != current_blood || state == "NO_TRACKING" {
+            if past_blood != current_blood || state == "NO_TRACKING" || total_duration == Duration::from_millis(5 * 60 * 1000) {
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
                 return Ok((

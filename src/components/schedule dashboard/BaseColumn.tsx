@@ -13,6 +13,7 @@ interface BaseColumnProps {
 const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
   const timeScale = 60;
   const [positionTimeline, setPositionTimeline] = useState({ y: 0 });
+  const [freezeMouse, setFreezeMouse] = useState(false);
   const [isHovering, setIsHovering] = useState(false); // State to track hover
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSelecting, setIsSelecting] = useState(false); // New state for selection
@@ -20,14 +21,30 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
   const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
   const currentTime12 = useSettingStore((state) => state.currentTime12);
   const currentTimeStart = useSettingStore((state) => state.currentTimeStart);
+  const zoomLevel = useSettingStore((state) => state.zoomLevel);
   const handleMouseMove = (e: React.MouseEvent) => {
     if (containerRef.current) {
-      // Check if ref is available
+      if (Math.floor(positionTimeline.y % 60) == 0) {
+      }
+
       const containerRect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - containerRect.left;
       const y = e.clientY - containerRect.top; // Calculate relative Y position
       setPositionTimeline({ y });
       if (isSelecting && selectionStart !== null) {
         setSelectionEnd(y); // Update the end of selection while dragging
+        if (Math.floor(y % 60) == 0) {
+          const nX = Math.floor(x);
+          const nY = Math.floor(y);
+          setFreezeMouse(true);
+          console.log("freeze mouse");
+        } else {
+          const nX = Math.floor(x);
+          const nY = Math.floor(y);
+          // invoke("freeze_mouse", { x: nX, y: nY });
+          // setFreezeMouse(false);
+          console.log("unfreeze mouse");
+        }
       }
     }
   };
@@ -38,6 +55,7 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
   const handleMouseDown = (e: React.MouseEvent) => {
     if (containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - containerRect.left;
       const y = e.clientY - containerRect.top;
       setIsSelecting(true); // Start selecting
       setSelectionStart(y); // Set the start of selection
@@ -60,9 +78,9 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
 
   // Function to calculate time based on vertical position
   const calculateTime = (y: number) => {
-    const gridLineHeight = 60;
+    const gridLineHeight = zoomLevel;
     const hours = Math.floor(y / gridLineHeight);
-    const minutes = Math.floor((y / gridLineHeight - hours) * 60);
+    const minutes = Math.floor((y / gridLineHeight - hours) * zoomLevel);
 
     if (currentTime12) {
       let hour12 = hours % currentTimeStart;
@@ -72,7 +90,6 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
       return `${hour12}:${String(minutes).padStart(2, "0")} ${period12}`;
     }
 
-    // Format the time (e.g., HH:mm)
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   };
 
@@ -88,6 +105,10 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
       };
     }
     return {}; // Return empty object if no selection
+  };
+
+  const littleBreakerLine = (y: number) => {
+    setPositionTimeline({ y });
   };
 
   return (
@@ -142,7 +163,10 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
       {Array.from({ length: 24 }, (_, i) => (
         <div
           key={i}
-          className={`border-border h-15 border-t ${i === 0 ? "border-t-0" : ""}`}
+          style={{
+            height: `${zoomLevel}px`,
+          }}
+          className={`border-border border-t ${i === 0 ? "border-t-0" : ""}`}
         />
       ))}
 

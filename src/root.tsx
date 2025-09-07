@@ -31,6 +31,13 @@ export function RootLayout() {
 
   useHotkeys(shortcuts, async (e, handler) => {
     console.log(`hotkey: ${handler.keys}`);
+
+    // general hotkeys
+    if (handler.ctrl && handler.keys?.includes("r")) {
+      await reloadWidget();
+      window.location.reload();
+    }
+
     if (handler.ctrl && handler.keys?.includes("p")) {
       await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
       await reloadWidget();

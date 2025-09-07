@@ -1,6 +1,6 @@
 import ActivitiesSummaryDemo from "@/components/shared/activities-summary-demo.tsx";
 import { connectToDB } from "@/db";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Event, listen } from "@tauri-apps/api/event";
 import TopBar2 from "@/components/shared/top-bar2.tsx";
 import {
@@ -12,6 +12,8 @@ import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 
 function Home() {
   const currentDay = useHydrateStore((state) => state.currentDay);
+  const [todayActivity, setTodayActivity] = useState<Array<any>>([]);
+
   const awayFromKeyboard = async () => {
     return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
       try {
@@ -20,7 +22,7 @@ function Home() {
         );
         const db = await connectToDB();
         await db.execute(
-          "INSERT INTO breaks (duration, start_time, end_time, day_id) VALUES ($1, $2, $3, $4)",
+          "INSERT INTO afks (duration, start_time, end_time, day_id) VALUES ($1, $2, $3, $4)",
           [
             event.payload.time.duration,
             event.payload.time.start,
@@ -28,6 +30,9 @@ function Home() {
             currentActiveDay,
           ],
         );
+
+        // group afk => breaks => get afks of today : logic (delay < 5min then bind and create break) : delete afk
+        await db.execute("");
         console.log(
           `afk event start:${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
         );
@@ -36,6 +41,7 @@ function Home() {
       }
     });
   };
+
   const heartbeat = async () => {
     const db = await connectToDB();
     return listen("heartbeat", async (event: Event<HeartbeatTypes>) => {
@@ -64,28 +70,7 @@ function Home() {
     });
   };
 
-  const createActivity = async () => {
-    try {
-      const db = await connectToDB();
-
-      const programs = await db.select(
-        "SELECT category, SUM(total_duration) AS category_total FROM " +
-          "(" +
-          "SELECT SUM(duration) AS total_duration, * FROM programs WHERE date_id = $1 GROUP BY name, category" +
-          ") GROUP BY category",
-        [currentDay],
-      );
-
-      console.log(JSON.parse(JSON.stringify(programs)));
-      // console.log(
-      //   `programs: ${programs.map((v) => {
-      //     console.log(v);
-      //   })}`,
-      // );
-    } catch (e) {
-      console.log(`error form createActivity: ${e}`);
-    }
-  };
+  const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -94,20 +79,12 @@ function Home() {
     const init = async () => {
       cleanup = await awayFromKeyboard();
       cleanup2 = await heartbeat();
+      // afk and blood will generate raw data
     };
 
     init();
 
-    // creating activity every 5min
-    const interval = setInterval(
-      async () => {
-        await createActivity();
-      },
-      1000 * 60 * 5,
-    );
-
     return () => {
-      clearInterval(interval);
       if (cleanup) cleanup();
       if (cleanup2) cleanup2();
     };
@@ -118,8 +95,8 @@ function Home() {
       <TopBar2 />
       <div className={"row-span-16 w-full"}>
         <div className="row-span-16 flex justify-start gap-6">
-          <ScheduleDashboard />
-          <ActivitiesSummaryDemo />
+          <ScheduleDashboard /> {/* show activities */}
+          <ActivitiesSummaryDemo /> {/*summary of activities*/}
         </div>
       </div>
     </div>

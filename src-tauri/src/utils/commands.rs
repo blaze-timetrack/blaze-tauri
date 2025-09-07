@@ -1,5 +1,6 @@
 use chrono::{Local, Utc};
 use serde::Serialize;
+use windows::Win32::UI::WindowsAndMessaging::SetCursorPos;
 
 #[derive(Serialize)]
 struct Times {
@@ -10,6 +11,21 @@ struct Times {
 #[tauri::command]
 pub fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+
+#[tauri::command]
+pub fn freeze_mouse(x: i32, y: i32) {
+    unsafe {
+        SetCursorPos(x, y);
+    }
+    print!("\x1B[2J\x1B[1;1H  hhh");
+}
+#[tauri::command]
+pub fn unfreeze_mouse(x: i32, y: i32) {
+    unsafe {
+        SetCursorPos(x, y);
+    }
 }
 
 #[tauri::command]
