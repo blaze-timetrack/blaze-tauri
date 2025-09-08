@@ -1,7 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TimeColumn from "./TimeColumn";
 import ColumnHeader from "./ColumnHeader";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import BaseColumn from "@/components/schedule dashboard/BaseColumn.tsx";
 import { cn } from "@/lib/utils.ts";
@@ -44,6 +44,7 @@ const ScheduleDashboard = () => {
 
   const [activities, setActivities] = useState<Event[] | []>([]);
 
+  // @ts-ignore
   const [flowSessions, setFlowSessions] = useState<Event[] | []>([
     {
       id: "2",
@@ -71,27 +72,32 @@ const ScheduleDashboard = () => {
       title: "Team Meeting",
       startTime: "11:00",
       endTime: "12:00",
+      activities: [],
     },
     {
       id: "6",
       title: "Lunch Break",
       startTime: "13:00",
       endTime: "14:00",
+      activities: [],
     },
   ]);
 
+  // @ts-ignore
   const [projects, setProjects] = useState<Event[]>([
     {
       id: "7",
       title: "Dashboard Redesign",
       startTime: "09:00",
       endTime: "11:00",
+      activities: [],
     },
     {
       id: "8",
       title: "API Integration",
       startTime: "15:00",
       endTime: "17:00",
+      activities: [],
     },
   ]);
 
@@ -145,32 +151,53 @@ const ScheduleDashboard = () => {
     setActivities(latestObject);
   };
 
-  const ZOOM_STEPS = [0, 30, 60, 90, 120];
+  const ZOOM_STEPS = [20, 30, 60, 90, 100];
 
+  // handle zoom
   function clampZoom(current, delta) {
     // Find the current index
     const idx = ZOOM_STEPS.indexOf(current);
     if (idx === -1) return 60;
-    let nextIdx = delta < 0 ? idx + 1 : idx - 1;
-    // Clamp index to [0, last]
-    nextIdx = Math.max(0, Math.min(ZOOM_STEPS.length - 1, nextIdx));
+
+    console.log("delta" + delta);
+    let nextIdx =
+      delta < 0
+        ? ZOOM_STEPS.indexOf(current) + 1
+        : ZOOM_STEPS.indexOf(current) - 1;
+    console.log("nextIdx", nextIdx);
+
     return ZOOM_STEPS[nextIdx];
   }
+  const handleWheel = useCallback(
+    async (event) => {
+      if (zoomActive) {
+        setTimeout(async () => {
+          const newZoom = clampZoom(zoomLevel, event.deltaY);
+          console.log("newZoom", newZoom);
+          await setZoomLevel(newZoom);
+        }, 600);
+      }
+    },
+    [zoomActive, zoomLevel],
+  );
+
+  // hold scroll position
+  const scrollAreaRef = useRef(null);
+  const handleScroll = () => {
+    const viewport = scrollAreaRef.current?.querySelector(
+      "[data-radix-scroll-area-viewport]",
+    );
+    console.log("changing", scrollAreaRef.current);
+    if (viewport) {
+      localStorage.setItem("scrollPosition", viewport.scrollTop);
+      console.log("setScrollPosition", viewport);
+    }
+  };
 
   useEffect(() => {
     setTimeout(async () => {
       await groupRaw();
     });
-    const listener = async (event: WheelEvent) => {
-      event.preventDefault();
-      console.log("inside wheel");
-      if (zoomActive) {
-        console.log("zoom active");
-        const newZoom = clampZoom(zoomLevel, event.deltaY);
-        await setZoomLevel(newZoom);
-      } else {
-      }
-    };
 
     const interval = setInterval(
       async () => {
@@ -179,11 +206,16 @@ const ScheduleDashboard = () => {
       5 * 60 * 1000,
     );
 
-    document.addEventListener("wheel", listener);
+    const viewport = scrollAreaRef.current?.querySelector(
+      "[data-radix-scroll-area-viewport]",
+    );
+    const savedPosition = localStorage.getItem("scrollPosition");
+    if (viewport && savedPosition) {
+      viewport.scrollTop = parseInt(savedPosition, 10);
+    }
 
     return () => {
       clearInterval(interval);
-      document.removeEventListener("wheel", listener);
     };
   }, []);
 
@@ -191,9 +223,8 @@ const ScheduleDashboard = () => {
     <div className="border-border bg-background text-foreground h-full w-full overflow-hidden rounded-lg border shadow-2xl">
       <div className="grid grid-cols-[auto_1fr]">
         <div
-          onClick={() => {
-            setZoomActive((prev) => !prev);
-          }}
+          onClick={() => setZoomActive((prev) => !prev)}
+          onWheel={handleWheel}
           className="border-border flex w-16.5 cursor-pointer items-center justify-center border-r"
         >
           {zoomActive ? (
@@ -218,7 +249,12 @@ const ScheduleDashboard = () => {
           ))}
         </div>
       </div>
-      <ScrollArea className="ssc overflow-hidden" scrollHideDelay={0}>
+      <ScrollArea
+        onScrollCapture={handleScroll}
+        viewportRef={scrollAreaRef}
+        className="ssc overflow-hidden"
+        scrollHideDelay={0}
+      >
         <div className="grid grid-cols-[auto_1fr]">
           <TimeColumn />
           <div

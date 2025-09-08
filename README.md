@@ -174,4 +174,8 @@ useEffect(() => {
 # handle every edge case
 
 - autostart every time if enable
-- while changing db schema make this in a way that old to new without losing data 
+- while changing db schema make this in a way that old to new without losing data
+
+# handle later
+
+- if setting file get erased (creat a default one)

@@ -499,6 +499,7 @@ const hydrate = async () => {
     root.setAttribute("data-theme", val.themeMode);
   }
   if (parsedTimezone.success) {
+    // @ts-ignore
     useSettingStore.setState({ timezone: parsedTimezone.data });
   }
   if (parsedCurrentTime12.success) {
@@ -522,12 +523,14 @@ const hydrate = async () => {
       a.value.localeCompare(b.value),
     );
     useSettingStore.setState({
+      // @ts-ignore
       scheduleDashboardColVisible: data,
     });
   }
 
   if (parsedCurrentMusic.success) {
     useSettingStore.setState({
+      // @ts-ignore
       currentMusic: parsedCurrentMusic.data,
     });
   }

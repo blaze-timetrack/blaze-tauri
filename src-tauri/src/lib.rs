@@ -233,7 +233,7 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                     .expect("Failed to load store.");
                 let state = store
                     .get("state")
-                    .expect("Failed to get state from setting store.")
+                    .unwrap_or(serde_json::Value::String(String::from("TRACKING")))
                     .clone();
                 println!("state: {}", state);
 

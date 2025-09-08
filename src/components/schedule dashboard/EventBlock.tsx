@@ -14,7 +14,7 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
     let [hours, minutes, seconds] = timeString.split(":").map(Number);
 
     if (zoomLevel > 60) {
-      minutes = minutes / zoomLevel;
+      minutes = minutes * 2;
     } else if (zoomLevel < 60) {
       minutes = minutes * zoomLevel;
     }
@@ -32,7 +32,7 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
 
   // Each hour is timeScale pixels tall
   // const top = relativeStart * timeScale;
-  const height = (duration / zoomLevel) * timeScale;
+  const height = (duration / 60) * timeScale;
 
   return (
     <div

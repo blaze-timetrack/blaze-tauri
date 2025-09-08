@@ -87,7 +87,7 @@ pub async fn start_heartbeat<R: Runtime>(
         let store = app.store(".settings.dat").expect("Failed to load store.");
         let state = store
             .get("state")
-            .expect("Failed to get state from setting store.")
+            .unwrap_or(serde_json::Value::String(String::from("TRACKING")))
             .clone();
 
         let mut past_blood_afk = None;
