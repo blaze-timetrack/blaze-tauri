@@ -29,6 +29,16 @@ export function RootLayout() {
   const defaultFlowTimer = useSettingStore((state) => state.defaultFlowTimer);
   const setStateFlowTimer = useBasicStore((state) => state.setStateFlowTimer);
 
+  const defaultBreakTimer = useSettingStore((state) => state.defaultBreakTimer);
+  const setStateBreakTimer = useBasicStore((state) => state.setStateBreakTimer);
+
+  const defaultMeetingTimer = useSettingStore(
+    (state) => state.defaultMeetingTimer,
+  );
+  const setStateMeetingTimer = useBasicStore(
+    (state) => state.setStateMeetingTimer,
+  );
+
   useHotkeys(shortcuts, async (e, handler) => {
     console.log(`hotkey: ${handler.keys}`);
 
@@ -36,29 +46,35 @@ export function RootLayout() {
     if (handler.ctrl && handler.keys?.includes("r")) {
       await reloadWidget();
       window.location.reload();
+      return;
     }
-
     if (handler.ctrl && handler.keys?.includes("p")) {
       await setState(state === "TRACKING" ? "NO_TRACKING" : "TRACKING");
       await reloadWidget();
       return;
     }
     if (handler.ctrl && handler.keys?.includes("s")) {
-      await setState("NO_TRACKING");
+      await setState("TRACKING");
       await reloadWidget();
+      return;
     }
     if (handler.ctrl && handler.keys?.includes("f")) {
       await setState("FLOW");
       setStateFlowTimer(defaultFlowTimer);
-      await reloadWidget();
     }
     if (handler.ctrl && handler.shift && handler.keys?.includes("f")) {
     }
     if (handler.ctrl && handler.keys?.includes("b")) {
+      await setState("BREAK");
+      setStateBreakTimer(defaultBreakTimer);
     }
     if (handler.ctrl && handler.shift && handler.keys?.includes("b")) {
     }
-    if (handler.ctrl && handler.keys?.includes("b")) {
+    if (handler.ctrl && handler.keys?.includes("m")) {
+      await setState("MEETING");
+      setStateMeetingTimer(defaultMeetingTimer);
+    }
+    if (handler.ctrl && handler.shift && handler.keys?.includes("m")) {
     }
 
     switch (handler.keys?.join("")) {

@@ -14,11 +14,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::Duration;
 use std::{env, result};
-use tauri::{
-    menu::{Menu, MenuItem},
-    utils::TitleBarStyle,
-    AppHandle, Emitter, LogicalPosition, PhysicalSize, Runtime,
-};
+use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, Env, LogicalPosition, PhysicalSize, Runtime};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
@@ -150,7 +146,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
             #[cfg(debug_assertions)]
             {
-                widget_window.open_devtools();
+                // widget_window.open_devtools();
                 main_window.open_devtools();
             }
 
@@ -253,10 +249,18 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                             let _ = app_handle.emit("afk", payload);
                         }
                     }
-                    Err(e) => eprintln!("Heartbeat error: {}", e),
+                    Err(e) => {
+                        eprintln!("Heartbeat error: {}", e);
+                        let env = Env::default();
+                        tauri::process::restart(&env)
+                    }
                 }
             }
         }
-        Err(e) => eprintln!("Database connection error: {}", e),
+        Err(e) => {
+            eprintln!("Database connection error: {}", e);
+            let env = Env::default();
+            tauri::process::restart(&env)
+        }
     }
 }

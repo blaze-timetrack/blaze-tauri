@@ -1,6 +1,6 @@
 import ActivitiesSummaryDemo from "@/components/shared/activities-summary-demo.tsx";
 import { connectToDB } from "@/db";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Event, listen } from "@tauri-apps/api/event";
 import TopBar2 from "@/components/shared/top-bar2.tsx";
 import {
@@ -12,27 +12,24 @@ import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 
 function Home() {
   const currentDay = useHydrateStore((state) => state.currentDay);
-  const [todayActivity, setTodayActivity] = useState<Array<any>>([]);
 
   const awayFromKeyboard = async () => {
     return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
       try {
-        const currentActiveDay = useHydrateStore(
-          (state) => state.currentActiveDay,
-        );
         const db = await connectToDB();
         await db.execute(
-          "INSERT INTO afks (duration, start_time, end_time, day_id) VALUES ($1, $2, $3, $4)",
+          "INSERT INTO breaks (duration, start_time, end_time, date_id) VALUES ($1, $2, $3, $4)",
           [
             event.payload.time.duration,
             event.payload.time.start,
             event.payload.time.end,
-            currentActiveDay,
+            currentDay,
           ],
         );
 
         // group afk => breaks => get afks of today : logic (delay < 5min then bind and create break) : delete afk
-        await db.execute("");
+        // await db.execute("");
+
         console.log(
           `afk event start:${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
         );

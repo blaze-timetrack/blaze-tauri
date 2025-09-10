@@ -117,8 +117,9 @@ export const defaultGroupingPrograms = [
 ];
 
 // export const defaultFlowTimer = 45 * 60;
-export const defaultFlowTimer = 5 * 60;
+export const defaultFlowTimer = 45 * 60;
 export const defaultBreakTimer = 5 * 60;
+export const defaultMeetingTimer = 45 * 60;
 
 export const defaultScheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[] =
   [
@@ -164,6 +165,7 @@ export interface SettingsStore {
   state: StateTypes;
   defaultFlowTimer: number;
   defaultBreakTimer: number;
+  defaultMeetingTimer: number;
   scheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[];
   currentMusic: MusicTypes;
   volume: number;
@@ -184,6 +186,7 @@ export interface SettingsStore {
   setState: (state: StateTypes) => Promise<void>;
   setDefaultFlowTimer: (defaultFlowTimer: number) => Promise<void>;
   setDefaultBreakTimer: (defaultBreakTimer: number) => Promise<void>;
+  setDefaultMeetingTimer: (defaultMeetingTimer: number) => Promise<void>;
   setScheduleDashboardColVisible: (
     scheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes,
   ) => Promise<void>;
@@ -208,6 +211,7 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   state: "TRACKING",
   defaultFlowTimer: defaultFlowTimer,
   defaultBreakTimer: defaultBreakTimer,
+  defaultMeetingTimer: defaultMeetingTimer,
   scheduleDashboardColVisible: defaultScheduleDashboardColVisible,
   currentMusic: {
     name: "Silent",
@@ -353,6 +357,10 @@ export const useSettingStore = create<SettingsStore>((set) => ({
     set({ defaultBreakTimer });
     await tauriStore.set("defaultBreakTimer", defaultBreakTimer);
   },
+  setDefaultMeetingTimer: async (defaultMeetingTimer) => {
+    set({ defaultMeetingTimer });
+    await tauriStore.set("defaultMeetingTimer", defaultMeetingTimer);
+  },
   setScheduleDashboardColVisible: async (scheduleDashboardColVisible) => {
     let past_data = useSettingStore
       .getState()
@@ -401,6 +409,9 @@ const hydrate = async () => {
   const defaultBreakTimerCheck = (await tauriStore.get(
     "defaultBreakTimer",
   )) as number;
+  const defaultMeetingTimerCheck = (await tauriStore.get(
+    "defaultMeetingTimer",
+  )) as number;
   const scheduleDashboardColVisible = (await tauriStore.get(
     "scheduleDashboardColVisible",
   )) as defaultScheduleDashboardColVisibleTypes[];
@@ -443,6 +454,9 @@ const hydrate = async () => {
   const parsedDefaultBreakTimerCheck = z
     .number()
     .safeParse(defaultBreakTimerCheck);
+  const parsedDefaultMeetingTimerCheck = z
+    .number()
+    .safeParse(defaultMeetingTimerCheck);
   const parsedScheduleDashboardColVisible = z
     .array(
       z.object({
@@ -516,6 +530,11 @@ const hydrate = async () => {
   if (parsedDefaultBreakTimerCheck.success) {
     useSettingStore.setState({
       defaultBreakTimer: parsedDefaultBreakTimerCheck.data,
+    });
+  }
+  if (parsedDefaultMeetingTimerCheck.success) {
+    useSettingStore.setState({
+      defaultMeetingTimer: parsedDefaultMeetingTimerCheck.data,
     });
   }
   if (parsedScheduleDashboardColVisible.success) {

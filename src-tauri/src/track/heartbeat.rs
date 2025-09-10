@@ -74,10 +74,10 @@ pub async fn start_heartbeat<R: Runtime>(
     let mut end_time: DateTime<Tz>;
     let mut afk = false;
     let mut past_afk = false;
-    let afk_duration_ms = 5 * 60 * 1000;
-    // let afk_duration_ms = 60 * 1000;
-    let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
-    // let afk_check_interval_ms = 30 * 1000;
+    // let afk_duration_ms = 5 * 60 * 1000;
+    let afk_duration_ms = 60 * 1000;
+    // let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
+    let afk_check_interval_ms = 30 * 1000;
     let mut afk_check_interval_timer_ms = Duration::ZERO;
     let mut end_afk = true;
 
@@ -148,14 +148,21 @@ pub async fn start_heartbeat<R: Runtime>(
                 end_afk = false;
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
+                end_time = end_time - chrono::Duration::minutes(5);
+let mut result_sub ;
+                match total_duration.checked_sub(Duration::new(5,0)) {
+                    Some(v) => result_sub = v,
+                    None => result_sub = Duration::ZERO,
+                };
+
                 past_blood_afk = Some(HeartbeatBlood {
                     process_name: past_blood.to_string(),
                     title: title.clone(),
                     url: url.clone(),
                     time: Time {
                         start: start_time.format(TIME_FORMAT).to_string(),
-                        end: end_time.format(TIME_FORMAT).to_string(), // do be reduced 4:55s
-                        duration: total_duration.as_secs() - 5 * 60 * 1000 + 5 * 1000,
+                        end: end_time.format(TIME_FORMAT).to_string(),
+                        duration: result_sub.as_secs(),
                     },
                 })
             }

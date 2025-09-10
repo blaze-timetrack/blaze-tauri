@@ -5,12 +5,15 @@ export interface BasicStore {
   stateTrackingTimer: number;
   stateFlowTimer: number;
   stateBreakTimer: number;
+  stateMeetingTimer: number;
   stateFlowValue: StateFlowValueTypes | null;
   commandOpen: boolean;
   setSettingTab: (settingTab: string) => void;
   setStateFlowValue: (stateFlowValue: StateFlowValueTypes) => void;
   setStateTrackingTimer: (stateTrackingTimer: number) => void;
   setStateFlowTimer: (stateFlowTimer: number) => void;
+  setStateBreakTimer: (stateBreakTimer: number) => void;
+  setStateMeetingTimer: (stateMeetingTimer: number) => void;
   setCommandOpen: (commandOpen: boolean) => void;
 }
 
@@ -33,6 +36,7 @@ export const useBasicStore = create<BasicStore>((set) => ({
   stateTrackingTimer: 0,
   stateFlowTimer: 0,
   stateBreakTimer: 0,
+  stateMeetingTimer: 0,
   commandOpen: false,
   setSettingTab: (settingTab) => {
     set({ settingTab });
@@ -45,6 +49,12 @@ export const useBasicStore = create<BasicStore>((set) => ({
   },
   setStateFlowTimer: (stateFlowTimer) => {
     set({ stateFlowTimer });
+  },
+  setStateBreakTimer: (stateBreakTimer) => {
+    set({ stateBreakTimer });
+  },
+  setStateMeetingTimer: (stateMeetingTimer) => {
+    set({ stateMeetingTimer });
   },
   setCommandOpen: (commandOpen: boolean) => {
     set({ commandOpen });

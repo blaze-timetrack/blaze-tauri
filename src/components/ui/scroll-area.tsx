@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
 function ScrollArea({
   className,
   children,
-  viewprotRef,
+  ref,
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      ref={viewprotRef}
+      ref={ref}
       className={cn("relative", className)}
       {...props}
     >

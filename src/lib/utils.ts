@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect } from "react";
+import spacetime from "spacetime";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -46,4 +47,8 @@ export const useDebounce = (fn: () => void, delay: number) => {
       clearTimeout(handler); //
     };
   }, [fn, delay]); // Re-run effect if value or delay changes.
+};
+
+export const timeD = (date: string | null, timezone: string | null) => {
+  return spacetime(date, timezone);
 };

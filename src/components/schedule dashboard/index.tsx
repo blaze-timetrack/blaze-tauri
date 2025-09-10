@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils.ts";
 import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 import { connectToDB } from "@/db";
 import { Circle, CircleDot } from "lucide-react";
+import spacetime from "spacetime";
 
 interface BloodProp {
   id: number;
@@ -36,11 +37,16 @@ const ScheduleDashboard = () => {
     (state) => state.scheduleDashboardColVisible,
   );
   const state = useSettingStore((state) => state.state);
-  const currentDay = useHydrateStore((state) => state.currentDay);
+  const currentActiveDay = useHydrateStore((state) => state.currentActiveDay);
+  const setCurrentActiveDay = useHydrateStore(
+    (state) => state.setCurrentActiveDay,
+  );
   const currentTime = useHydrateStore((state) => state.currentTime);
   const tauriTimezone = useSettingStore((state) => state.timezone);
   const zoomLevel = useSettingStore((state) => state.zoomLevel);
   const setZoomLevel = useSettingStore((state) => state.setZoomLevel);
+
+  const d = spacetime(currentActiveDay, tauriTimezone.value);
 
   const [activities, setActivities] = useState<Event[] | []>([]);
 
@@ -65,6 +71,8 @@ const ScheduleDashboard = () => {
       endTime: "15:00",
     },
   ]);
+
+  const [breakSession, setBreakSession] = useState<Event[] | []>([]);
 
   const [calendarEvents, setCalendarEvents] = useState<Event[]>([
     {
@@ -101,70 +109,101 @@ const ScheduleDashboard = () => {
     },
   ]);
 
-  const groupRaw = async () => {
-    const db = await connectToDB();
-    // group blood
-    // logic (5min, category) : create activity attach details ([...ids])
-    const res: Array<any> = await db.select(
-      "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM programs WHERE date_id = $1)",
-      [currentDay],
-    );
+  const setAcivitiesSession = async (v) => {
+    try {
+      const db = await connectToDB();
+      // group blood
+      // logic (5min, category) : create activity attach details ([...ids])
+      let dateD = d.format("{date-pad}-{month-pad}-{year}-{timezone}");
+      let timezoneChange = dateD.split("/");
 
-    console.log("res: ", res);
-    if (!res) return;
-
-    let latestObject: Array<any> = [];
-    let latestAct: Array<any> = [];
-    let start_time: string | null = null;
-    let end_time: string | null = null;
-    let title = null;
-    res.map((v, i) => {
-      if (v.diff_seconds === null) {
-        start_time = v.start_time;
-        end_time = v.end_time;
-        latestAct.push(v);
-        return;
-      } else if (v.diff_seconds >= 5 * 60) {
-        latestObject.push({
-          id: i,
-          title: "Deep Activity",
-          startTime: start_time,
-          endTime: end_time,
-          activities: latestAct,
-        });
-        start_time = v.start_time;
-        latestAct = [];
-      } else if (i === res.length - 1) {
-        latestObject.push({
-          id: i,
-          title: "Deep Activity",
-          startTime: start_time,
-          endTime: v.end_time,
-          activities: latestAct,
-        });
-        return;
+      // todo can be removed with understanding spacetime
+      if (timezoneChange[1] === "Kolkata") {
+        dateD = timezoneChange[0] + "/Calcutta";
       }
-      latestAct.push(v);
-      end_time = v.end_time;
-    });
 
-    setActivities(latestObject);
+      let activities: Array<any> =
+        v === "programs" &&
+        (await db.select(
+          "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM programs WHERE date_id = $1)",
+          [dateD],
+        ));
+      if (v === "afks")
+        activities = await db.select(
+          "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM breaks WHERE date_id = $1)",
+          [dateD],
+        );
+
+      if (!activities) return;
+      let title = null;
+      if (v === "programs") {
+        title = "Deep Activities";
+      } else if (v === "afks") {
+        title = "Break";
+      }
+
+      let latestObject: Array<any> = [];
+      let latestAct: Array<any> = [];
+      let start_time: string | null = null;
+      let end_time: string | null = null;
+      activities.map((v, i) => {
+        if (v.diff_seconds === null) {
+          start_time = v.start_time;
+          end_time = v.end_time;
+          latestAct.push(v);
+          return;
+        } else if (v.diff_seconds >= 5 * 60) {
+          latestObject.push({
+            id: i,
+            title,
+            startTime: start_time,
+            endTime: end_time,
+            activities: latestAct,
+          });
+          start_time = v.start_time;
+          latestAct = [];
+        } else if (i === activities.length - 1) {
+          latestObject.push({
+            id: i,
+            title,
+            startTime: start_time,
+            endTime: v.end_time,
+            activities: latestAct,
+          });
+          return;
+        }
+        latestAct.push(v);
+        end_time = v.end_time;
+      });
+
+      if (v === "programs") {
+        setActivities(latestObject);
+      } else if (v === "afks") {
+        setBreakSession(latestObject);
+      }
+
+      console.log("activities: ", activities);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const ZOOM_STEPS = [20, 30, 60, 90, 100];
+  const groupRaw = async () => {
+    ["programs", "afks"].forEach((v) => setAcivitiesSession(v));
+  };
 
   // handle zoom
   function clampZoom(current, delta) {
+    const ZOOM_STEPS = [20, 30, 60, 90, 100];
     // Find the current index
     const idx = ZOOM_STEPS.indexOf(current);
     if (idx === -1) return 60;
 
-    console.log("delta" + delta);
     let nextIdx =
       delta < 0
         ? ZOOM_STEPS.indexOf(current) + 1
         : ZOOM_STEPS.indexOf(current) - 1;
-    console.log("nextIdx", nextIdx);
+    if (nextIdx === -1) return 60;
 
     return ZOOM_STEPS[nextIdx];
   }
@@ -172,9 +211,12 @@ const ScheduleDashboard = () => {
     async (event) => {
       if (zoomActive) {
         setTimeout(async () => {
-          const newZoom = clampZoom(zoomLevel, event.deltaY);
-          console.log("newZoom", newZoom);
-          await setZoomLevel(newZoom);
+          try {
+            const newZoom = clampZoom(zoomLevel, event.deltaY);
+            await setZoomLevel(newZoom);
+          } catch (e) {
+            console.log(e);
+          }
         }, 600);
       }
     },
@@ -187,10 +229,8 @@ const ScheduleDashboard = () => {
     const viewport = scrollAreaRef.current?.querySelector(
       "[data-radix-scroll-area-viewport]",
     );
-    console.log("changing", scrollAreaRef.current);
     if (viewport) {
       localStorage.setItem("scrollPosition", viewport.scrollTop);
-      console.log("setScrollPosition", viewport);
     }
   };
 
@@ -217,7 +257,7 @@ const ScheduleDashboard = () => {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [currentActiveDay, setCurrentActiveDay]);
 
   return (
     <div className="border-border bg-background text-foreground h-full w-full overflow-hidden rounded-lg border shadow-2xl">
@@ -251,7 +291,7 @@ const ScheduleDashboard = () => {
       </div>
       <ScrollArea
         onScrollCapture={handleScroll}
-        viewportRef={scrollAreaRef}
+        ref={scrollAreaRef}
         className="ssc overflow-hidden"
         scrollHideDelay={0}
       >

@@ -1,24 +1,24 @@
 import { create } from "zustand/react";
-import spacetime from "spacetime";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import { connectToDB } from "@/db";
+import { timeD } from "@/lib/utils.ts";
 
 export const timeFormat = "{hour-24-pad}:{minute-pad}:{second-pad}";
 
 export interface HydrateStoreTypes {
   currentDay: string;
   currentTime: string;
-  currentActiveDay: string;
+  currentActiveDay: string | null;
   setCurrentDay: (currentDay: string) => void;
   setCurrentTime: (currentTime: string) => void;
-  setCurrentActiveDay: (currentActiveDay: string) => void;
+  setCurrentActiveDay: (currentActiveDay: string | null) => void;
   _hydrated: boolean;
 }
 
 export const useHydrateStore = create<HydrateStoreTypes>((set) => ({
   currentDay: "",
   currentTime: "",
-  currentActiveDay: "",
+  currentActiveDay: null,
   setCurrentDay: (currentDay) => {
     set({ currentDay });
   },
@@ -33,17 +33,17 @@ export const useHydrateStore = create<HydrateStoreTypes>((set) => ({
 
 const hydrate = async () => {
   const tauriTimezone = useSettingStore.getState().timezone;
-  let d = spacetime(null, tauriTimezone.value);
+  let d = timeD(null, tauriTimezone.value);
   useHydrateStore.setState({ currentTime: d.format(timeFormat) });
   useHydrateStore.setState({
     currentDay: d.format("{date-pad}-{month-pad}-{year}-{timezone}"),
   });
 
-  useHydrateStore.setState({
-    currentActiveDay: d.format("{date-pad}-{month-pad}-{year}-{timezone}"),
-  });
+  // useHydrateStore.setState({
+  //   currentActiveDay: d.format("{date-pad}-{month-pad}-{year}-{timezone}"),
+  // });
 
-  const currentDay = useHydrateStore.getState().currentActiveDay;
+  const currentDay = useHydrateStore.getState().currentDay;
 
   try {
     const db = await connectToDB();

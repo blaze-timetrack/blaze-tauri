@@ -179,3 +179,5 @@ useEffect(() => {
 # handle later
 
 - if setting file get erased (creat a default one)
+-
+- type error after 18 to 19 react version

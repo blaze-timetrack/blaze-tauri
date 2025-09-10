@@ -112,14 +112,15 @@ export const shortcuts: string[] = [
   "c",
   "p",
   "g",
-  "?",
-  ".",
+  "m",
   "ctrl+p",
   "ctrl+f",
   "ctrl+shift+f",
   "ctrl+b",
   "ctrl+shift+b",
   "ctrl+s",
+  "ctrl+m",
+  "ctrl+shift+m",
 ];
 
 export const availableMusic = [
