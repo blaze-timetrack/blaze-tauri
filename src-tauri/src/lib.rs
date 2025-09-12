@@ -240,14 +240,17 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
 
                 match start_heartbeat(&app_handle).await {
                     Ok((heartbeat_blood, heartbeat_stop)) => {
-                        if let Some(heartbeat_blood) = heartbeat_blood {
+                        if let Some(ref heartbeat_blood) = heartbeat_blood {
                             let payload = json!(heartbeat_blood);
+                            println!("Heartbeat inside: {}", payload);
                             let _ = app_handle.emit("heartbeat", payload);
                         }
-                        if let Some(heartbeat_stop) = heartbeat_stop {
+                        if let Some(ref heartbeat_stop) = heartbeat_stop {
                             let payload = json!(heartbeat_stop);
+                            println!("Heartbeat stop inside: {}", payload);
                             let _ = app_handle.emit("afk", payload);
                         }
+                        println!("heartbeat {:#?}, heartbeat_stop {:#?}", heartbeat_blood, heartbeat_stop);
                     }
                     Err(e) => {
                         eprintln!("Heartbeat error: {}", e);

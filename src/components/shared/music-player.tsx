@@ -36,7 +36,6 @@ const MusicPlayer = () => {
     if (currentMusic.value == "silent") {
       setIsPlaying(false);
     }
-    console.log(currentMusic);
     // searchMusic().then((v) => {
     //   if (v === "jfKfPfyJRdk") {
     //     console.log("same video ID true");

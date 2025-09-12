@@ -15,6 +15,7 @@ function Home() {
 
   const awayFromKeyboard = async () => {
     return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
+      console.log("listening afk");
       try {
         const db = await connectToDB();
         await db.execute(
@@ -42,6 +43,7 @@ function Home() {
   const heartbeat = async () => {
     const db = await connectToDB();
     return listen("heartbeat", async (event: Event<HeartbeatTypes>) => {
+      console.log("listening blood");
       try {
         // check program category
         const program_name = event.payload.process_name.split(".")[0];

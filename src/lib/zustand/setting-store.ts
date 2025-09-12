@@ -20,6 +20,7 @@ import { ITimezone, ITimezoneOption } from "react-timezone-select";
 const tauriStore = new LazyStore(".settings.dat", { autoSave: true });
 
 export interface defaultScheduleDashboardColVisibleTypes {
+  id: number;
   label: string;
   value: string;
   checkValue: boolean;
@@ -124,21 +125,25 @@ export const defaultMeetingTimer = 45 * 60;
 export const defaultScheduleDashboardColVisible: defaultScheduleDashboardColVisibleTypes[] =
   [
     {
+      id: 0,
       label: "Flow Sessions",
       value: "flow_session",
       checkValue: true,
     },
     {
+      id: 1,
       label: "Projects",
       value: "project",
       checkValue: true,
     },
     {
+      id: 2,
       label: "Clients",
       value: "client",
       checkValue: true,
     },
     {
+      id: 3,
       label: "Tasks",
       value: "task",
       checkValue: true,
@@ -457,15 +462,6 @@ const hydrate = async () => {
   const parsedDefaultMeetingTimerCheck = z
     .number()
     .safeParse(defaultMeetingTimerCheck);
-  const parsedScheduleDashboardColVisible = z
-    .array(
-      z.object({
-        label: z.string(),
-        value: z.string(),
-        checkValue: z.boolean(),
-      }),
-    )
-    .safeParse(scheduleDashboardColVisible);
   const parsedCurrentTime12 = z.boolean().safeParse(currentTime12);
   const parsedCurrentMusic = z
     .object({
@@ -476,6 +472,17 @@ const hydrate = async () => {
   const parsedVolume = z.number().safeParse(volume);
   const parsedIsPlaying = z.boolean().safeParse(isPlaying);
   const parsedZoomLevel = z.number().safeParse(zoomLevel);
+
+  const parsedScheduleDashboardColVisible = z
+    .array(
+      z.object({
+        id: z.number(),
+        label: z.string(),
+        value: z.string(),
+        checkValue: z.boolean(),
+      }),
+    )
+    .safeParse(scheduleDashboardColVisible);
 
   if (parsedCategoryStates.success) {
     useSettingStore.setState({ categoryStates: parsedCategoryStates.data });

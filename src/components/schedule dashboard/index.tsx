@@ -23,12 +23,15 @@ interface BloodProp {
 }
 
 export interface Event {
-  id: string;
+  id: number;
   title: string;
   startTime: string;
   endTime: string;
+  blockColor: string;
   activities: Array<any>;
 }
+
+export interface Event {}
 
 const ScheduleDashboard = () => {
   const [zoomActive, setZoomActive] = useState(false);
@@ -50,66 +53,15 @@ const ScheduleDashboard = () => {
 
   const [activities, setActivities] = useState<Event[] | []>([]);
 
-  // @ts-ignore
-  const [flowSessions, setFlowSessions] = useState<Event[] | []>([
-    {
-      id: "2",
-      title: "Focused Coding",
-      startTime: "10:00",
-      endTime: "11:30",
-    },
-    {
-      id: "3",
-      title: "Review Session",
-      startTime: "12:00",
-      endTime: "13:00",
-    },
-    {
-      id: "4",
-      title: "Planning",
-      startTime: "14:00",
-      endTime: "15:00",
-    },
-  ]);
+  const [flowSessions, setFlowSessions] = useState<Event[] | []>([]);
 
-  const [breakSession, setBreakSession] = useState<Event[] | []>([]);
+  const [projects, setProjects] = useState<Event[] | []>([]);
 
-  const [calendarEvents, setCalendarEvents] = useState<Event[]>([
-    {
-      id: "5",
-      title: "Team Meeting",
-      startTime: "11:00",
-      endTime: "12:00",
-      activities: [],
-    },
-    {
-      id: "6",
-      title: "Lunch Break",
-      startTime: "13:00",
-      endTime: "14:00",
-      activities: [],
-    },
-  ]);
+  const [clients, setClients] = useState<Event[] | []>([]);
 
-  // @ts-ignore
-  const [projects, setProjects] = useState<Event[]>([
-    {
-      id: "7",
-      title: "Dashboard Redesign",
-      startTime: "09:00",
-      endTime: "11:00",
-      activities: [],
-    },
-    {
-      id: "8",
-      title: "API Integration",
-      startTime: "15:00",
-      endTime: "17:00",
-      activities: [],
-    },
-  ]);
+  const [tasks, setTasks] = useState<Event[] | []>([]);
 
-  const setAcivitiesSession = async (v) => {
+  const setActivitiesSession = async (state) => {
     try {
       const db = await connectToDB();
       // group blood
@@ -122,31 +74,37 @@ const ScheduleDashboard = () => {
         dateD = timezoneChange[0] + "/Calcutta";
       }
 
-      let activities: Array<any> =
-        v === "programs" &&
+      let eventBlocks: Array<any> =
+        state === "programs" &&
         (await db.select(
           "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM programs WHERE date_id = $1)",
           [dateD],
         ));
-      if (v === "afks")
-        activities = await db.select(
+      if (state === "afks") {
+        let breakData: Array<any> = await db.select(
           "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM breaks WHERE date_id = $1)",
           [dateD],
         );
+        let flowData: Array<any> = await db.select(
+          "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM flows WHERE date_id = $1)",
+          [dateD],
+        );
+        eventBlocks = [...breakData, ...flowData];
+      }
 
-      if (!activities) return;
+      if (!eventBlocks) return;
       let title = null;
-      if (v === "programs") {
+      if (state === "programs") {
         title = "Deep Activities";
-      } else if (v === "afks") {
+      } else if (state === "afks") {
         title = "Break";
       }
 
-      let latestObject: Array<any> = [];
-      let latestAct: Array<any> = [];
+      let latestObject: Array<any> = []; // blocks
+      let latestAct: Array<any> = []; // programs
       let start_time: string | null = null;
       let end_time: string | null = null;
-      activities.map((v, i) => {
+      eventBlocks.map((v, i) => {
         if (v.diff_seconds === null) {
           start_time = v.start_time;
           end_time = v.end_time;
@@ -158,16 +116,24 @@ const ScheduleDashboard = () => {
             title,
             startTime: start_time,
             endTime: end_time,
+            blockColor:
+              state === "programs"
+                ? "bg-purple-400"
+                : state === "afks" && "bg-blue-300",
             activities: latestAct,
           });
           start_time = v.start_time;
           latestAct = [];
-        } else if (i === activities.length - 1) {
+        } else if (i === eventBlocks.length - 1) {
           latestObject.push({
             id: i,
             title,
             startTime: start_time,
             endTime: v.end_time,
+            blockColor:
+              state === "programs"
+                ? "bg-purple-400"
+                : state === "afks" && "bg-blue-300",
             activities: latestAct,
           });
           return;
@@ -176,20 +142,20 @@ const ScheduleDashboard = () => {
         end_time = v.end_time;
       });
 
-      if (v === "programs") {
+      if (state === "programs") {
         setActivities(latestObject);
-      } else if (v === "afks") {
-        setBreakSession(latestObject);
+      } else if (state === "afks") {
+        setFlowSessions(latestObject);
       }
 
-      console.log("activities: ", activities);
+      console.log("eventBlocks: ", latestObject);
     } catch (error) {
       console.error(error);
     }
   };
 
   const groupRaw = async () => {
-    ["programs", "afks"].forEach((v) => setAcivitiesSession(v));
+    ["programs", "afks"].forEach((v) => setActivitiesSession(v));
   };
 
   // handle zoom
@@ -207,6 +173,7 @@ const ScheduleDashboard = () => {
 
     return ZOOM_STEPS[nextIdx];
   }
+
   const handleWheel = useCallback(
     async (event) => {
       if (zoomActive) {
@@ -311,9 +278,19 @@ const ScheduleDashboard = () => {
               />
             </span>
             {scheduleDashboardColVisible.map((v, i) => (
-              <span key={i} className={`${!v.checkValue && "hidden"}`}>
+              <span key={v.id} className={`${!v.checkValue && "hidden"}`}>
                 <BaseColumn
-                  events={flowSessions}
+                  events={
+                    v.id === 0
+                      ? flowSessions
+                      : v.id === 1
+                        ? projects
+                        : v.id === 2
+                          ? clients
+                          : v.id === 3
+                            ? tasks
+                            : []
+                  }
                   className={`bg-background`}
                   id={v.value}
                 />

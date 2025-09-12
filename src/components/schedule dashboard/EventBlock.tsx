@@ -43,7 +43,8 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
         left: "8px",
       }}
       className={cn(
-        "text-background/80 absolute rounded-md bg-purple-400 pl-2 transition-all hover:brightness-110",
+        "text-background/80 absolute rounded-md pl-2 transition-all hover:brightness-110",
+        event.blockColor,
       )}
     >
       <h3 className="mt-2 text-sm font-medium">{event.title}</h3>

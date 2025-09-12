@@ -170,8 +170,8 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
         />
       ))}
 
-      {events.map((event) => (
-        <EventBlock key={event.id} event={event} timeScale={timeScale} />
+      {events.map((event, i) => (
+        <EventBlock key={i} event={event} timeScale={timeScale} />
       ))}
     </div>
   );

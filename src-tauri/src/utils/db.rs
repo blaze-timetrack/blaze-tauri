@@ -81,7 +81,9 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         (id INTEGER PRIMARY KEY,
         duration INT NOT NULL DEFAULT 0,
         start_time DATETIME NOT NULL,
-        end_time DATETIME NOT NULL)"#,
+        end_time DATETIME NOT NULL,
+        date_id DATE
+        )"#,
     )
         .execute(pool)
         .await?;

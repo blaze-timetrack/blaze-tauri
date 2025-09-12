@@ -70,17 +70,17 @@ pub async fn start_heartbeat<R: Runtime>(
 
     let mut total_duration = Duration::ZERO;
     let mut last_check = Instant::now();
-    let start_time: DateTime<Tz> = utc_now.with_timezone(&tz);
+    let mut start_time: DateTime<Tz> = utc_now.with_timezone(&tz);
     let mut end_time: DateTime<Tz>;
     let mut afk = false;
     let mut past_afk = false;
-    // let afk_duration_ms = 5 * 60 * 1000;
-    let afk_duration_ms = 60 * 1000;
-    // let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
-    let afk_check_interval_ms = 30 * 1000;
+    let afk_duration_ms = 5 * 60 * 1000;
+    // let afk_duration_ms = 30 * 1000;
+    let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
+    // let afk_check_interval_ms = 30 * 1000;
     let mut afk_check_interval_timer_ms = Duration::ZERO;
     let mut end_afk = true;
-
+    let mut past_blood_afk = None;
     let mut continue_afk = false;
 
     loop {
@@ -90,7 +90,6 @@ pub async fn start_heartbeat<R: Runtime>(
             .unwrap_or(serde_json::Value::String(String::from("TRACKING")))
             .clone();
 
-        let mut past_blood_afk = None;
         let mut elapsed = last_check.elapsed();
         last_check = Instant::now();
 
@@ -105,6 +104,7 @@ pub async fn start_heartbeat<R: Runtime>(
             if past_afk {
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
+                println!("Past AFK: {:#?}", past_blood_afk.as_ref());
                 return Ok((
                     past_blood_afk,
                     Some(HeartbeatStop {
@@ -148,23 +148,25 @@ pub async fn start_heartbeat<R: Runtime>(
                 end_afk = false;
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
-                end_time = end_time - chrono::Duration::minutes(5);
-let mut result_sub ;
-                match total_duration.checked_sub(Duration::new(5,0)) {
-                    Some(v) => result_sub = v,
-                    None => result_sub = Duration::ZERO,
+                match total_duration.checked_sub(Duration::new(5 * 60, 0)) {
+                    Some(v) => {
+                        println!("total duration: {} result_sub {:#?}", total_duration.as_secs(), v);
+                        past_blood_afk = Some(HeartbeatBlood {
+                            process_name: past_blood.to_string(),
+                            title: title.clone(),
+                            url: url.clone(),
+                            time: Time {
+                                start: start_time.format(TIME_FORMAT).to_string(),
+                                end: end_time.format(TIME_FORMAT).to_string(),
+                                duration: total_duration.as_secs(),
+                            },
+                        });
+                        start_time = end_time;
+                        total_duration = v;
+                        println!("PAST AFK in afk: {:#?}", past_blood_afk.as_ref().unwrap());
+                    }
+                    None => {}
                 };
-
-                past_blood_afk = Some(HeartbeatBlood {
-                    process_name: past_blood.to_string(),
-                    title: title.clone(),
-                    url: url.clone(),
-                    time: Time {
-                        start: start_time.format(TIME_FORMAT).to_string(),
-                        end: end_time.format(TIME_FORMAT).to_string(),
-                        duration: result_sub.as_secs(),
-                    },
-                })
             }
             // continues check of afk
             if !afk {
