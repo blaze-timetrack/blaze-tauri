@@ -1,5 +1,5 @@
-import { Event } from "./index";
-import EventBlock from "./EventBlock";
+import { Event } from "./index.tsx";
+import EventBlock from "./EventBlock.tsx";
 import React, { useRef, useState } from "react";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import { cn } from "@/lib/utils.ts";

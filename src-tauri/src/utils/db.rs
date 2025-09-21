@@ -82,6 +82,7 @@ pub async fn setup_schema(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         duration INT NOT NULL DEFAULT 0,
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
+        category TEXT NOT NULL DEFAULT 'uncategorized',
         date_id DATE
         )"#,
     )

@@ -43,10 +43,12 @@ export type categoryStateTypes = z.infer<typeof categoryStateTypeSchema>;
 export const zodCategoryStateSchema = z.array(categoryStateTypeSchema).min(0);
 
 //  group programs (based on category)
-export enum GroupProgramsPlatformType {
-  WINDOWS = "windows",
-  MACOS = "macos",
-}
+export type GroupProgramsPlatformType =
+  | "ANY"
+  | "WINDOWS"
+  | "MACOS"
+  | "LINUX"
+  | "ANDROID";
 
 export const groupProgramsTypeSchema = z.object({
   name: z
@@ -57,7 +59,7 @@ export const groupProgramsTypeSchema = z.object({
     .max(20),
   publisher: z.string().min(3).max(20).optional(),
   category: z.string().min(3).max(20),
-  platform: z.nativeEnum(GroupProgramsPlatformType),
+  platform: z.enum(["ANY", "WINDOWS", "MACOS", "LINUX", "ANDROID"]),
   point: z.number().optional(),
 });
 export type groupProgramsType = z.infer<typeof groupProgramsTypeSchema>;

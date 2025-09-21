@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router";
 import { RootLayout } from "@/root";
-import HomePage from "@/pages/home.tsx";
+import HomePage from "@/pages/home/home.tsx";
 import CategoriesPage from "@/pages/categories.tsx";
 import Tasks from "@/pages/work/tasks.tsx";
 import Clients from "@/pages/work/clients.tsx";

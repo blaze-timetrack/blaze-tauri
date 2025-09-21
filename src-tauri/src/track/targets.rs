@@ -25,16 +25,24 @@ pub enum BrowserList {
     Arc,
 }
 
-fn format_name<'a>(window_name: &'a str, process_name: &'a str) -> &'a str {
-    if process_name.eq("ApplicationFrameHost.exe") {
-        println!("ApplicationFrameHost.exe");
-        return window_name;
-    }
+fn format_name<'a>(window_name: &'a str, process_name: &'a str) -> Option<&'a str> {
+    if process_name.eq("ApplicationFrameHost.exe") || process_name.eq("explorer.exe") || process_name.eq("msedgewebview2") {
+        println!("{}", process_name);
 
-    process_name
+        if window_name.to_lowercase().eq("program manager") {
+            return None;
+        }
+
+        if window_name.eq("") {
+            return Some(process_name);
+        }
+        return Some(window_name);
+    }
+    // shellHost.exe (quick settings), shellExperienceHost.exe(notification center), enty (on taskbar), searchHost.exe (search windows app), StartMenuExperienceHost.exe (start in search)
+    Some(process_name)
 }
 
-fn is_browser(process_name: &str) -> Option<BrowserList> {
+fn is_browser(process_name: String) -> Option<BrowserList> {
     match process_name.to_lowercase() {
         name if name.contains("chrome.exe") => Some(BrowserList::Chrome),
         name if name.contains("brave.exe") => Some(BrowserList::Brave),
@@ -64,7 +72,7 @@ pub fn get_active_pid_title() -> (HWND, u32, String) {
     }
 }
 
-pub fn get_active_process_name() -> Option<(HWND, String, String)> {
+pub fn get_active_process_name() -> Option<(HWND, Option<String>, String)> {
     let sys = System::new_all();
 
     let (hwnd_window, window_pid, window_title) = get_active_pid_title();
@@ -79,17 +87,19 @@ pub fn get_active_process_name() -> Option<(HWND, String, String)> {
     // println!("process: {:?}", process?.root());
 
     if let Some(process) = process {
-        let name = format_name(window_title.as_str(), process.name().to_str().unwrap());
-        return Some((hwnd_window, name.to_string(), window_title));
+        if let Some(name) = format_name(window_title.as_str(), process.name().to_str().unwrap()) {
+            return Some((hwnd_window, Some(name.to_string()), window_title));
+        }
+        return Some((hwnd_window, None, window_title));
     };
 
     None
 }
 
 // title, process-name, url, hwnd(opt)
-pub fn get_active_all() -> Option<(String, String, Option<String>)> {
+pub fn get_active_all() -> Option<(String, Option<String>, Option<String>)> {
     let (hwnd_process, process_name, window_title) = get_active_process_name()?;
-    match get_browser_active_url(&hwnd_process, &process_name) {
+    match get_browser_active_url(&hwnd_process, process_name.clone()) {
         Ok(url) => return Some((window_title, process_name, Some(url))),
         Err(e) => return Some((window_title, process_name, None)),
     }
@@ -97,9 +107,11 @@ pub fn get_active_all() -> Option<(String, String, Option<String>)> {
 
 pub fn get_browser_active_url(
     hwnd_process: &HWND,
-    process_name: &String,
+    process_name: Option<String>,
 ) -> Result<String, &'static str> {
-    if let Some(browser) = is_browser(process_name) {
+    if process_name == None { return Err("Not a browser"); }
+
+    if let Some(browser) = is_browser(process_name.unwrap()) {
         unsafe {
             let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
 

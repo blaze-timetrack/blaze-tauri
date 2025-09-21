@@ -1,9 +1,9 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import TimeColumn from "./TimeColumn";
-import ColumnHeader from "./ColumnHeader";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+import TimeColumn from "./TimeColumn.tsx";
+import ColumnHeader from "./ColumnHeader.tsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
-import BaseColumn from "@/components/schedule dashboard/BaseColumn.tsx";
+import BaseColumn from "@/pages/home/components/schedule dashboard/BaseColumn.tsx";
 import { cn } from "@/lib/utils.ts";
 import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 import { connectToDB } from "@/db";
@@ -81,15 +81,16 @@ const ScheduleDashboard = () => {
           [dateD],
         ));
       if (state === "afks") {
-        let breakData: Array<any> = await db.select(
+        eventBlocks = await db.select(
           "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM breaks WHERE date_id = $1)",
           [dateD],
         );
-        let flowData: Array<any> = await db.select(
+      }
+      if (state === "flows") {
+        eventBlocks = await db.select(
           "SELECT *, prev_end_time, strftime('%s', start_time) - strftime('%s', prev_end_time) AS diff_seconds FROM ( SELECT *, LAG(end_time) OVER (ORDER BY start_time) AS prev_end_time FROM flows WHERE date_id = $1)",
           [dateD],
         );
-        eventBlocks = [...breakData, ...flowData];
       }
 
       if (!eventBlocks) return;
@@ -98,6 +99,8 @@ const ScheduleDashboard = () => {
         title = "Deep Activities";
       } else if (state === "afks") {
         title = "Break";
+      } else if (state === "flows") {
+        title = "Flow Sessions";
       }
 
       let latestObject: Array<any> = []; // blocks
@@ -119,7 +122,11 @@ const ScheduleDashboard = () => {
             blockColor:
               state === "programs"
                 ? "bg-purple-400"
-                : state === "afks" && "bg-blue-300",
+                : state === "afks"
+                  ? "bg-blue-300"
+                  : state === "flows"
+                    ? "bg-blue-600"
+                    : "bg-purple-400",
             activities: latestAct,
           });
           start_time = v.start_time;
@@ -133,7 +140,11 @@ const ScheduleDashboard = () => {
             blockColor:
               state === "programs"
                 ? "bg-purple-400"
-                : state === "afks" && "bg-blue-300",
+                : state === "afks"
+                  ? "bg-blue-300"
+                  : state === "flows"
+                    ? "bg-blue-600"
+                    : "bg-purple-400",
             activities: latestAct,
           });
           return;
@@ -145,7 +156,9 @@ const ScheduleDashboard = () => {
       if (state === "programs") {
         setActivities(latestObject);
       } else if (state === "afks") {
-        setFlowSessions(latestObject);
+        setFlowSessions(latestObject);S
+      } else if (state === "flows") {
+        setFlowSessions((prev) => [...prev, ...latestObject]);
       }
 
       console.log("eventBlocks: ", latestObject);
@@ -155,7 +168,7 @@ const ScheduleDashboard = () => {
   };
 
   const groupRaw = async () => {
-    ["programs", "afks"].forEach((v) => setActivitiesSession(v));
+    ["programs", "afks", "flows"].forEach((v) => setActivitiesSession(v));
   };
 
   // handle zoom

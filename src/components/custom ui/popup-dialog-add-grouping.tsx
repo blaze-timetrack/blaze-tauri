@@ -10,7 +10,6 @@ import {
 import React, { useState } from "react";
 import {
   ActionNameTypes,
-  GroupProgramsPlatformType,
   groupProgramsType,
   groupProgramsTypeSchema,
 } from "@/lib/types/store-settings.types.ts";
@@ -45,7 +44,7 @@ export function PopupDialogAddGrouping({
     resolver: zodResolver(groupProgramsTypeSchema),
     defaultValues: {
       name: "",
-      platform: GroupProgramsPlatformType.WINDOWS,
+      platform: "WINDOWS", // todo detect and add
       category: "browser",
       point: 0,
     },

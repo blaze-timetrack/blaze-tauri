@@ -7,11 +7,14 @@ import {
   HeartbeatStopTypes,
   HeartbeatTypes,
 } from "@/lib/types/heartbeat.types.ts";
-import ScheduleDashboard from "@/components/schedule dashboard";
+import ScheduleDashboard from "@/pages/home/components/schedule dashboard";
 import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
 function Home() {
   const currentDay = useHydrateStore((state) => state.currentDay);
+  const groupedPrograms = useSettingStore((state) => state.groupedPrograms);
+  const categoriesStates = useSettingStore((state) => state.categoryStates);
 
   const awayFromKeyboard = async () => {
     return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
@@ -44,9 +47,26 @@ function Home() {
     const db = await connectToDB();
     return listen("heartbeat", async (event: Event<HeartbeatTypes>) => {
       console.log("listening blood");
+      const inGroupProgram = groupedPrograms.findIndex((v) => {
+        return (
+          v.name.toLowerCase() ===
+          event.payload.process_name.toLowerCase().split(".")[0]
+        );
+      });
+      let categoryOfGroupProgram;
+      if (inGroupProgram == -1) {
+        categoryOfGroupProgram = "uncategorized";
+        // show option to change the category
+      } else {
+        categoryOfGroupProgram = groupedPrograms[inGroupProgram].category;
+        if (categoryOfGroupProgram == undefined) {
+          categoryOfGroupProgram = "unknown";
+        }
+      }
       try {
         // check program category
         const program_name = event.payload.process_name.split(".")[0];
+
         await db.execute(
           "INSERT INTO programs (name, title, url, duration, start_time, end_time, category, date_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
           [
@@ -56,10 +76,35 @@ function Home() {
             event.payload.time.duration,
             event.payload.time.start,
             event.payload.time.end,
-            "uncategorized",
+            categoryOfGroupProgram,
             currentDay,
           ],
         );
+
+        let found = categoriesStates.findIndex(
+          (v) => v.name.toLowerCase() === categoryOfGroupProgram.toLowerCase(),
+        );
+
+        if (found == -1) {
+        } else {
+          let categoryStateOfFlow = categoriesStates[found].state_flow.state;
+          if (categoryStateOfFlow) {
+            await db.execute(
+              "INSERT INTO flows (duration, start_time, end_time, category, date_id) VALUES ($1, $2, $3, $4, $5)",
+              [
+                event.payload.time.duration,
+                event.payload.time.start,
+                event.payload.time.end,
+                categoryOfGroupProgram,
+                currentDay,
+              ],
+            );
+            console.log(
+              "adding to flow session as the category belongs to flow sessions.",
+            );
+          }
+        }
+
         console.log(
           `heartbeat event start: ${event.payload.time.start} end:${event.payload.time.end} duration:${event.payload.time.duration}`,
         );

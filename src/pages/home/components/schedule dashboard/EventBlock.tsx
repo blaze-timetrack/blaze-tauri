@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { Event } from "./index";
+import { cn } from "@/lib/utils.ts";
+import { Event } from "./index.tsx";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
 interface EventBlockProps {

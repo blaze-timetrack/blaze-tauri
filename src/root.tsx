@@ -15,7 +15,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { shortcuts } from "@/lib/constants/settings-const.tsx";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 import { useBasicStore } from "@/lib/zustand/basic-store.ts";
-import TitleBar from "@/components/backend components/title-bar.tsx";
+import TitleBar from "@/components/shared/backend components/title-bar.tsx";
 import TopBar from "@/components/shared/top-bar.tsx";
 
 export function RootLayout() {

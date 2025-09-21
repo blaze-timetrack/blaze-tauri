@@ -3,7 +3,6 @@ import {
   ActionNameTypes,
   CategoryActionTypes,
   categoryStateTypes,
-  GroupProgramsPlatformType,
   groupProgramsType,
   MusicTypes,
   StateTypes,
@@ -100,19 +99,40 @@ export const defaultCategoryStates = [
     },
   },
 ];
-export const defaultGroupingPrograms = [
+export const defaultGroupingPrograms: groupProgramsType[] = [
   {
-    name: "zen browser",
+    name: "zen",
     publisher: "browser company",
     category: "browser",
-    platform: GroupProgramsPlatformType.WINDOWS,
+    platform: "WINDOWS",
     point: 0,
   },
   {
-    name: "key paint",
+    name: "brave",
+    publisher: "browser company",
+    category: "browser",
+    platform: "WINDOWS",
+    point: 0,
+  },
+  {
+    name: "Gmail",
     publisher: "Apple Inc.",
-    category: "paint",
-    platform: GroupProgramsPlatformType.MACOS,
+    category: "email",
+    platform: "MACOS",
+    point: 0,
+  },
+  {
+    name: "Instagram",
+    publisher: "Instagram",
+    category: "social",
+    platform: "ANY",
+    point: 0,
+  },
+  {
+    name: "rustrover64",
+    publisher: "rustrover64",
+    category: "coding",
+    platform: "ANY",
     point: 0,
   },
 ];

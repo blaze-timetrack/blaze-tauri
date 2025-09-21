@@ -1,0 +1,27 @@
+PANIC at src\lib.rs:232:22: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 232, column: 22 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-12 22:51:11 UTC
+
+PANIC at src\lib.rs:232:22: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 232, column: 22 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-12 22:51:11 UTC
+
+PANIC at src\lib.rs:232:22: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 232, column: 22 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-12 22:51:12 UTC
+
+PANIC at src\track\heartbeat.rs:100:58: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 100, column: 58 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-13 20:59:56 UTC
+
+PANIC at src\track\heartbeat.rs:102:58: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 102, column: 58 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-13 21:59:27 UTC
+
+PANIC at src\track\heartbeat.rs:102:58: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 102, column: 58 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-14 17:53:37 UTC
+
+PANIC at src\track\heartbeat.rs:129:50: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 129, column: 50 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-14 18:03:23 UTC
+
+PANIC at src\track\heartbeat.rs:129:50: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 129, column: 50 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-14 18:06:04 UTC
+
+PANIC at src\track\heartbeat.rs:102:58: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 102, column: 58 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-09-17 14:57:33 UTC
+

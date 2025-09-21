@@ -74,6 +74,8 @@ pub async fn start_heartbeat<R: Runtime>(
     let mut end_time: DateTime<Tz>;
     let mut afk = false;
     let mut past_afk = false;
+    let mut idle_t = false;
+    let mut crossed_5_min_idle_t = false;
     let afk_duration_ms = 5 * 60 * 1000;
     // let afk_duration_ms = 30 * 1000;
     let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
@@ -81,7 +83,6 @@ pub async fn start_heartbeat<R: Runtime>(
     let mut afk_check_interval_timer_ms = Duration::ZERO;
     let mut end_afk = true;
     let mut past_blood_afk = None;
-    let mut continue_afk = false;
 
     loop {
         let store = app.store(".settings.dat").expect("Failed to load store.");
@@ -100,11 +101,18 @@ pub async fn start_heartbeat<R: Runtime>(
         if !afk {
             let (_, current_blood, _) = get_active_all().unwrap();
 
-            // || total_duration == Duration::from_millis(5 * 60 * 1000) put here
-            if past_afk {
+            // idle programs check
+            if past_blood != current_blood && idle_t {
+                if (total_duration.as_secs().gt(&(5 * 60))) {
+                    crossed_5_min_idle_t = true;
+                } else {
+                    return Ok((None, None));
+                }
+            }
+
+            if past_afk || crossed_5_min_idle_t {
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
-                println!("Past AFK: {:#?}", past_blood_afk.as_ref());
                 return Ok((
                     past_blood_afk,
                     Some(HeartbeatStop {
@@ -122,7 +130,7 @@ pub async fn start_heartbeat<R: Runtime>(
                 end_time = now.with_timezone(&tz);
                 return Ok((
                     Some(HeartbeatBlood {
-                        process_name: past_blood.to_string(),
+                        process_name: past_blood.unwrap().to_string(),
                         title: title.clone(),
                         url: url.clone(),
                         time: Time {
@@ -133,6 +141,13 @@ pub async fn start_heartbeat<R: Runtime>(
                     }),
                     None,
                 ));
+            }
+
+            if past_blood == None {
+                idle_t = true;
+                println!("past_blood: {:#?}", past_blood_afk.as_ref());
+                tokio::time::sleep(POLL_INTERVAL).await;
+                continue;
             }
         }
 
@@ -150,9 +165,8 @@ pub async fn start_heartbeat<R: Runtime>(
                 end_time = now.with_timezone(&tz);
                 match total_duration.checked_sub(Duration::new(5 * 60, 0)) {
                     Some(v) => {
-                        println!("total duration: {} result_sub {:#?}", total_duration.as_secs(), v);
                         past_blood_afk = Some(HeartbeatBlood {
-                            process_name: past_blood.to_string(),
+                            process_name: past_blood.clone().unwrap().to_string(),
                             title: title.clone(),
                             url: url.clone(),
                             time: Time {
@@ -163,7 +177,6 @@ pub async fn start_heartbeat<R: Runtime>(
                         });
                         start_time = end_time;
                         total_duration = v;
-                        println!("PAST AFK in afk: {:#?}", past_blood_afk.as_ref().unwrap());
                     }
                     None => {}
                 };

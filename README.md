@@ -1,5 +1,14 @@
 # BLAZE
 
+# Service I Will Deliver
+
+- best time visualization and analyzation
+- best connectivity between teams
+- best customizability
+- best performance
+- best sync with encryption
+- best feedback loop for both in-product and features-products
+
 ## Ideas of BLAZE
 
 - flow creation
@@ -169,15 +178,15 @@ useEffect(() => {
 - widget for desktop && phones
 
 - remove the start screen white background or display when ready (visible: false, focus: true -> check this as this may
-  not work in all platforms)  = visible: true, focus: true
+  not work in all platforms) = visible: true, focus: true
 
 # handle every edge case
 
-- autostart every time if enable
-- while changing db schema make this in a way that old to new without losing data
+- autostart every time if enabled
+- while changing db schema makes this in a way that old to new without losing data
 
 # handle later
 
-- if setting file get erased (creat a default one)
--
-- type error after 18 to 19 react version
+- if a setting file gets erased (create a default one)
+- create setting file fields used in the backend
+- type error after 18 to 19 React version

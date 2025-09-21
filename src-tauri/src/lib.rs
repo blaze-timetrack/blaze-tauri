@@ -97,7 +97,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                     settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
                     settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
-                    settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                     // settings.SetAreDevToolsEnabled(true).unwrap();
                 })
                 .unwrap();
@@ -139,7 +139,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                     settings.SetIsGeneralAutofillEnabled(false).unwrap();
                     settings.SetIsWebMessageEnabled(false).unwrap();
-                    settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                     settings.SetAreDevToolsEnabled(true).unwrap();
                 })
                 .unwrap();
@@ -229,6 +229,7 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                     .expect("Failed to load store.");
                 let state = store
                     .get("state")
+                    // .unwrap() // panic
                     .unwrap_or(serde_json::Value::String(String::from("TRACKING")))
                     .clone();
                 println!("state: {}", state);
