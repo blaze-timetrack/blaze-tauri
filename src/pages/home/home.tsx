@@ -1,4 +1,4 @@
-import ActivitiesSummaryDemo from "@/components/shared/activities-summary-demo.tsx";
+import ActivitiesSummaryDemo from "@/pages/home/components/activities-summary-demo.tsx";
 import { connectToDB } from "@/db";
 import { useEffect } from "react";
 import { Event, listen } from "@tauri-apps/api/event";

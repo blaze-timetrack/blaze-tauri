@@ -28,7 +28,8 @@
   of window, title, urls, afk (store them locally)
 - default categories of programs (_program->categories_->states(flow,work,idle,distraction)) => Settings of categories
 - activity tracking
-- auto & self flow-sessions, breaks(idle detection), meeting, workout (duration changing). (*, freeze line)
+- auto & self flow-sessions, breaks
+- flow-sessions, breaks(idle), meeting, workout(duration changing) (details, daily summary). (*)
 - stoping distractions
 - go cloud
 - set client projects and tasks
@@ -45,6 +46,13 @@
     - work target
     - Day Cutoff Time
 - export data
+
+_ui_
+
+- tabs list animation
+- freeze line
+- schedule dashboard size
+- settings tabs list size
 
 ## Strategy
 

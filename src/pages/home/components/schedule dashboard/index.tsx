@@ -108,11 +108,13 @@ const ScheduleDashboard = () => {
       let start_time: string | null = null;
       let end_time: string | null = null;
       eventBlocks.map((v, i) => {
+        // first block
         if (v.diff_seconds === null) {
           start_time = v.start_time;
           end_time = v.end_time;
           latestAct.push(v);
           return;
+          // show a single block
         } else if (v.diff_seconds >= 5 * 60) {
           latestObject.push({
             id: i,
@@ -123,14 +125,16 @@ const ScheduleDashboard = () => {
               state === "programs"
                 ? "bg-purple-400"
                 : state === "afks"
-                  ? "bg-blue-300"
+                  ? "bg-blue-600"
                   : state === "flows"
-                    ? "bg-blue-600"
+                    ? "bg-blue-300"
                     : "bg-purple-400",
             activities: latestAct,
           });
           start_time = v.start_time;
           latestAct = [];
+
+          // last block
         } else if (i === eventBlocks.length - 1) {
           latestObject.push({
             id: i,
@@ -141,9 +145,9 @@ const ScheduleDashboard = () => {
               state === "programs"
                 ? "bg-purple-400"
                 : state === "afks"
-                  ? "bg-blue-300"
+                  ? "bg-blue-600"
                   : state === "flows"
-                    ? "bg-blue-600"
+                    ? "bg-blue-300"
                     : "bg-purple-400",
             activities: latestAct,
           });
@@ -156,7 +160,7 @@ const ScheduleDashboard = () => {
       if (state === "programs") {
         setActivities(latestObject);
       } else if (state === "afks") {
-        setFlowSessions(latestObject);S
+        setFlowSessions(latestObject);
       } else if (state === "flows") {
         setFlowSessions((prev) => [...prev, ...latestObject]);
       }

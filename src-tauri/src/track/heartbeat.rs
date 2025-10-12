@@ -77,8 +77,8 @@ pub async fn start_heartbeat<R: Runtime>(
     let mut idle_t = false;
     let mut crossed_5_min_idle_t = false;
     let afk_duration_ms = 5 * 60 * 1000;
-    // let afk_duration_ms = 30 * 1000;
     let afk_check_interval_ms = 2 * 60 * 1000 + 30 * 1000;
+    // let afk_duration_ms = 30 * 1000;
     // let afk_check_interval_ms = 30 * 1000;
     let mut afk_check_interval_timer_ms = Duration::ZERO;
     let mut end_afk = true;
@@ -110,6 +110,7 @@ pub async fn start_heartbeat<R: Runtime>(
                 }
             }
 
+            // afk check
             if past_afk || crossed_5_min_idle_t {
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);
@@ -125,6 +126,7 @@ pub async fn start_heartbeat<R: Runtime>(
                 ));
             }
 
+            // current program change check
             if past_blood != current_blood || state == "NO_TRACKING" || total_duration == Duration::from_millis(5 * 60 * 1000) {
                 let now = Utc::now();
                 end_time = now.with_timezone(&tz);

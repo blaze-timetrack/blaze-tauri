@@ -1,16 +1,20 @@
 import { getCurrentWindow, LogicalPosition } from "@tauri-apps/api/window";
 import { Menu as MenuIcon } from "lucide-react";
 import {
+  CheckMenuItem,
   Menu,
   MenuItem,
   PredefinedMenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
 import { useCallback } from "react";
-import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { disable, enable } from "@tauri-apps/plugin-autostart";
+import { useSettingStore } from "@/lib/zustand/setting-store.ts";
 
 function TitleBar() {
   const appWindow = getCurrentWindow();
+  const autostart = useSettingStore((state) => state.autostart);
+  const setAutostart = useSettingStore((state) => state.setAutostart);
 
   const handleMenuClick = useCallback(async () => {
     const fileSubmenu = await Submenu.new({
@@ -23,17 +27,20 @@ function TitleBar() {
             console.log("about blaze clicked");
           },
         }),
-        await MenuItem.new({
+        await CheckMenuItem.new({
           id: "startup_launch",
           text: "Launch on Startup",
+          checked: autostart,
           action: async () => {
             console.log("Open launch at startup clicked");
-            if (await isEnabled()) {
+            if (autostart) {
               await disable();
+              await setAutostart(false);
               console.log("is disabled");
               return;
             }
             await enable();
+            await setAutostart(true);
             console.log("is enabled");
           },
         }),

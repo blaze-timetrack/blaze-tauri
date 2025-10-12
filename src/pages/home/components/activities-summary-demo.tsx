@@ -2,8 +2,13 @@
 
 import type React from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
+import { Progress } from "@/components/ui/progress.tsx";
 
 interface ActivityData {
   name: string;

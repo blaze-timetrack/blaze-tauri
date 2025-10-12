@@ -1,13 +1,10 @@
 // -- Sub-Modules
-mod classifier;
 mod track;
 mod utils;
 
 use crate::track::afk::away_from_keyboard;
 use crate::track::heartbeat::start_heartbeat;
 use crate::utils::db::{close_connection_db, connect_to_db, setup_schema};
-use classifier::classify_text;
-use classifier::Classifier;
 use serde_json::json;
 use std::borrow::Cow;
 use std::path::PathBuf;
@@ -22,6 +19,7 @@ use tauri_plugin_sql::Migration;
 use tauri_plugin_sql::MigrationKind;
 use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
+use tokio::time;
 use track::installed_app::{get_apps_via_powershell, get_installed_applications};
 use utils::commands::{freeze_mouse, get_systems_timezone, greet};
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
@@ -29,9 +27,9 @@ use windows::core::Interface;
 
 // #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let classifier = Classifier::new().expect("Failed to load model");
+    // let classifier = Classifier::new().expect("Failed to load model");
 
-    let mut builder = tauri::Builder::default().manage(Mutex::new(classifier));
+    let mut builder = tauri::Builder::default();
 
     #[cfg(desktop)]
     {
@@ -204,7 +202,6 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             get_installed_applications,
             get_apps_via_powershell,
             freeze_mouse,
-            classify_text
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -222,7 +219,7 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
             let _ = close_connection_db(&db).await;
             loop {
                 println!("tracker running in background");
-                tokio::time::sleep(Duration::from_micros(80)).await;
+                time::sleep(Duration::from_micros(80)).await;
 
                 let store = &app_handle
                     .store(".settings.dat")
@@ -235,7 +232,7 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
                 println!("state: {}", state);
 
                 if state == "NO_TRACKING" {
-                    tokio::time::sleep(Duration::from_secs(5)).await;
+                    time::sleep(Duration::from_secs(5)).await;
                     continue;
                 }
 

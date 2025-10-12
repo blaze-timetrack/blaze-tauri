@@ -33,9 +33,9 @@ webview2-com = "0.37.0"
 supabase_rs = "0.4.2"
 notify = "8.0.0"
 winreg = "0.55.0"
-candle-core = { git = "https://github.com/huggingface/candle.git" }
-candle-nn = { git = "https://github.com/huggingface/candle.git" }
-candle-transformers = { git = "https://github.com/huggingface/candle.git" }
+#candle-core = { git = "https://github.com/huggingface/candle.git" }
+#candle-nn = { git = "https://github.com/huggingface/candle.git" }
+#candle-transformers = { git = "https://github.com/huggingface/candle.git" }
 tokenizers = "0.21.1"
 hf-hub = "0.4.3"
 
