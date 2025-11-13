@@ -79,7 +79,7 @@ function GroupingTab() {
               >
                 <p className={"min-w-xs lowercase"}>{v.name}</p>
                 <div className={"flex items-center gap-1"}>
-                  {v.platform === "windows" ? (
+                  {v.platform === "WINDOWS" ? (
                     <AppWindowIcon className={"h-4 w-4"} />
                   ) : (
                     <AppWindowMac className={"h-4 w-4"} />

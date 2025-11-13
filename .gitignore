@@ -28,3 +28,4 @@ dist-ssr
 /.react-router/
 /build/
 ~/.tauri/
+.tauri/
