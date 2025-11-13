@@ -31,3 +31,30 @@ Timestamp: 2025-10-10 21:13:49 UTC
 PANIC at src\track\heartbeat.rs:102:58: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\track\\heartbeat.rs", line: 102, column: 58 }, can_unwind: true, force_no_backtrace: false }
 Timestamp: 2025-10-10 21:16:27 UTC
 
+PANIC at src\lib.rs:137:91: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 137, column: 91 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 07:49:09 UTC
+
+PANIC at src\lib.rs:134:91: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 134, column: 91 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 07:51:45 UTC
+
+PANIC at src\lib.rs:134:91: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 134, column: 91 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:04:54 UTC
+
+PANIC at src\lib.rs:133:87: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 133, column: 87 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:10:21 UTC
+
+PANIC at src\lib.rs:133:87: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 133, column: 87 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:13:04 UTC
+
+PANIC at src\lib.rs:133:87: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 133, column: 87 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:14:44 UTC
+
+PANIC at src\lib.rs:133:87: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\lib.rs", line: 133, column: 87 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:15:21 UTC
+
+PANIC at src\utils\global_shortcut.rs:10:66: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\utils\\global_shortcut.rs", line: 10, column: 66 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:56:56 UTC
+
+PANIC at src\utils\global_shortcut.rs:10:66: PanicHookInfo { payload: Any { .. }, location: Location { file: "src\\utils\\global_shortcut.rs", line: 10, column: 66 }, can_unwind: true, force_no_backtrace: false }
+Timestamp: 2025-11-11 08:57:42 UTC
+

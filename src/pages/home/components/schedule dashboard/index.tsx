@@ -3,7 +3,7 @@ import TimeColumn from "./TimeColumn.tsx";
 import ColumnHeader from "./ColumnHeader.tsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
-import BaseColumn from "@/pages/home/components/schedule dashboard/BaseColumn.tsx";
+import { BaseColumn } from "@/pages/home/components/schedule dashboard/BaseColumn.tsx";
 import { cn } from "@/lib/utils.ts";
 import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 import { connectToDB } from "@/db";

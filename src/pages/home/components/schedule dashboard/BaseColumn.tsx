@@ -10,11 +10,12 @@ interface BaseColumnProps {
   id: string;
 }
 
-const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
+export const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
   const timeScale = 60;
   const [positionTimeline, setPositionTimeline] = useState({ y: 0 });
   const [freezeMouse, setFreezeMouse] = useState(false);
   const [isHovering, setIsHovering] = useState(false); // State to track hover
+  const [isClicked, setIsClicked] = useState(false); // State to track click
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSelecting, setIsSelecting] = useState(false); // New state for selection
   const [selectionStart, setSelectionStart] = useState<number | null>(null); // Start Y position of selection
@@ -23,6 +24,7 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
   const currentTimeStart = useSettingStore((state) => state.currentTimeStart);
   const zoomLevel = useSettingStore((state) => state.zoomLevel);
   const handleMouseMove = (e: React.MouseEvent) => {
+    // console.log("baseCol handleMouseMove called");
     if (containerRef.current) {
       if (Math.floor(positionTimeline.y % 60) == 0) {
       }
@@ -53,6 +55,7 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
     setIsSelecting(false); // Stop selecting
   };
   const handleMouseDown = (e: React.MouseEvent) => {
+    console.log("baseCol handleMouseDown");
     if (containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const x = e.clientX - containerRect.left;
@@ -63,16 +66,27 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
     }
   };
   const handleMouseEnter = () => {
+    // console.log("basekcol handleMouseEnter called");
     setIsHovering(true); // Set hovering to true when mouse enters
   };
 
   const handleMouseLeave = () => {
+    // console.log("baseCol handleMouseLeave called");
     setIsHovering(false); // Set hovering to false when mouse leaves
     // Clear selection if mouse leaves while selecting
-    if (isSelecting) {
+    if (isSelecting && !isHovering) {
       setIsSelecting(false);
       setSelectionStart(null);
       setSelectionEnd(null);
+    }
+
+    // console.log(`selected start: ${selectionStart} end: ${selectionEnd}`);
+  };
+
+  const handleClick = (e) => {
+    console.log("click in basedColumn");
+    if (e.buttons === 0) {
+      setIsClicked(false);
     }
   };
 
@@ -117,40 +131,15 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
       className={cn(
         `border-border relative col-span-1 border-r transition-colors`,
         className,
-        !isSelecting && "hover:bg-foreground/5",
+        !isSelecting && "hover:bg-foreground/2",
       )}
       onMouseDown={handleMouseDown} // Start selection on mouse down
       onMouseMove={handleMouseMove} // Track mouse movement
       onMouseUp={handleMouseUp} // Stop selection on mouse up
       onMouseEnter={handleMouseEnter} // Detect mouse entering
       onMouseLeave={handleMouseLeave} // Detect mouse leaving
+      onClick={handleClick}
     >
-      {/* Conditionally render the line based on isHovering */}
-      {isHovering && !isSelecting && (
-        <>
-          {/* Horizontal Line */}
-          <div
-            className={"bg-foreground/80 absolute z-50 h-[1px] w-full"}
-            style={{
-              top: `${positionTimeline.y}px`,
-            }}
-          />
-
-          {/* Time Display */}
-          <div
-            className={
-              "text-foreground bg-background absolute z-50 rounded-r-sm p-1 text-xs"
-            }
-            style={{
-              top: `${positionTimeline.y - 12}px`, // Adjust for vertical alignment
-              left: 0, // Position on the left side
-            }}
-          >
-            {calculateTime(positionTimeline.y)}
-          </div>
-        </>
-      )}
-
       {/* Selection Highlight */}
       {selectionStart !== null && selectionEnd !== null && (
         <div
@@ -171,10 +160,42 @@ const BaseColumn = ({ events, className, id }: BaseColumnProps) => {
       ))}
 
       {events.map((event, i) => (
-        <EventBlock key={i} event={event} timeScale={timeScale} />
+        <EventBlock
+          key={i}
+          event={event}
+          timeScale={timeScale}
+          setEventBlockClick={setIsClicked}
+        />
       ))}
+
+      {/* Conditionally render the line based on isHovering */}
+      {!isClicked && isHovering && !isSelecting && (
+        <>
+          {/* Horizontal Line */}
+          <div
+            className={"bg-foreground/80 absolute z-50 h-[1px] w-full"}
+            style={{
+              top: `${positionTimeline.y}px`,
+            }}
+            onClick={() => {
+              console.log("click in basedColumn in line");
+            }}
+          />
+
+          {/* Time Display */}
+          <div
+            className={
+              "text-foreground bg-background absolute z-50 rounded-r-sm p-1 text-xs"
+            }
+            style={{
+              top: `${positionTimeline.y - 12}px`, // Adjust for vertical alignment
+              left: 0, // Position on the left side
+            }}
+          >
+            {calculateTime(positionTimeline.y)}
+          </div>
+        </>
+      )}
     </div>
   );
 };
-
-export default BaseColumn;

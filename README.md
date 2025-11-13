@@ -29,7 +29,8 @@
 - default categories of programs (_program->categories_->states(flow,work,idle,distraction)) => Settings of categories
 - activity tracking
 - auto & self flow-sessions, breaks
-- flow-sessions, breaks(idle), meeting, workout(duration changing) (details, daily summary). (*)
+- flow-sessions, breaks(idle), meeting, workout(duration changing) (details, daily summary) showState in
+  StateOfFlow. (*)
 - stoping distractions
 - go cloud
 - set client projects and tasks

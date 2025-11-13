@@ -10,11 +10,18 @@ import {
 import ScheduleDashboard from "@/pages/home/components/schedule dashboard";
 import { useHydrateStore } from "@/lib/zustand/hydrate-store.ts";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
+import EventBlockDetails from "@/pages/home/components/schedule dashboard/EventBlockDetails.tsx";
+import { useBasicStore } from "@/lib/zustand/basic-store.ts";
 
 function Home() {
   const currentDay = useHydrateStore((state) => state.currentDay);
   const groupedPrograms = useSettingStore((state) => state.groupedPrograms);
   const categoriesStates = useSettingStore((state) => state.categoryStates);
+
+  const eventBlockDetailsPosition = useBasicStore(
+    (state) => state.eventBlockDetailsPosition,
+  );
+  const eventBlockDetails = useBasicStore((state) => state.eventBlockDetails);
 
   const awayFromKeyboard = async () => {
     return listen("afk", async (event: Event<HeartbeatStopTypes>) => {
@@ -141,6 +148,11 @@ function Home() {
         <div className="row-span-16 flex justify-start gap-6">
           <ScheduleDashboard /> {/* show activities */}
           <ActivitiesSummaryDemo /> {/*summary of activities*/}
+          {/*  activity details */}
+          <EventBlockDetails
+            startPosition={eventBlockDetailsPosition}
+            details={eventBlockDetails}
+          />
         </div>
       </div>
     </div>

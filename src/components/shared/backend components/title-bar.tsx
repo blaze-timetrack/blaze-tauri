@@ -10,11 +10,16 @@ import {
 import { useCallback } from "react";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
+import { emit } from "@tauri-apps/api/event";
+import { quitApp } from "@/lib/utils.ts";
 
 function TitleBar() {
   const appWindow = getCurrentWindow();
   const autostart = useSettingStore((state) => state.autostart);
   const setAutostart = useSettingStore((state) => state.setAutostart);
+
+  const showWidget = useSettingStore((state) => state.showWidget);
+  const setShowWidget = useSettingStore((state) => state.setShowWidget);
 
   const handleMenuClick = useCallback(async () => {
     const fileSubmenu = await Submenu.new({
@@ -63,7 +68,7 @@ function TitleBar() {
           id: "exit",
           text: "Exit",
           accelerator: "Ctrl+Q",
-          action: () => appWindow.hide(),
+          action: () => quitApp(),
         }),
       ],
     });
@@ -205,12 +210,18 @@ function TitleBar() {
     const widgetSubmenu = await Submenu.new({
       text: "Widget",
       items: [
-        await MenuItem.new({
+        await CheckMenuItem.new({
           id: "show_widget",
           text: "Show On Desktop",
           accelerator: "Ctrl+Shift+W",
+          checked: showWidget,
           action: () => {
-            console.log("Redo clicked");
+            if (showWidget) {
+              setShowWidget(false);
+            } else {
+              setShowWidget(true);
+            }
+            emit("showWidget", showWidget);
           },
         }),
       ],

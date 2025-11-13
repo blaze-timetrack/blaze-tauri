@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect } from "react";
 import spacetime from "spacetime";
+import { invoke } from "@tauri-apps/api/core";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,6 +12,10 @@ export function cn(...inputs: ClassValue[]) {
 export const reloadWidget = async () => {
   await emit("reload", { windowLabel: "widget" });
 };
+
+export async function quitApp() {
+  await invoke("quit_app");
+}
 
 export const reloadMain = async () => {
   await emit("reload", { windowLabel: "main" });

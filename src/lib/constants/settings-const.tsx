@@ -148,4 +148,16 @@ export const availableMusic = [
     name: "Pal Pal",
     value: "8of5w7RgcTc",
   },
+  {
+    name: "Kiliye Kiliye",
+    value: "Qk5rfuCTU9U",
+  },
+  {
+    name: "चलना है दूर मुसाफिर",
+    value: "oA8kYJOx",
+  },
+  {
+    name: "ना मैं धर्मी नाहिं अधर्मी",
+    value: "_nL3zbCjVZc",
+  },
 ];

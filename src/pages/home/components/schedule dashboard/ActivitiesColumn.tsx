@@ -1,4 +1,4 @@
-import BaseColumn from "./BaseColumn.tsx";
+import { BaseColumn } from "./BaseColumn.tsx";
 import { Event } from "./index.tsx";
 
 interface ActivitiesColumnProps {

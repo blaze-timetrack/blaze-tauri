@@ -35,6 +35,12 @@ pub fn get_systems_timezone() -> String {
 
     format!("{}", current_time)
 }
+
+#[tauri::command]
+pub fn quit_app() {
+    std::process::exit(0);
+}
+
 // -> Result<Value, String>
 // #[tauri::command]
 // async fn get_programs() {

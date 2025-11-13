@@ -8,6 +8,11 @@ export interface BasicStore {
   stateMeetingTimer: number;
   stateFlowValue: StateFlowValueTypes | null;
   commandOpen: boolean;
+  eventBlockDetails: any; // add types
+  eventBlockDetailsPosition: {
+    x: number;
+    y: number;
+  };
   setSettingTab: (settingTab: string) => void;
   setStateFlowValue: (stateFlowValue: StateFlowValueTypes) => void;
   setStateTrackingTimer: (stateTrackingTimer: number) => void;
@@ -15,6 +20,11 @@ export interface BasicStore {
   setStateBreakTimer: (stateBreakTimer: number) => void;
   setStateMeetingTimer: (stateMeetingTimer: number) => void;
   setCommandOpen: (commandOpen: boolean) => void;
+  setEventBlockDetails: (blockDetails: any) => void;
+  setEventBlockDetailsPosition: (eventBlockDetailsPosition: {
+    x: number;
+    y: number;
+  }) => void;
 }
 
 interface StateFlowValueTypes {
@@ -38,6 +48,11 @@ export const useBasicStore = create<BasicStore>((set) => ({
   stateBreakTimer: 0,
   stateMeetingTimer: 0,
   commandOpen: false,
+  eventBlockDetails: null,
+  eventBlockDetailsPosition: {
+    x: 0,
+    y: 0,
+  },
   setSettingTab: (settingTab) => {
     set({ settingTab });
   },
@@ -58,5 +73,11 @@ export const useBasicStore = create<BasicStore>((set) => ({
   },
   setCommandOpen: (commandOpen: boolean) => {
     set({ commandOpen });
+  },
+  setEventBlockDetails: (eventBlockDetails) => {
+    set({ eventBlockDetails });
+  },
+  setEventBlockDetailsPosition: (eventBlockDetailsPosition) => {
+    set({ eventBlockDetailsPosition });
   },
 }));

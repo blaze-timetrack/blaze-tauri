@@ -186,6 +186,7 @@ export interface SettingsStore {
   theme: ThemeTypes;
   themeMode: ThemeModeTypes;
   autostart: boolean;
+  showWidget: boolean;
   timezone: ITimezoneOption;
   currentTime12: boolean;
   currentTimeStart: number;
@@ -209,6 +210,7 @@ export interface SettingsStore {
   setTheme: (theme: ThemeTypes) => Promise<void>;
   setThemeMode: (themeMode: ThemeModeTypes) => Promise<void>;
   setAutostart: (autostart: boolean) => Promise<void>;
+  setShowWidget: (showWidgets: boolean) => Promise<void>;
   setTimezone: (timezone: ITimezoneOption) => Promise<void>;
   setCurrentTime12: (currentTime12: boolean) => Promise<void>;
   setState: (state: StateTypes) => Promise<void>;
@@ -231,6 +233,7 @@ export const useSettingStore = create<SettingsStore>((set) => ({
   theme: "system",
   themeMode: "default",
   autostart: true,
+  showWidget: true,
   timezone: {
     value: Intl.DateTimeFormat().resolvedOptions().timeZone,
     label: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -367,6 +370,18 @@ export const useSettingStore = create<SettingsStore>((set) => ({
 
     await tauriStore.set("autostart", autostart);
   },
+  setShowWidget: async (showWidget) => {
+    const closedWidgetState = (await tauriStore.get("showWidget")) as boolean;
+    const realValue = useSettingStore.getState().showWidget;
+    if (closedWidgetState !== realValue) {
+      set({ showWidget: true });
+      return;
+    }
+
+    set({ showWidget });
+
+    await tauriStore.set("showWidget", showWidget);
+  },
   setTimezone: async (timezone: ITimezoneOption) => {
     set({ timezone });
     await tauriStore.set("timezone", timezone);
@@ -436,6 +451,7 @@ const hydrate = async () => {
   const theme = (await tauriStore.get("theme")) as ThemeTypes;
   const themeMode = (await tauriStore.get("themeMode")) as ThemeModeTypes;
   const autostart = (await tauriStore.get("autostart")) as boolean;
+  const showWidget = (await tauriStore.get("showWidget")) as boolean;
   const timezone = (await tauriStore.get("timezone")) as ITimezone;
   const state = (await tauriStore.get("state")) as StateTypes;
   const defaultFlowTimerCheck = (await tauriStore.get(
@@ -463,6 +479,7 @@ const hydrate = async () => {
     .enum(["default", "mono", "catppuccin"])
     .safeParse(themeMode);
   const parsedAutostart = z.boolean().safeParse(autostart);
+  const parsedShowWidget = z.boolean().safeParse(showWidget);
   const parsedTimezone =
     z
       .object({
@@ -552,6 +569,9 @@ const hydrate = async () => {
   }
   if (parsedAutostart.success) {
     useSettingStore.setState({ autostart: parsedAutostart.data });
+  }
+  if (parsedShowWidget.success) {
+    useSettingStore.setState({ showWidget: parsedShowWidget.data });
   }
   if (parsedTimezone.success) {
     // @ts-ignore

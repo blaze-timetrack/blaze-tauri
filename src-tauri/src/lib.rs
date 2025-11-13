@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::Duration;
 use std::{env, result};
-use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, Env, LogicalPosition, PhysicalSize, Runtime};
+use tauri::{menu::{Menu, MenuItem}, utils::TitleBarStyle, AppHandle, Emitter, Env, Listener, LogicalPosition, PhysicalSize, Runtime};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
@@ -21,7 +21,7 @@ use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use tokio::time;
 use track::installed_app::{get_apps_via_powershell, get_installed_applications};
-use utils::commands::{freeze_mouse, get_systems_timezone, greet};
+use utils::commands::{freeze_mouse, get_systems_timezone, greet, quit_app};
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 use windows::core::Interface;
 
@@ -93,12 +93,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                         settings.cast::<ICoreWebView2Settings6>().unwrap();
                     settings.SetIsSwipeNavigationEnabled(false).unwrap();
                     settings.SetAreDefaultContextMenusEnabled(false).unwrap();
-                    settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
+                    // settings.SetIsBuiltInErrorPageEnabled(false).unwrap();
                     settings.SetAreDefaultScriptDialogsEnabled(false).unwrap();
-                    // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                     // settings.SetAreDevToolsEnabled(true).unwrap();
                 })
                 .unwrap();
+
+            let store = app.store(".settings.dat")
+                .expect("Failed to load store.");
+            let show_widget = store.get("showWidget").unwrap_or(serde_json::Value::Bool(true));
 
             if let Some(monitor) = widget_window.primary_monitor().unwrap() {
                 let monitor_size = monitor.size();
@@ -115,6 +119,33 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     .set_position(widget_position)
                     .expect("failed to set position");
             }
+
+            if (show_widget.as_bool().unwrap()) {
+                widget_window.show().unwrap();
+            } else {
+                widget_window.hide().unwrap();
+            }
+
+            let app_handle_clone = app.handle().clone();
+            let value = store.clone();
+            app.listen("showWidget", move |e| {
+                if let Ok(show) = e.payload().parse::<bool>() {
+                    println!("Received event payload: {}", show);
+                    let widget_window = app_handle_clone.get_webview_window("widget").unwrap();
+                    if show {
+                        if (widget_window.is_visible().unwrap()) {
+                            widget_window.hide().unwrap();
+                        } else {
+                            widget_window.show().unwrap();
+                            value.clone().set("showWidget", true)
+                        }
+                    } else {
+                        widget_window.show().unwrap();
+                    }
+                } else {
+                    println!("Received event with no payload!");
+                }
+            });
 
             // style
             main_window.set_decorations(false)?;
@@ -137,7 +168,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     settings.SetAreDefaultContextMenusEnabled(false).unwrap();
                     settings.SetIsGeneralAutofillEnabled(false).unwrap();
                     settings.SetIsWebMessageEnabled(false).unwrap();
-                    // settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
+                    settings.SetAreBrowserAcceleratorKeysEnabled(false).unwrap();
                     settings.SetAreDevToolsEnabled(true).unwrap();
                 })
                 .unwrap();
@@ -176,6 +207,14 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                         let _ = main_window.hide();
                     }
                 });
+
+                widget_window.clone().on_window_event(move |event| {
+                    if let WindowEvent::CloseRequested { api, .. } = event {
+                        api.prevent_close();
+                        let _ = widget_window.hide();
+                        store.clone().set("showWidget", false)
+                    }
+                });
             }
 
             // utils::notification::show_notification(app.handle())?;
@@ -202,6 +241,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             get_installed_applications,
             get_apps_via_powershell,
             freeze_mouse,
+            quit_app,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

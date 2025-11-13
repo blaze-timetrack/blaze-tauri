@@ -1,16 +1,33 @@
 import { cn } from "@/lib/utils.ts";
 import { Event } from "./index.tsx";
 import { useSettingStore } from "@/lib/zustand/setting-store.ts";
-import { Card } from "@/components/ui/card.tsx";
-import { CommandLoading } from "cmdk";
+import { useBasicStore } from "@/lib/zustand/basic-store.ts";
+import React from "react";
 
 interface EventBlockProps {
   event: Event;
   timeScale: number;
+  setEventBlockClick: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EventBlock = ({ event, timeScale }: EventBlockProps) => {
+const EventBlock = ({
+  event,
+  timeScale,
+  setEventBlockClick,
+}: EventBlockProps) => {
   const zoomLevel = useSettingStore((state) => state.zoomLevel);
+
+  const eventBlockDetailsPosition = useBasicStore(
+    (state) => state.eventBlockDetailsPosition,
+  );
+  const eventBlockDetails = useBasicStore((state) => state.eventBlockDetails);
+  const setEventBlockDetailsPosition = useBasicStore(
+    (state) => state.setEventBlockDetailsPosition,
+  );
+  const setEventBlockDetails = useBasicStore(
+    (state) => state.setEventBlockDetails,
+  );
+
   // Calculate position and height based on start and end times
   const getTimePosition = (timeString: string) => {
     let [hours, minutes, seconds] = timeString.split(":").map(Number);
@@ -38,6 +55,24 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
 
   const heightInMin = height / 2 < 15;
 
+  const handleLeftClick = (e) => {
+    console.log("left click mouse");
+    if (e.button === 0) {
+      setEventBlockDetailsPosition({
+        y: startPosition + 172, // (adding all upper components' height)
+        x: endPosition + 75,
+      });
+    }
+    // Execute your function here
+  };
+
+  const handleMouseLeave = () => {
+    setEventBlockDetailsPosition({
+      x: 0,
+      y: 0,
+    });
+  };
+
   return (
     <div className="group">
       <div
@@ -51,6 +86,13 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
           "text-background/80 absolute rounded-md pl-2 transition-all hover:brightness-110",
           event.blockColor,
         )}
+        onClick={(e) => {
+          console.log("click in event block");
+          if (e.button === 0) {
+            setEventBlockClick(true);
+          }
+        }}
+        onMouseLeave={handleMouseLeave}
       >
         <h3 className={cn(`mt-2 text-sm font-medium`, heightInMin && "hidden")}>
           {event.title}
@@ -59,26 +101,8 @@ const EventBlock = ({ event, timeScale }: EventBlockProps) => {
           {event.startTime.slice(0, -3)} - {event.endTime.slice(0, -3)}
         </div>
       </div>
-      <div className={cn("hidden group-hover:block")}>
-        <EventBlockDetails startPosition={startPosition} />
-      </div>
     </div>
   );
 };
 
 export default EventBlock;
-
-const EventBlockDetails = ({ startPosition }) => {
-  return (
-    <Card
-      style={{
-        top: `${startPosition}px`,
-      }}
-      className={cn(
-        "text-background/80 absolute left-11/12 z-50 w-2xs rounded-md bg-black pl-2",
-      )}
-    >
-      <CommandLoading />
-    </Card>
-  );
-};
