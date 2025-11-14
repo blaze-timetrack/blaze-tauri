@@ -84,9 +84,9 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE0M0UwMjNCMTFGOTFCNTUKUldSVkcva1JPd0krRkR4dEFHbkZGVGYyQ2tORUZDRklzWkgvRU50UjN3dlRUNHlOY3ZBN3RCOVMK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM1QTk4MDI0Q0VGQjk0QTkKUldTcGxQdk9KSUNwTlFPbzVWbDBWeGFWbGtQVEMxRFE1UjBCS3BoL3lURnpoWFcyUk0vd0tpaysK",
       "endpoints": [
-        "https://github.com/blaze-timetrack/blaze-tauri/releases/latest/download/latest.json"
+        "https://gist.githubusercontent.com/GrvExplorer/0f05011bde0ed188120240909932d099/raw/a889546b84912aa8fb026a1a36333a2e15b21f0e/latest.json"
       ]
     }
   }

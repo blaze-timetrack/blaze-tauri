@@ -18,6 +18,7 @@ use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_sql::Migration;
 use tauri_plugin_sql::MigrationKind;
 use tauri_plugin_store::StoreExt;
+use tauri_plugin_updater::UpdaterExt;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use tokio::time;
 use track::installed_app::{get_apps_via_powershell, get_installed_applications};
@@ -74,7 +75,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                update(handle).await.unwrap();
+            });
+
             let main_window = app.get_webview_window("main").unwrap();
             // @todo add only to desktop
             let widget_window = app.get_webview_window("widget").unwrap();
@@ -304,4 +311,26 @@ async fn background_track<R: Runtime>(app_data_dir: PathBuf, app_handle: tauri::
             tauri::process::restart(&env)
         }
     }
+}
+
+
+async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
+    println!("Updating..");
+
+    if let Ok(Some(update)) = app.updater()?.check().await {
+        println!("update available...");
+        let mut download = 0;
+        update.download_and_install(|chunk_length, content_length| {
+            download += chunk_length;
+            println!("Downloaded chunk length: {}", download);
+        }, || {
+            println!("Downloaded finished");
+        }).await?;
+        println!("update finished");
+
+        app.restart();
+    } else {
+        println!("No update available");
+    }
+    Ok(())
 }
