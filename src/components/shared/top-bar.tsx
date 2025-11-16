@@ -39,7 +39,7 @@ function TopBar() {
       </div>
 
       <div>
-        <p className={"text-2xl font-bold uppercase"}>Blaze</p>
+        <p className={"text-2xl font-bold uppercase"}>Blaze v0.3.4</p>
       </div>
 
       {/* profile */}

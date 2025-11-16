@@ -1,6 +1,6 @@
 [package]
 name = "Blaze"
-version = "0.3.3"
+version = "0.3.4"
 description = "A Tauri App"
 authors = ["GrvExplorer, Inc."]
 edition = "2021"

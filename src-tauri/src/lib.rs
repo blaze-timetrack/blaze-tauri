@@ -79,7 +79,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .setup(|app| {
             let handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
-                update(handle).await.unwrap();
+                update(handle).await.expect("TODO: panic message");
             });
 
             let main_window = app.get_webview_window("main").unwrap();
@@ -322,15 +322,14 @@ async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
         let mut download = 0;
         update.download_and_install(|chunk_length, content_length| {
             download += chunk_length;
-            println!("Downloaded chunk length: {}", download);
+            println!("Downloaded chunk length: {}, content: {:?}", download, content_length);
         }, || {
             println!("Downloaded finished");
         }).await?;
-        println!("update finished");
 
-        app.restart();
+        println!("update finished");
     } else {
-        println!("No update available");
+        println!("update not available");
     }
     Ok(())
 }

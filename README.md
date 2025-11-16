@@ -78,10 +78,6 @@ _ui_
 
 - integrating with other tracking app or importing tracking data
 
-**_Categories on and off auto_**
-
- <img src="./public/categorie_auto.png">
-
 ## Essential Add-Ons
 
 - Payment Gateway
